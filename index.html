@@ -2318,6 +2318,34 @@
             }
         }
         
+        /**
+         * Calculate monthly loan payments for 0% and 15% APR over 5-year term
+         * @param {number} principal - Loan amount (net cost after incentives)
+         * @returns {object} Object with formatted monthly payment strings
+         */
+        function calculateFinancing(principal) {
+            if (principal <= 0) {
+                return { zeroPercent: '$0', fifteenPercent: '$0' };
+            }
+            
+            const months = 60; // 5-year term
+            
+            // 0% APR - Simple division
+            const zeroPercentPayment = principal / months;
+            
+            // 15% APR - Use standard loan payment formula: P * [r(1+r)^n] / [(1+r)^n - 1]
+            const annualRate = 0.15;
+            const monthlyRate = annualRate / 12;
+            const fifteenPercentPayment = principal * 
+                (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+                (Math.pow(1 + monthlyRate, months) - 1);
+            
+            return {
+                zeroPercent: `$${Math.round(zeroPercentPayment).toLocaleString()}`,
+                fifteenPercent: `$${Math.round(fifteenPercentPayment).toLocaleString()}`
+            };
+        }
+        
         function generateCostSummary(recommendations) {
             const selected = recommendations.filter(r => r.selected);
             const all = recommendations;
@@ -2339,6 +2367,10 @@
                 fullIncentives += r.totalIncentives || 0;
             });
             const fullNet = fullCost - fullIncentives;
+            
+            // Calculate financing options for net costs
+            const selectedFinancing = calculateFinancing(selectedNet);
+            const fullFinancing = calculateFinancing(fullNet);
             
             return `
                 <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Cost Summary</h3>
@@ -2363,6 +2395,21 @@
                             <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
                                 ${Math.round((selectedIncentives / selectedCost) * 100) || 0}% covered by incentives
                             </div>
+                            ${selectedNet > 0 ? `
+                                <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <h5 style="margin: 0 0 0.75rem 0; color: var(--brand); font-size: 0.95rem;">💳 Financing Options (5-year term)</h5>
+                                    <div style="display: grid; gap: 0.5rem; font-size: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>0% APR:</span>
+                                            <strong style="color: var(--success);">${selectedFinancing.zeroPercent}/month</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>15% APR:</span>
+                                            <strong>${selectedFinancing.fifteenPercent}/month</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                     
@@ -2386,6 +2433,21 @@
                             <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
                                 ${Math.round((fullIncentives / fullCost) * 100) || 0}% covered by incentives
                             </div>
+                            ${fullNet > 0 ? `
+                                <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <h5 style="margin: 0 0 0.75rem 0; color: var(--accent-dark); font-size: 0.95rem;">💳 Financing Options (5-year term)</h5>
+                                    <div style="display: grid; gap: 0.5rem; font-size: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>0% APR:</span>
+                                            <strong style="color: var(--success);">${fullFinancing.zeroPercent}/month</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>15% APR:</span>
+                                            <strong>${fullFinancing.fifteenPercent}/month</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 </div>

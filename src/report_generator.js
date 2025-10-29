@@ -514,7 +514,33 @@ class ReportGenerator {
                     </table>
                 </div>
 
-                <h3>💳 Financing Options</h3>
+                <h3>💳 Financing Calculator</h3>
+                <div class="financing-calculator">
+                    <p>Estimated monthly payments for your net cost of <strong>$${netCost.toLocaleString()}</strong> over a 5-year term:</p>
+                    <table class="financing-table">
+                        <tr class="table-header">
+                            <th>Interest Rate</th>
+                            <th>Monthly Payment</th>
+                            <th>Total Paid</th>
+                            <th>Total Interest</th>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>0% APR</strong></td>
+                            <td class="payment-value"><strong>$${Math.round(netCost / 60).toLocaleString()}/month</strong></td>
+                            <td>$${netCost.toLocaleString()}</td>
+                            <td class="savings-value">$0</td>
+                        </tr>
+                        <tr>
+                            <td>15% APR</td>
+                            <td class="payment-value">$${this.calculateMonthlyPayment(netCost, 0.15, 60).toLocaleString()}/month</td>
+                            <td>$${Math.round(this.calculateMonthlyPayment(netCost, 0.15, 60) * 60).toLocaleString()}</td>
+                            <td>$${Math.round((this.calculateMonthlyPayment(netCost, 0.15, 60) * 60) - netCost).toLocaleString()}</td>
+                        </tr>
+                    </table>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;"><em>Note: 0% financing may be available through Energy Trust or utility programs for qualified customers.</em></p>
+                </div>
+                
+                <h3 style="margin-top: 2rem;">Financing Programs</h3>
                 <div class="financing-options">
                     <div class="financing-card">
                         <h4>Energy Trust Financing</h4>
@@ -1117,6 +1143,26 @@ class ReportGenerator {
         const totalIncentives = (rec.availableIncentives || []).reduce((sum, inc) => sum + inc.amount, 0);
         return Math.max(0, rec.estimatedCost - totalIncentives);
     }
+    
+    /**
+     * Calculate monthly loan payment using standard loan formula
+     * @param {number} principal - Loan amount
+     * @param {number} annualRate - Annual interest rate (e.g., 0.15 for 15%)
+     * @param {number} months - Loan term in months
+     * @returns {number} Monthly payment amount
+     */
+    calculateMonthlyPayment(principal, annualRate, months) {
+        if (principal <= 0) return 0;
+        if (annualRate === 0) return Math.round(principal / months);
+        
+        const monthlyRate = annualRate / 12;
+        const payment = principal * 
+            (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+            (Math.pow(1 + monthlyRate, months) - 1);
+        
+        return Math.round(payment);
+    }
+
 
     getPriorityClass(priority) {
         if (priority.includes('CRITICAL')) return 'priority-critical';
