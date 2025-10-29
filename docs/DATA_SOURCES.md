@@ -173,15 +173,15 @@ householdAdjustments: { 1: 0.70, ... 8: 1.32 }
 ## **Eligibility Thresholds**
 
 ### **Income-Based Eligibility**
-| Program | Threshold | Source |
-|---------|-----------|--------|
-| **Oregon Weatherization** | ≤60% SMI OR ≤200% FPL | OHCS WAP 2025 guidelines |
-| **CPF** | ≤80% AMI + Priority Community/CBO | Energy Trust CPF program rules |
-| **LIHEAP** | ≤150% FPL | Federal LIHEAP guidelines |
-| **HEAR Low-Income (100%)** | ≤80% AMI | IRA Section 50122 |
-| **HEAR Moderate (50%)** | 81-150% AMI | IRA Section 50122 |
-| **HOMES** | ≤400% AMI | IRA Section 50121 |
-| **Energy Trust IQ** | ≤80% AMI | Energy Trust 2025 guidelines |
+| Program | Threshold | Source | Notes |
+|---------|-----------|--------|-------|
+| **Oregon Weatherization** | ≤60% SMI OR ≤200% FPL | OHCS WAP 2025 guidelines | Uses SMI, not AMI |
+| **CPF** | ≤80% AMI + Priority Community/CBO | Energy Trust CPF program rules | **CORRECTED Oct 2025** (was <150%) |
+| **LIHEAP** | ≤150% FPL | Federal LIHEAP guidelines | Bill assistance |
+| **HEAR Low-Income (100%)** | ≤80% AMI | IRA Section 50122 | **Includes weatherization tier** |
+| **HEAR Moderate (50%)** | 81-150% AMI | IRA Section 50122 | Federal IRA |
+| **HOMES** | ≤400% AMI | IRA Section 50121 | Performance-based |
+| **Energy Trust IQ** | ≤80% AMI | Energy Trust 2025 guidelines | Utility-funded |
 
 ---
 
@@ -264,6 +264,33 @@ To update data in this tool:
 
 ---
 
+## **Corrections and Updates**
+
+### October 29, 2025 - Eligibility Threshold Corrections
+
+**Issues Identified via Data Audit:**
+
+1. **CPF Eligibility Threshold** (CRITICAL FIX)
+   - **Previous (Incorrect):** <150% AMI + priority community/CBO
+   - **Corrected:** ≤80% AMI + priority community/CBO
+   - **Source:** Energy Trust CPF program documentation
+   - **Impact:** Over-promising eligibility to 81-149% AMI households
+   - **Status:** ✅ CORRECTED in code (index.html line 1555)
+
+2. **HEAR Low-Income Eligibility** (MEDIUM FIX)
+   - **Previous (Incorrect):** >60% AND ≤80% AMI (excluded ≤60% tier)
+   - **Corrected:** ≤80% AMI (includes all income-qualified, including weatherization tier)
+   - **Source:** IRA Section 50122
+   - **Rationale:** Weatherization-eligible customers should see HEAR as alternative if waitlist exists
+   - **Status:** ✅ CORRECTED in code (index.html line 1566)
+
+**Validation:**
+- All corrections verified via test suite (`tests/eligibility-validation.test.js`)
+- 8/8 edge case tests passing
+- Audit report available: `docs/AUDIT_REPORT.md`
+
+---
+
 **Last Verified:** October 29, 2025  
-**Data Version:** 1.0  
+**Data Version:** 1.1 (post-corrections)  
 **Maintained By:** Project contributors

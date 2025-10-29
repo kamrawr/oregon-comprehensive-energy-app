@@ -950,7 +950,8 @@
                     <h4>Income Eligibility Assessment</h4>
                     <p>This information helps us determine which energy assistance programs you qualify for. All information is confidential.</p>
                     <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
-                        Results are estimates only. Contact program administrators for official eligibility determination.
+                        Results are estimates only. Contact program administrators for official eligibility determination.<br>
+                        <strong>Using 2025 Data:</strong> HUD Income Limits, HHS Poverty Guidelines | Last verified: Oct 29, 2025
                     </p>
                 </div>
 
@@ -1306,8 +1307,9 @@
                 To apply for programs or verify eligibility, please contact the respective program administrators using the contact information provided in your assessment results.
             </p>
             <p style="font-size: 0.85rem; color: #888; margin: 0.75rem 0 0 0; font-style: italic;">
-                Data sources: 2025 HUD Income Limits, Federal Poverty Guidelines, Energy Trust program guidelines, and publicly available program documentation. 
-                Last updated: 2025. Use at your own discretion.
+                <strong>Data Sources:</strong> 2025 HUD Income Limits, Federal Poverty Guidelines, Energy Trust program guidelines, and publicly available program documentation.<br>
+                <strong>Last Verified:</strong> October 29, 2025 | <strong>Data Version:</strong> 1.0 | <strong>Next Review:</strong> December 2025<br>
+                Use at your own discretion. Verify all amounts with official program administrators.
             </p>
         </div>
     </div>
@@ -1324,7 +1326,13 @@
         };
 
         // ===== OREGON DATA (2025 OFFICIAL) =====
-        // Source: oregon-income-calculator repo (2025 HUD Income Limits)
+        // All data sourced from official government agencies - see docs/DATA_SOURCES.md
+        // Last verified: October 2025
+        
+        // 2025 Area Median Income (AMI) by County
+        // Source: HUD Income Limits 2025 | oregon-income-calculator repo
+        // Reference: https://www.huduser.gov/portal/datasets/il.html
+        // Used for: Energy Trust, CPF, HEAR, HOMES eligibility
         const oregonCounties = {
             "Baker County": { ami: 55800 },
             "Benton County": { ami: 76900 },
@@ -1365,18 +1373,27 @@
         };
 
         // 2025 Federal Poverty Guidelines (HHS)
+        // Source: U.S. Department of Health & Human Services
+        // Reference: https://aspe.hhs.gov/poverty-guidelines
+        // Used for: LIHEAP, Weatherization eligibility determination
         const fplData = {
             1: 15060, 2: 20440, 3: 25820, 4: 31200,
             5: 36580, 6: 41960, 7: 47340, 8: 52720
         };
 
         // 2025 Household size adjustments for AMI/SMI
+        // Source: HUD Income Limits methodology
+        // Adjusts county/state median incomes for household size
+        // 4-person household = 1.00 (base), others scaled accordingly
         const householdAdjustments = {
             1: 0.70, 2: 0.80, 3: 0.90, 4: 1.00,
             5: 1.08, 6: 1.16, 7: 1.24, 8: 1.32
         };
 
-        // 2025 Oregon State Median Income
+        // 2025 Oregon State Median Income (4-person household)
+        // Source: Oregon OHCS 2025
+        // Used for: Weatherization eligibility (uses SMI, not AMI)
+        // IMPORTANT: Weatherization uses SMI ≤60%, NOT AMI
         const oregonSMI = 78600;
 
         // ===== INITIALIZATION =====
@@ -1544,11 +1561,15 @@
             appState.eligibilityResults = {
                 // Core income-based programs (LIHEAP is federal but not part of opt-out - it's bill assistance)
                 liheap: !optOutFederal && percentages.fpl <= 150,
-                // CORRECTED: Weatherization uses ≤60% SMI (not AMI) or ≤200% FPL - FILTERED if opt-out
+                
+                // Weatherization uses ≤60% SMI (not AMI) or ≤200% FPL - FILTERED if opt-out
+                // Source: DATA_SOURCES.md line 178 | OHCS WAP 2025 guidelines
                 weatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),
                 
-                // CPF eligibility: <150% AMI + (priority community OR CBO) - FILTERED if opt-out (federally-funded no-cost track)
-                cpfEligible: !optOutFederal && percentages.ami < 150 && (isPriorityCommunity || workingWithCBO),
+                // CORRECTED: CPF eligibility ≤80% AMI + (priority community OR CBO) - FILTERED if opt-out
+                // Source: DATA_SOURCES.md line 179 | Energy Trust CPF program rules
+                // Previous incorrect threshold: <150% AMI (audit correction Oct 2025)
+                cpfEligible: !optOutFederal && percentages.ami <= 80 && (isPriorityCommunity || workingWithCBO),
                 
                 // Standard income-qualified (Energy Trust is utility/state-funded, NOT federal)
                 energyTrust: percentages.ami <= 80,
@@ -1556,7 +1577,10 @@
                 firstTimeHomebuyer: percentages.ami <= 120,
                 
                 // HEAR eligibility - ALL INCOME TIERS can access HEAR - FILTERED if opt-out (federal IRA program)
-                hearLowIncome: !optOutFederal && percentages.ami > 60 && percentages.ami <= 80,    // 100% HEAR
+                // CORRECTED: Include all ≤80% AMI (including weatherization tier ≤60%)
+                // Source: IRA Section 50122, incentive_eligibility_map.json line 43
+                // Rationale: Weatherization-eligible customers can choose HEAR if waitlist exists
+                hearLowIncome: !optOutFederal && percentages.ami <= 80,    // 100% HEAR (all ≤80% AMI)
                 hearModerate: !optOutFederal && percentages.ami > 80 && percentages.ami <= 150,    // 50% HEAR
                 hearWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),  // Can access HEAR even with OHCS
                 
