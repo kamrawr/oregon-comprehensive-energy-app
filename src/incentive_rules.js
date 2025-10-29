@@ -27,24 +27,72 @@
  * CPF amounts may exceed remaining costs to provide customer assurance.
  */
 
+// Load ConfigLoader
+const ConfigLoader = require('./config_loader');
+
 class IncentiveRules {
     constructor() {
-        // Income tier thresholds
+        // Load configuration synchronously (for Node.js environment and tests)
+        const configLoader = new ConfigLoader();
+        try {
+            const config = configLoader.loadConfigSync();
+            this.config = config;
+            this.incomeThresholds = config.income_thresholds;
+            this.programCaps = {
+                HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
+                HEAR_MODERATE: config.program_caps.hear_household_cap,
+                HOMES_MIN: config.program_caps.homes_modeled_min,
+                HOMES_MAX: config.program_caps.homes_modeled_max,
+                HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
+                CERTA_MAX: config.program_caps.certa_household_cap
+            };
+            this.homesCoverageRules = config.homes_coverage_rules;
+            this.measureIncentives = config.measure_incentives;
+            this.certaEligibleMeasures = config.certa_eligible_measures || [];
+            this.homesAllocationPriority = config.homes_allocation_priority || [];
+        } catch (error) {
+            console.warn('⚠️  Config load failed, using fallback defaults:', error.message);
+            // Fallback to hardcoded defaults if config loading fails
+            this.incomeThresholds = {
+                weatherization_smi_max: 60,
+                weatherization_fpl_max: 200,
+                cpf_tier1_ami_max: 80,
+                hear_moderate_ami_min: 81,
+                hear_moderate_ami_max: 150
+            };
+            this.programCaps = {
+                HEAR_LOW_INCOME: 14000,
+                HEAR_MODERATE: 14000,
+                HOMES_MIN: 2000,
+                HOMES_MAX: 8000,
+                HOMES_FLEX_MAX: 10000,
+                CERTA_MAX: 2000
+            };
+            this.measureIncentives = null;
+            this.certaEligibleMeasures = [
+                'attic_insulation',
+                'wall_insulation',
+                'floor_insulation',
+                'air_sealing',
+                'duct_sealing'
+            ];
+            this.homesAllocationPriority = [
+                'health_safety_repairs',
+                'attic_insulation',
+                'wall_insulation',
+                'floor_insulation',
+                'air_sealing',
+                'window_replacement',
+                'duct_sealing'
+            ];
+        }
+        
+        // Income tier thresholds (these remain constant)
         this.tiers = {
-            WEATHERIZATION: 'weatherization',      // ≤60% AMI or ≤200% FPL - NO COST
+            WEATHERIZATION: 'weatherization',      // ≤60% SMI or ≤200% FPL - NO COST
             CPF_LOW_INCOME: 'cpf_low',            // 60-80% AMI - Enhanced + HEAR 100%
             HEAR_MODERATE: 'hear_moderate',        // 81-150% AMI - Standard + HEAR 50%
             STANDARD: 'standard'                   // >150% AMI - Standard only
-        };
-        
-        // Program-level caps (IRA federal programs)
-        this.programCaps = {
-            HEAR_LOW_INCOME: 14000,      // $14,000 household cap (≤80% or ≤150% FPL)
-            HEAR_MODERATE: 14000,         // $14,000 household cap (81-150% AMI)
-            HOMES_MIN: 2000,              // $2,000 minimum HOMES rebate
-            HOMES_MAX: 8000,              // $8,000 maximum HOMES rebate (whole-home modeled savings)
-            HOMES_FLEX_MAX: 10000,        // $10,000 HOMES flex funding for non-HEAR measures
-            CERTA_MAX: 2000               // $2,000 CERTA cap for enabling repairs
         };
     }
 
@@ -57,17 +105,20 @@ class IncentiveRules {
     getEligibilityTier(amiPercent, smiPercent, fplPercent) {
         // Priority 1: Weatherization (no-cost comprehensive)
         // Correct rule: ≤60% SMI (not AMI) or ≤200% FPL
-        if (smiPercent <= 60 || fplPercent <= 200) {
+        if (smiPercent <= this.incomeThresholds.weatherization_smi_max || 
+            fplPercent <= this.incomeThresholds.weatherization_fpl_max) {
             return this.tiers.WEATHERIZATION;
         }
         
         // Priority 2: CPF Income-Qualified (60-80% AMI)
-        if (amiPercent > 60 && amiPercent <= 80) {
+        if (amiPercent > this.incomeThresholds.weatherization_smi_max && 
+            amiPercent <= this.incomeThresholds.cpf_tier1_ami_max) {
             return this.tiers.CPF_LOW_INCOME;
         }
         
         // Priority 3: HEAR Moderate Income (81-150% AMI)
-        if (amiPercent > 80 && amiPercent <= 150) {
+        if (amiPercent > this.incomeThresholds.hear_moderate_ami_min && 
+            amiPercent <= this.incomeThresholds.hear_moderate_ami_max) {
             return this.tiers.HEAR_MODERATE;
         }
         
@@ -191,17 +242,10 @@ class IncentiveRules {
     }
     
     /**
-     * Check if measure is eligible for CERTA (insulation/sealing/duct projects only)
+     * Check if measure is eligible for CERTA (loaded from config)
      */
     isCERTAEligible(measureId) {
-        const certaMeasures = [
-            'attic_insulation',
-            'wall_insulation',
-            'floor_insulation',
-            'air_sealing',
-            'duct_sealing'
-        ];
-        return certaMeasures.includes(measureId);
+        return this.certaEligibleMeasures.includes(measureId);
     }
     
     /**
@@ -422,9 +466,15 @@ class IncentiveRules {
     }
 
     /**
-     * Define measure-specific incentive rules
+     * Get measure-specific incentive rules (loaded from config)
      */
     getMeasureRules() {
+        // If config was loaded successfully, use it
+        if (this.measureIncentives) {
+            return this.measureIncentives;
+        }
+        
+        // Fallback to hardcoded rules if config loading failed
         return {
             'heat_pump_ductless': {
                 cpf: { single_family: 1800, manufactured: 3500, multifamily: 2000 },
@@ -506,14 +556,14 @@ class IncentiveRules {
                 hear: 4000,
                 standard: 0,
                 homes_eligible: false,
-                certa_eligible: 2000
+                certa_eligible: true
             },
-            'electrical_wiring': {
-                cpf: null,
-                hear: 2500,
+            'health_safety_repairs': {
+                cpf: 'full',
+                hear: null,
                 standard: 0,
-                homes_eligible: false,
-                certa_eligible: 2000
+                homes_eligible: true,
+                certa_eligible: true
             }
         };
     }
@@ -764,16 +814,8 @@ class IncentiveRules {
         // Check if customer is moderate income (affects HOMES percentage)
         const isModerateIncome = customerTier === this.tiers.HEAR_MODERATE;
         
-        // Priority order for HOMES allocation
-        const priorityOrder = [
-            'health_safety_repairs',
-            'attic_insulation',
-            'wall_insulation', 
-            'floor_insulation',
-            'air_sealing',
-            'window_replacement',
-            'duct_sealing'
-        ];
+        // Priority order for HOMES allocation (loaded from config)
+        const priorityOrder = this.homesAllocationPriority;
         
         // Sort measures by priority
         const sortedMeasures = enrichedRecommendations
