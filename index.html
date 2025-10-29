@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oregon Comprehensive Energy Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --brand: #2c5530;
+            --brand-light: #5cb85c;
+            --accent: #3282b8;
+            --accent-dark: #0f4c75;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #2e2e2e;
+            --muted: #6b7280;
+            --success: #28a745;
+            --warning: #fd7e14;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .app-header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .app-header h1 {
+            color: var(--brand);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-header .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-light));
+            z-index: 1;
+            transition: width 0.5s ease;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .step.active .step-circle {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-align: center;
+            max-width: 120px;
+        }
+
+        .step.active .step-label {
+            color: var(--brand);
+        }
+
+        /* Main Content Card */
+        .main-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            min-height: 600px;
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .module-title {
+            color: var(--brand);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--brand-light);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e1ecf4;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--brand-light);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.1);
+            background: white;
+        }
+
+        .checkbox-group {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-label:hover {
+            background: #f3f4f6;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--brand-light);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            box-shadow: 0 10px 25px rgba(92, 184, 92, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(92, 184, 92, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* Results/Summary Styles */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card.highlight {
+            border-color: var(--brand-light);
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Eligibility badges */
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Recommendations Table */
+        .recommendations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .recommendations-table th {
+            background: var(--brand);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendations-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .recommendations-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .recommendations-table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Customer ID Display */
+        .customer-id-display {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .customer-id-display .id-label {
+            font-size: 0.9rem;
+            color: #1565c0;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .customer-id-display .id-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d47a1;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--brand-light);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .progress-steps {
+                flex-wrap: wrap;
+            }
+
+            .step {
+                flex-basis: 50%;
+                margin-bottom: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 2rem 0;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            background: #f8f9fa;
+            border-left: 4px solid var(--brand-light);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-panel h4 {
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-panel p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Priority indicators */
+        .priority-high {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: var(--warning);
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: var(--info);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- App Header -->
+        <div class="app-header">
+            <h1>🏠 Oregon Comprehensive Energy Assessment</h1>
+            <p class="subtitle">Complete energy efficiency evaluation with personalized incentive pathways</p>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step active" data-step="1" onclick="goToStep(1)">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Customer Intake</div>
+                </div>
+                <div class="step" data-step="2" onclick="goToStep(2)">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Income Qualification</div>
+                </div>
+                <div class="step" data-step="3" onclick="goToStep(3)">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Energy Assessment</div>
+                </div>
+                <div class="step" data-step="4" onclick="goToStep(4)">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Incentive Insights</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="main-card">
+            <!-- MODULE 1: Customer Intake -->
+            <div class="module active" id="module1">
+                <h2 class="module-title">Step 1: Customer Intake & Eligibility</h2>
+                
+                <div class="info-panel">
+                    <h4>Welcome to Your Energy Assessment</h4>
+                    <p>Let's start by gathering some basic information to determine your eligibility for energy assistance programs and create your customer profile.</p>
+                </div>
+
+                <form id="intakeForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control">
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Geographic & Program Information</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="county">Oregon County *</label>
+                            <select id="county" class="form-control" required>
+                                <option value="">Select your county...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="utilityProvider">Utility Provider *</label>
+                            <select id="utilityProvider" class="form-control" required>
+                                <option value="">Select your utility...</option>
+                                <option value="pge">Portland General Electric (PGE)</option>
+                                <option value="pacific_power">Pacific Power</option>
+                                <option value="nw_natural">NW Natural Gas</option>
+                                <option value="cascade">Cascade Natural Gas</option>
+                                <option value="avista">Avista</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="housingType">Housing Type *</label>
+                            <select id="housingType" class="form-control" required>
+                                <option value="">Select housing type...</option>
+                                <option value="single_family">Single Family Home</option>
+                                <option value="multi_family">Multi-Family</option>
+                                <option value="townhome">Townhome</option>
+                                <option value="manufactured">Manufactured Home</option>
+                                <option value="condo">Condominium</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ownershipStatus">Home Ownership *</label>
+                            <select id="ownershipStatus" class="form-control" required>
+                                <option value="">Select status...</option>
+                                <option value="own">Own</option>
+                                <option value="rent">Rent</option>
+                                <option value="landlord">Landlord (Own but don't live there)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Priority Needs Assessment</h3>
+                    
+                    <div class="form-group">
+                        <label>What are your primary energy concerns? (Select all that apply)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="high_bills">
+                                <span>High energy bills</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="comfort">
+                                <span>Home comfort (too hot/cold)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="drafts">
+                                <span>Drafts and air leaks</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="old_equipment">
+                                <span>Old or inefficient heating/cooling equipment</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="insulation">
+                                <span>Poor insulation</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="windows">
+                                <span>Old or inefficient windows</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="concerns" value="health">
+                                <span>Health and safety concerns</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="urgency">How urgent is your need for energy assistance?</label>
+                        <select id="urgency" class="form-control">
+                            <option value="immediate">Immediate - Critical need</option>
+                            <option value="high">High - Need soon</option>
+                            <option value="moderate">Moderate - Planning ahead</option>
+                            <option value="low">Low - Exploring options</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-primary" onclick="submitIntake()">
+                            Continue to Income Qualification →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- MODULE 2: Income Qualification -->
+            <div class="module" id="module2">
+                <h2 class="module-title">Step 2: Income Qualification</h2>
+                
+                <div class="customer-id-display" id="customerIdDisplay" style="display: none;">
+                    <div class="id-label">Your Customer ID</div>
+                    <div class="id-value" id="customerId"></div>
+                </div>
+
+                <div class="info-panel">
+                    <h4>Income Eligibility Assessment</h4>
+                    <p>This information helps us determine which energy assistance programs you qualify for. All information is confidential.</p>
+                </div>
+
+                <form id="incomeForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="householdSize">Household Size *</label>
+                            <select id="householdSize" class="form-control" required>
+                                <option value="1">1 person</option>
+                                <option value="2">2 people</option>
+                                <option value="3">3 people</option>
+                                <option value="4">4 people</option>
+                                <option value="5">5 people</option>
+                                <option value="6">6 people</option>
+                                <option value="7">7 people</option>
+                                <option value="8">8 people</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="income">Household Income *</label>
+                            <input type="number" id="income" class="form-control" min="0" step="100" placeholder="Enter amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="frequency">Income Frequency *</label>
+                            <select id="frequency" class="form-control" required>
+                                <option value="annual">Annual</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="biweekly">Biweekly</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Status *</label>
+                            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="radio" name="taxStatus" value="pretax" checked>
+                                    <span>Pre-tax (Gross)</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="radio" name="taxStatus" value="posttax">
+                                    <span>Post-tax (Net)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+                            ← Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="calculateIncome()">
+                            Calculate Eligibility
+                        </button>
+                    </div>
+                </form>
+
+                <div id="incomeResults" style="display: none;">
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Your Eligibility Results</h3>
+                    
+                    <div class="summary-grid" id="incomeSummary"></div>
+                    
+                    <div id="programEligibility"></div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+                            ← Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(3)">
+                            Continue to Energy Assessment →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 3: Energy Assessment -->
+            <div class="module" id="module3">
+                <h2 class="module-title">Step 3: Home Energy Assessment</h2>
+                
+                <div class="info-panel">
+                    <h4>Comprehensive Home Energy Evaluation</h4>
+                    <p>Provide details about your home's current condition and systems. Use "N/A" for unknown items.</p>
+                </div>
+
+                <form id="assessmentForm">
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Property Details</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="homeSquareFootage">Home Square Footage</label>
+                            <input type="number" id="homeSquareFootage" class="form-control" placeholder="e.g., 2000">
+                        </div>
+                        <div class="form-group">
+                            <label for="conditionedSpace">Conditioned Space (for HVAC sizing)</label>
+                            <input type="number" id="conditionedSpace" class="form-control" placeholder="e.g., 1800">
+                        </div>
+                        <div class="form-group">
+                            <label for="foundationType">Foundation Type</label>
+                            <select id="foundationType" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="slab">Slab</option>
+                                <option value="crawlspace">Crawlspace</option>
+                                <option value="basement_unfinished">Basement - Unfinished</option>
+                                <option value="basement_finished">Basement - Finished</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="roofCondition">Roof Condition</label>
+                            <select id="roofCondition" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="poor">Poor</option>
+                                <option value="fair">Fair</option>
+                                <option value="good">Good</option>
+                                <option value="excellent">Excellent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Building Envelope</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="atticInsulation">Attic Insulation</label>
+                            <select id="atticInsulation" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="none">None</option>
+                                <option value="poor">Poor</option>
+                                <option value="fair">Fair</option>
+                                <option value="good">Good</option>
+                                <option value="excellent">Excellent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wallInsulation">Wall Insulation</label>
+                            <select id="wallInsulation" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="none">None</option>
+                                <option value="partial">Partial</option>
+                                <option value="full">Full</option>
+                                <option value="excellent">Excellent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="windowType">Window Type</label>
+                            <select id="windowType" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="single">Single Pane</option>
+                                <option value="double">Double Pane</option>
+                                <option value="triple">Triple Pane</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="doorSealing">Door Sealing</label>
+                            <select id="doorSealing" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="poor">Poor</option>
+                                <option value="fair">Fair</option>
+                                <option value="good">Good</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">HVAC Systems</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="heatingType">Primary Heating System</label>
+                            <select id="heatingType" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="gas_furnace">Gas Furnace</option>
+                                <option value="electric_furnace">Electric Furnace</option>
+                                <option value="heat_pump">Heat Pump</option>
+                                <option value="baseboard">Electric Baseboard</option>
+                                <option value="wood_stove">Wood Stove</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="heatingAge">Heating System Age (years)</label>
+                            <input type="number" id="heatingAge" class="form-control" min="0" placeholder="Years">
+                        </div>
+                        <div class="form-group">
+                            <label for="coolingType">Cooling System</label>
+                            <select id="coolingType" class="form-control">
+                                <option value="none">None</option>
+                                <option value="central_ac">Central AC</option>
+                                <option value="heat_pump">Heat Pump</option>
+                                <option value="window_units">Window Units</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ductwork">Ductwork Condition</label>
+                            <select id="ductwork" class="form-control">
+                                <option value="na">N/A</option>
+                                <option value="none">No Ducts</option>
+                                <option value="poor">Poor</option>
+                                <option value="fair">Fair</option>
+                                <option value="good">Good</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Health & Safety</h3>
+                    
+                    <div class="form-group">
+                        <label>Check all that apply:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="combustion">
+                                <span>Combustion Appliances Present</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="moisture">
+                                <span>Moisture/Water Issues</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="mold">
+                                <span>Visible Mold</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="asbestos">
+                                <span>Suspected Asbestos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="lead">
+                                <span>Suspected Lead Paint</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="healthSafety" value="none">
+                                <span>No Known Health/Safety Issues</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(2)">
+                            ← Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="analyzeAssessment()">
+                            Analyze Home Assessment
+                        </button>
+                    </div>
+                </form>
+
+                <div id="assessmentResults" style="display: none;">
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Assessment Summary</h3>
+                    
+                    <div class="summary-grid" id="assessmentSummary"></div>
+                    
+                    <div id="assessmentRecommendations"></div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="editAssessment()">
+                            ← Edit Assessment
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(4)">
+                            View Personalized Incentives →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 4: Incentive Insights & Pathways -->
+            <div class="module" id="module4">
+                <h2 class="module-title">Step 4: Personalized Incentive Pathways</h2>
+                
+                <div class="info-panel">
+                    <h4>Your Customized Retrofit Plan</h4>
+                    <p>Based on your intake profile, income eligibility, and home assessment, here are your personalized recommendations with available incentives and financing options.</p>
+                </div>
+
+                <div id="comprehensiveResults">
+                    <div class="alert alert-info">
+                        <strong>📋 Complete all previous steps to see your personalized incentive pathways.</strong>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep(3)">
+                        ← Back to Assessment
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="downloadReport()">
+                        📥 Download Full Report
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="startOver()">
+                        🔄 Start New Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== GLOBAL STATE =====
+        const appState = {
+            currentStep: 1,
+            customerData: {},
+            incomeData: {},
+            assessmentData: {},
+            eligibilityResults: {},
+            recommendations: []
+        };
+
+        // ===== OREGON DATA =====
+        const oregonCounties = {
+            "Baker County": { ami: 55800 },
+            "Benton County": { ami: 76900 },
+            "Clackamas County": { ami: 95800 },
+            "Clatsop County": { ami: 67500 },
+            "Columbia County": { ami: 82100 },
+            "Coos County": { ami: 61400 },
+            "Crook County": { ami: 61900 },
+            "Curry County": { ami: 56200 },
+            "Deschutes County": { ami: 81300 },
+            "Douglas County": { ami: 63200 },
+            "Gilliam County": { ami: 58400 },
+            "Grant County": { ami: 52100 },
+            "Harney County": { ami: 53900 },
+            "Hood River County": { ami: 79400 },
+            "Jackson County": { ami: 68900 },
+            "Jefferson County": { ami: 59700 },
+            "Josephine County": { ami: 58700 },
+            "Klamath County": { ami: 58900 },
+            "Lake County": { ami: 54700 },
+            "Lane County": { ami: 72100 },
+            "Lincoln County": { ami: 64700 },
+            "Linn County": { ami: 69200 },
+            "Malheur County": { ami: 51200 },
+            "Marion County": { ami: 78400 },
+            "Morrow County": { ami: 67800 },
+            "Multnomah County": { ami: 95800 },
+            "Polk County": { ami: 73800 },
+            "Sherman County": { ami: 59100 },
+            "Tillamook County": { ami: 67300 },
+            "Umatilla County": { ami: 62800 },
+            "Union County": { ami: 57600 },
+            "Wallowa County": { ami: 54300 },
+            "Wasco County": { ami: 65100 },
+            "Washington County": { ami: 98200 },
+            "Wheeler County": { ami: 50800 },
+            "Yamhill County": { ami: 75600 }
+        };
+
+        const fplData = {
+            1: 15060, 2: 20440, 3: 25820, 4: 31200,
+            5: 36580, 6: 41960, 7: 47340, 8: 52720
+        };
+
+        const householdAdjustments = {
+            1: 0.70, 2: 0.80, 3: 0.90, 4: 1.00,
+            5: 1.08, 6: 1.16, 7: 1.24, 8: 1.32
+        };
+
+        const oregonSMI = 78600;
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCounties();
+            initializeApp();
+        });
+
+        function populateCounties() {
+            const countySelect = document.getElementById('county');
+            Object.keys(oregonCounties).sort().forEach(county => {
+                const option = document.createElement('option');
+                option.value = county;
+                option.textContent = county;
+                countySelect.appendChild(option);
+            });
+        }
+
+        function initializeApp() {
+            updateProgress();
+        }
+
+        // ===== NAVIGATION =====
+        function goToStep(step) {
+            // Hide all modules
+            document.querySelectorAll('.module').forEach(module => {
+                module.classList.remove('active');
+            });
+            
+            // Show target module
+            document.getElementById(`module${step}`).classList.add('active');
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                stepEl.classList.remove('active');
+                if (index + 1 < step) {
+                    stepEl.classList.add('completed');
+                } else {
+                    stepEl.classList.remove('completed');
+                }
+            });
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            
+            appState.currentStep = step;
+            updateProgress();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const progress = ((appState.currentStep - 1) / 3) * 100;
+            document.getElementById('progressLine').style.width = `${progress}%`;
+        }
+
+        // ===== MODULE 1: CUSTOMER INTAKE =====
+        function submitIntake() {
+            const form = document.getElementById('intakeForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Gather customer data
+            appState.customerData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                county: document.getElementById('county').value,
+                utilityProvider: document.getElementById('utilityProvider').value,
+                housingType: document.getElementById('housingType').value,
+                ownershipStatus: document.getElementById('ownershipStatus').value,
+                concerns: Array.from(document.querySelectorAll('input[name="concerns"]:checked')).map(cb => cb.value),
+                urgency: document.getElementById('urgency').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Generate customer ID
+            appState.customerData.customerId = generateCustomerId();
+            
+            // Show customer ID in next module
+            document.getElementById('customerId').textContent = appState.customerData.customerId;
+            document.getElementById('customerIdDisplay').style.display = 'block';
+
+            // Pre-fill county in income module
+            const countyFromIntake = document.getElementById('county').value;
+            
+            goToStep(2);
+        }
+
+        function generateCustomerId() {
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substring(2, 7);
+            return `OR-${timestamp}-${random}`.toUpperCase();
+        }
+
+        // ===== MODULE 2: INCOME QUALIFICATION =====
+        function calculateIncome() {
+            const form = document.getElementById('incomeForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const income = parseFloat(document.getElementById('income').value);
+            const frequency = document.getElementById('frequency').value;
+            const taxStatus = document.querySelector('input[name="taxStatus"]:checked').value;
+            const householdSize = parseInt(document.getElementById('householdSize').value);
+            const county = appState.customerData.county;
+
+            // Convert to annual income
+            const annualIncome = convertToAnnual(income, frequency, taxStatus);
+
+            // Calculate percentages
+            const percentages = calculatePercentages(annualIncome, county, householdSize);
+
+            // Store income data
+            appState.incomeData = {
+                householdSize,
+                annualIncome,
+                percentages,
+                county
+            };
+
+            // Determine eligibility
+            appState.eligibilityResults = {
+                liheap: percentages.fpl <= 150,
+                weatherization: percentages.smi <= 60,
+                lowIncomeHousing: percentages.ami <= 80,
+                energyTrust: percentages.ami <= 80,
+                firstTimeHomebuyer: percentages.ami <= 120,
+                standardPrograms: percentages.ami > 120
+            };
+
+            // Display results
+            displayIncomeResults(annualIncome, percentages, householdSize);
+        }
+
+        function convertToAnnual(amount, frequency, taxStatus) {
+            let annualAmount = amount;
+            
+            switch(frequency) {
+                case 'monthly': annualAmount = amount * 12; break;
+                case 'biweekly': annualAmount = amount * 26; break;
+                case 'weekly': annualAmount = amount * 52; break;
+            }
+            
+            if (taxStatus === 'posttax') {
+                annualAmount = annualAmount * 1.25;
+            }
+            
+            return Math.round(annualAmount);
+        }
+
+        function calculatePercentages(annualIncome, county, householdSize) {
+            const countyAMI = oregonCounties[county].ami;
+            const adjustment = householdAdjustments[householdSize];
+            const adjustedAMI = countyAMI * adjustment;
+            const adjustedSMI = oregonSMI * adjustment;
+            const fplAmount = fplData[householdSize];
+            
+            return {
+                ami: Math.round((annualIncome / adjustedAMI) * 100),
+                smi: Math.round((annualIncome / adjustedSMI) * 100),
+                fpl: Math.round((annualIncome / fplAmount) * 100),
+                adjustedAMI,
+                adjustedSMI,
+                fplAmount
+            };
+        }
+
+        function displayIncomeResults(annualIncome, percentages, householdSize) {
+            const summaryHTML = `
+                <div class="summary-card ${percentages.ami <= 80 ? 'highlight' : ''}">
+                    <div class="summary-value">${percentages.ami}%</div>
+                    <div class="summary-label">Area Median Income</div>
+                </div>
+                <div class="summary-card ${percentages.smi <= 60 ? 'highlight' : ''}">
+                    <div class="summary-value">${percentages.smi}%</div>
+                    <div class="summary-label">State Median Income</div>
+                </div>
+                <div class="summary-card ${percentages.fpl <= 150 ? 'highlight' : ''}">
+                    <div class="summary-value">${percentages.fpl}%</div>
+                    <div class="summary-label">Federal Poverty Level</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">$${annualIncome.toLocaleString()}</div>
+                    <div class="summary-label">Annual Income</div>
+                </div>
+            `;
+            
+            document.getElementById('incomeSummary').innerHTML = summaryHTML;
+
+            const eligibility = appState.eligibilityResults;
+            const programHTML = `
+                <div class="info-panel">
+                    <h4>Program Eligibility Summary</h4>
+                    <div style="margin-top: 1rem;">
+                        ${eligibility.liheap ? '<span class="badge badge-success">✓ LIHEAP Eligible (≤150% FPL)</span>' : '<span class="badge badge-danger">✗ Not LIHEAP Eligible</span>'}
+                        ${eligibility.weatherization ? '<span class="badge badge-success">✓ Weatherization Eligible (≤60% SMI)</span>' : '<span class="badge badge-danger">✗ Not Weatherization Eligible</span>'}
+                        ${eligibility.energyTrust ? '<span class="badge badge-success">✓ Energy Trust Income-Qualified (≤80% AMI)</span>' : ''}
+                        ${eligibility.lowIncomeHousing ? '<span class="badge badge-success">✓ Low-Income Housing Programs (≤80% AMI)</span>' : ''}
+                        ${eligibility.firstTimeHomebuyer ? '<span class="badge badge-success">✓ First-Time Homebuyer (≤120% AMI)</span>' : ''}
+                        ${eligibility.standardPrograms ? '<span class="badge badge-info">Standard Energy Trust Programs Available</span>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('programEligibility').innerHTML = programHTML;
+            
+            document.getElementById('incomeForm').style.display = 'none';
+            document.getElementById('incomeResults').style.display = 'block';
+        }
+
+        // ===== MODULE 3: ENERGY ASSESSMENT =====
+        function analyzeAssessment() {
+            // Gather assessment data
+            appState.assessmentData = {
+                homeSquareFootage: document.getElementById('homeSquareFootage').value,
+                conditionedSpace: document.getElementById('conditionedSpace').value,
+                foundationType: document.getElementById('foundationType').value,
+                roofCondition: document.getElementById('roofCondition').value,
+                atticInsulation: document.getElementById('atticInsulation').value,
+                wallInsulation: document.getElementById('wallInsulation').value,
+                windowType: document.getElementById('windowType').value,
+                doorSealing: document.getElementById('doorSealing').value,
+                heatingType: document.getElementById('heatingType').value,
+                heatingAge: document.getElementById('heatingAge').value,
+                coolingType: document.getElementById('coolingType').value,
+                ductwork: document.getElementById('ductwork').value,
+                healthSafety: Array.from(document.querySelectorAll('input[name="healthSafety"]:checked')).map(cb => cb.value)
+            };
+
+            // Analyze and generate recommendations
+            generateRecommendations();
+            
+            // Display assessment summary
+            displayAssessmentSummary();
+            
+            document.getElementById('assessmentForm').style.display = 'none';
+            document.getElementById('assessmentResults').style.display = 'block';
+        }
+
+        function generateRecommendations() {
+            const data = appState.assessmentData;
+            const recommendations = [];
+            let priority = 1;
+
+            // Health & Safety first
+            if (data.healthSafety.length > 0 && !data.healthSafety.includes('none')) {
+                recommendations.push({
+                    priority: '🔴',
+                    measure: 'Health & Safety Assessment',
+                    description: 'Address health and safety concerns before proceeding with other upgrades',
+                    estimatedCost: 'Varies',
+                    incentive: 'May be covered under weatherization program',
+                    dependencies: 'Required before weatherization work'
+                });
+            }
+
+            // Insulation recommendations
+            if (data.atticInsulation === 'none' || data.atticInsulation === 'poor') {
+                const sqft = parseInt(data.homeSquareFootage) || 2000;
+                const cost = sqft * 2.5;
+                const incentive = sqft * 0.15;
+                recommendations.push({
+                    priority: '🟠',
+                    measure: 'Attic Insulation',
+                    description: `Upgrade attic insulation to R-49 (~${sqft} sq ft)`,
+                    estimatedCost: `$${cost.toLocaleString()}`,
+                    incentive: `$${Math.round(incentive).toLocaleString()} Energy Trust rebate`,
+                    dependencies: 'Roof in good condition'
+                });
+            }
+
+            if (data.wallInsulation === 'none' || data.wallInsulation === 'partial') {
+                const sqft = parseInt(data.homeSquareFootage) || 2000;
+                const wallSqft = Math.round(sqft * 0.6);
+                const cost = wallSqft * 3.5;
+                const incentive = wallSqft * 0.10;
+                recommendations.push({
+                    priority: '🟠',
+                    measure: 'Wall Insulation',
+                    description: `Add wall insulation (~${wallSqft} sq ft)`,
+                    estimatedCost: `$${cost.toLocaleString()}`,
+                    incentive: `$${Math.round(incentive).toLocaleString()} Energy Trust rebate`,
+                    dependencies: 'None'
+                });
+            }
+
+            // HVAC recommendations
+            const heatingAge = parseInt(data.heatingAge) || 0;
+            if (heatingAge > 15 || data.heatingType === 'baseboard' || data.heatingType === 'electric_furnace') {
+                const units = Math.ceil((parseInt(data.conditionedSpace) || 1800) / 900);
+                const cost = units * 8000;
+                const incentive = units * 500;
+                recommendations.push({
+                    priority: '🟡',
+                    measure: 'Heat Pump System',
+                    description: `Install ${units} ductless heat pump unit(s) for efficient heating/cooling`,
+                    estimatedCost: `$${cost.toLocaleString()}`,
+                    incentive: `$${incentive.toLocaleString()} Energy Trust + utility incentives`,
+                    dependencies: 'Insulation upgrades recommended first'
+                });
+            }
+
+            // Windows
+            if (data.windowType === 'single') {
+                recommendations.push({
+                    priority: '🟡',
+                    measure: 'Window Upgrades',
+                    description: 'Replace single-pane windows with double-pane Energy Star windows',
+                    estimatedCost: '$5,000 - $15,000',
+                    incentive: 'Potential tax credits available',
+                    dependencies: 'None'
+                });
+            }
+
+            // Air sealing
+            if (data.doorSealing === 'poor') {
+                recommendations.push({
+                    priority: '🟢',
+                    measure: 'Air Sealing',
+                    description: 'Professional air sealing and weatherstripping',
+                    estimatedCost: '$500 - $2,000',
+                    incentive: 'May be included in weatherization program',
+                    dependencies: 'Should be done with insulation work'
+                });
+            }
+
+            appState.recommendations = recommendations;
+        }
+
+        function displayAssessmentSummary() {
+            const data = appState.assessmentData;
+            const issues = countIssues(data);
+            
+            const summaryHTML = `
+                <div class="summary-card">
+                    <div class="summary-value">${appState.recommendations.length}</div>
+                    <div class="summary-label">Recommendations</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">${issues}</div>
+                    <div class="summary-label">Potential Issues</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">${calculateTotalIncentives()}</div>
+                    <div class="summary-label">Estimated Incentives</div>
+                </div>
+            `;
+            
+            document.getElementById('assessmentSummary').innerHTML = summaryHTML;
+
+            if (appState.recommendations.length > 0) {
+                let tableHTML = `
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Recommended Energy Upgrades</h3>
+                    <table class="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Measure</th>
+                                <th>Description</th>
+                                <th>Est. Cost</th>
+                                <th>Incentives</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                appState.recommendations.forEach(rec => {
+                    tableHTML += `
+                        <tr>
+                            <td style="font-size: 1.5rem; text-align: center;">${rec.priority}</td>
+                            <td><strong>${rec.measure}</strong></td>
+                            <td>${rec.description}<br><small style="color: var(--muted);">${rec.dependencies}</small></td>
+                            <td><strong>${rec.estimatedCost}</strong></td>
+                            <td style="color: var(--success);">${rec.incentive}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                document.getElementById('assessmentRecommendations').innerHTML = tableHTML;
+            }
+        }
+
+        function countIssues(data) {
+            let count = 0;
+            if (data.atticInsulation === 'poor' || data.atticInsulation === 'none') count++;
+            if (data.wallInsulation === 'none' || data.wallInsulation === 'partial') count++;
+            if (data.windowType === 'single') count++;
+            if (data.doorSealing === 'poor') count++;
+            if (parseInt(data.heatingAge) > 15) count++;
+            if (data.healthSafety.length > 0 && !data.healthSafety.includes('none')) count++;
+            return count;
+        }
+
+        function calculateTotalIncentives() {
+            let total = 0;
+            appState.recommendations.forEach(rec => {
+                const match = rec.incentive.match(/\$([0-9,]+)/);
+                if (match) {
+                    total += parseInt(match[1].replace(/,/g, ''));
+                }
+            });
+            return `$${total.toLocaleString()}`;
+        }
+
+        function editAssessment() {
+            document.getElementById('assessmentForm').style.display = 'block';
+            document.getElementById('assessmentResults').style.display = 'none';
+        }
+
+        // ===== MODULE 4: COMPREHENSIVE INSIGHTS =====
+        function showComprehensiveResults() {
+            const eligibility = appState.eligibilityResults;
+            const customer = appState.customerData;
+            const income = appState.incomeData;
+            
+            let html = `
+                <div class="customer-id-display">
+                    <div class="id-label">Assessment ID</div>
+                    <div class="id-value">${customer.customerId}</div>
+                </div>
+
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Your Personalized Energy Pathway</h3>
+                
+                <div class="alert alert-info">
+                    <strong>Customer Profile:</strong> ${customer.firstName} ${customer.lastName} | 
+                    ${income.householdSize} person household | 
+                    ${customer.county} | 
+                    ${customer.housingType.replace(/_/g, ' ')}
+                </div>
+            `;
+
+            // Eligibility-based recommendations
+            if (eligibility.weatherization && eligibility.liheap) {
+                html += `
+                    <div class="alert alert-success">
+                        <h4 style="margin-bottom: 0.5rem;">🎉 You Qualify for Comprehensive Assistance!</h4>
+                        <p>Based on your income, you're eligible for Oregon's weatherization program, which can provide many of the recommended upgrades at little to no cost.</p>
+                    </div>
+                    
+                    <div class="info-panel">
+                        <h4>Next Steps - Priority Path</h4>
+                        <ol style="margin-left: 1.5rem; line-height: 2;">
+                            <li><strong>Contact Oregon Weatherization Program</strong> - They can provide free energy assessments and upgrades</li>
+                            <li><strong>Apply for LIHEAP</strong> - Get help with energy bills while waiting for upgrades</li>
+                            <li><strong>Energy Trust of Oregon</strong> - Additional incentives may be available for income-qualified households</li>
+                        </ol>
+                    </div>
+                `;
+            } else if (eligibility.energyTrust) {
+                html += `
+                    <div class="alert alert-success">
+                        <h4 style="margin-bottom: 0.5rem;">✓ Energy Trust Income-Qualified Programs</h4>
+                        <p>You qualify for enhanced incentives through Energy Trust of Oregon's income-qualified programs.</p>
+                    </div>
+                `;
+            }
+
+            // Add recommendations table
+            if (appState.recommendations.length > 0) {
+                html += `
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan</h3>
+                    <table class="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Measure</th>
+                                <th>Details</th>
+                                <th>Cost</th>
+                                <th>Your Incentives</th>
+                                <th>Net Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                appState.recommendations.forEach(rec => {
+                    // Adjust incentives based on eligibility
+                    let incentiveText = rec.incentive;
+                    if (eligibility.weatherization) {
+                        incentiveText = 'Potentially fully covered by weatherization program';
+                    }
+
+                    html += `
+                        <tr>
+                            <td style="font-size: 1.5rem; text-align: center;">${rec.priority}</td>
+                            <td><strong>${rec.measure}</strong></td>
+                            <td>${rec.description}</td>
+                            <td><strong>${rec.estimatedCost}</strong></td>
+                            <td style="color: var(--success);">${incentiveText}</td>
+                            <td><strong>${eligibility.weatherization ? '$0 - Low' : 'Varies'}</strong></td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            // Financing options
+            html += `
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Financing & Resources</h3>
+                <div class="form-grid">
+                    <div class="info-panel">
+                        <h4>📞 Oregon Weatherization</h4>
+                        <p>Phone: 1-800-766-6861<br>
+                        Website: oregon.gov/ohcs/energy-weatherization</p>
+                    </div>
+                    <div class="info-panel">
+                        <h4>⚡ Energy Trust of Oregon</h4>
+                        <p>Phone: 1-866-368-7878<br>
+                        Website: energytrust.org</p>
+                    </div>
+                    <div class="info-panel">
+                        <h4>💰 Financing Options</h4>
+                        <p>${eligibility.weatherization ? 'Weatherization grants available' : 'Energy Trust financing programs'}</p>
+                    </div>
+                    <div class="info-panel">
+                        <h4>🏠 Local Contractors</h4>
+                        <p>Find Energy Trust Trade Ally contractors at energytrust.org/find-a-contractor</p>
+                    </div>
+                </div>
+            `;
+
+            // Priority concerns from intake
+            if (customer.concerns && customer.concerns.length > 0) {
+                html += `
+                    <div class="alert alert-info">
+                        <h4 style="margin-bottom: 0.5rem;">Your Stated Concerns</h4>
+                        <p>You indicated concerns about: <strong>${customer.concerns.map(c => c.replace(/_/g, ' ')).join(', ')}</strong></p>
+                        <p>Our recommendations above specifically address these issues.</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('comprehensiveResults').innerHTML = html;
+        }
+
+        // When user reaches step 4, generate comprehensive results
+        const originalGoToStep = goToStep;
+        goToStep = function(step) {
+            originalGoToStep(step);
+            if (step === 4 && appState.recommendations.length > 0) {
+                showComprehensiveResults();
+            }
+        };
+
+        // ===== UTILITY FUNCTIONS =====
+        function downloadReport() {
+            const reportContent = document.getElementById('comprehensiveResults').innerHTML;
+            const fullReport = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Energy Assessment Report - ${appState.customerData.customerId}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background-color: #2c5530; color: white; }
+                        .alert { padding: 15px; margin: 15px 0; border-radius: 5px; }
+                        .alert-success { background-color: #d4edda; border-left: 4px solid #28a745; }
+                        .alert-info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Oregon Comprehensive Energy Assessment Report</h1>
+                    <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                    ${reportContent}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([fullReport], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `energy-assessment-${appState.customerData.customerId}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function startOver() {
+            if (confirm('Are you sure you want to start a new assessment? Current data will be lost.')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
