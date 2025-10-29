@@ -1834,12 +1834,14 @@
                 const sqft = parseInt(data.homeSquareFootage) || 2000;
                 const costPerSqft = data.atticInsulation === 'none' ? 3.0 : 2.5; // Higher for none
                 const cost = Math.round(sqft * costPerSqft);
+                const monthlySavings = Math.round((sqft / 1000) * 25); // ~$25/month per 1000 sqft
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Attic Insulation',
                     description: `Upgrade attic insulation to R-38+ (~${sqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
                     sqft: sqft, // Store for incentive calculation
+                    monthlySavings: monthlySavings,
                     incentive: 'Calculated based on eligibility',
                     dependencies: 'Roof in good condition'
                 });
@@ -1850,12 +1852,14 @@
                 const wallSqft = Math.round(sqft * 0.6); // Exterior wall area approximation
                 const costPerSqft = data.wallInsulation === 'none' ? 4.0 : 3.0; // $1.0-4.5/sqft range
                 const cost = Math.round(wallSqft * costPerSqft);
+                const monthlySavings = Math.round((sqft / 1000) * 20); // ~$20/month per 1000 sqft home
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Wall Insulation',
                     description: `Add wall insulation (~${wallSqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
                     sqft: wallSqft,
+                    monthlySavings: monthlySavings,
                     incentive: 'Calculated based on eligibility',
                     dependencies: 'None'
                 });
@@ -1867,12 +1871,14 @@
                 const sqft = parseInt(data.homeSquareFootage) || 2000;
                 const costPerSqft = 3.5; // Mid-range for floor insulation
                 const cost = Math.round(sqft * costPerSqft);
+                const monthlySavings = Math.round((sqft / 1000) * 18); // ~$18/month per 1000 sqft
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Floor Insulation',
                     description: `Insulate floor/crawlspace to R-30 (~${sqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
                     sqft: sqft,
+                    monthlySavings: monthlySavings,
                     incentive: 'Calculated based on eligibility',
                     dependencies: 'Moisture control may be required first'
                 });
@@ -1888,12 +1894,15 @@
                     // Recommend ducted heat pump for homes with existing duct system
                     // Residential insights: $2500-15000 range for heat pumps
                     const cost = 12000; // Typical ducted system cost
+                    // Heat pump savings: $75-150/month depending on replaced system
+                    const monthlySavings = data.heatingType === 'electric_furnace' ? 120 : 80;
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
                         heatPumpType: 'ducted',
                         description: `Install ducted (central) heat pump system (HSPF2 ≥7.5) to utilize existing ductwork`,
                         estimatedCost: `$${cost.toLocaleString()}`,
+                        monthlySavings: monthlySavings,
                         incentive: 'Calculated based on eligibility',
                         dependencies: 'Duct sealing recommended first'
                     });
@@ -1902,12 +1911,14 @@
                     const units = Math.ceil(conditionedSpace / 900);
                     const costPerUnit = units === 1 ? 6000 : 5000; // Single vs multi-head
                     const cost = units * costPerUnit;
+                    const monthlySavings = data.heatingType === 'baseboard' ? 100 : 75;
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
                         heatPumpType: 'ductless',
                         description: `Install ${units} ductless heat pump unit(s) (HSPF2 ≥8.1) - no ductwork needed`,
                         estimatedCost: `$${cost.toLocaleString()}`,
+                        monthlySavings: monthlySavings,
                         incentive: 'Calculated based on eligibility',
                         dependencies: 'Insulation upgrades recommended first'
                     });
@@ -1916,11 +1927,14 @@
 
             // Windows
             if (data.windowType === 'single') {
+                const sqft = parseInt(data.homeSquareFootage) || 2000;
+                const monthlySavings = Math.round((sqft / 1000) * 15); // ~$15/month per 1000 sqft
                 recommendations.push({
                     priority: '🟡',
                     measure: 'Window Upgrades',
                     description: 'Replace single-pane windows with double-pane Energy Star windows',
                     estimatedCost: '$5,000 - $15,000',
+                    monthlySavings: monthlySavings,
                     incentive: 'Potential tax credits available',
                     dependencies: 'None'
                 });
@@ -1928,11 +1942,14 @@
 
             // Air sealing
             if (data.doorSealing === 'poor') {
+                const sqft = parseInt(data.homeSquareFootage) || 2000;
+                const monthlySavings = Math.round((sqft / 1000) * 12); // ~$12/month per 1000 sqft
                 recommendations.push({
                     priority: '🟢',
                     measure: 'Air Sealing',
                     description: 'Professional air sealing and weatherstripping',
                     estimatedCost: '$500 - $2,000',
+                    monthlySavings: monthlySavings,
                     incentive: 'May be included in weatherization program',
                     dependencies: 'Should be done with insulation work'
                 });
@@ -1944,11 +1961,13 @@
             if ((waterHeaterAge > 10 || data.waterHeaterType === 'electric_tank' || data.waterHeaterType === 'gas_tank') && 
                 data.waterHeaterType !== 'heat_pump_water_heater') {
                 const cost = 4500; // Mid-range for HPWH
+                const monthlySavings = data.waterHeaterType === 'electric_tank' ? 35 : 25; // Higher savings from electric
                 recommendations.push({
                     priority: '🟡',
                     measure: 'Heat Pump Water Heater',
                     description: 'Replace existing water heater with energy-efficient heat pump model (UEF ≥3.0)',
                     estimatedCost: `$${cost.toLocaleString()}`,
+                    monthlySavings: monthlySavings,
                     incentive: 'Calculated based on eligibility',
                     dependencies: '30A dedicated circuit may be required'
                 });
@@ -1988,20 +2007,21 @@
                                 <th>Measure</th>
                                 <th>Description</th>
                                 <th>Est. Cost</th>
-                                <th>Incentives</th>
+                                <th>Est. Monthly Savings</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 
                 appState.recommendations.forEach(rec => {
+                    const savingsDisplay = rec.monthlySavings ? `$${rec.monthlySavings}/month` : 'Varies';
                     tableHTML += `
                         <tr>
                             <td style="font-size: 1.5rem; text-align: center;">${rec.priority}</td>
                             <td><strong>${rec.measure}</strong></td>
                             <td>${rec.description}<br><small style="color: var(--muted);">${rec.dependencies}</small></td>
                             <td><strong>${rec.estimatedCost}</strong></td>
-                            <td style="color: var(--success);">${rec.incentive}</td>
+                            <td style="color: var(--success); font-weight: 600;">${savingsDisplay}</td>
                         </tr>
                     `;
                 });
