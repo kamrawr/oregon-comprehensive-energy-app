@@ -1477,6 +1477,17 @@
             appState.currentStep = step;
             updateProgress();
             
+            // Auto-load demo data if in quick demo mode
+            if (isQuickDemoMode) {
+                setTimeout(() => {
+                    if (step === 2) {
+                        loadDemoIncomeData(true);
+                    } else if (step === 3) {
+                        loadDemoAssessmentData(true);
+                    }
+                }, 100);
+            }
+            
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -3092,12 +3103,15 @@
         }
         
         // ===== QUICK DEMO MODE - Load all data and skip to recommendations =====
+        let isQuickDemoMode = false; // Global flag to track if we're in quick demo mode
+        
         function loadFullDemoAndSkip() {
             try {
                 // Show loading message
                 const originalText = event.target.innerHTML;
                 event.target.innerHTML = '⏳ Loading Demo...';
                 event.target.disabled = true;
+                isQuickDemoMode = true; // Activate quick demo mode
                 
                 setTimeout(() => {
                     try {
@@ -3105,48 +3119,38 @@
                         loadDemoData(true);
                         
                         // Step 2: Submit intake form programmatically
-                        const intakeForm = document.getElementById('intakeForm');
-                        const intakeEvent = new Event('submit', { bubbles: true, cancelable: true });
-                        if (!intakeForm.dispatchEvent(intakeEvent)) {
-                            // Form validation failed, call submitIntakeForm directly
-                            submitIntakeForm(intakeEvent);
-                        }
+                        submitIntake();
                         
-                        // Brief delay for intake processing
+                        // Brief delay for intake processing, then continue to income
                         setTimeout(() => {
-                            // Step 3: Navigate to income module and load data
+                            // Step 3: Navigate to income module (will auto-load via demo flag)
                             goToStep(2);
+                            
                             setTimeout(() => {
-                                loadDemoIncomeData(true);
+                                // Step 4: Calculate income
+                                calculateIncome();
                                 
-                                // Step 4: Calculate income programmatically
                                 setTimeout(() => {
-                                    calculateIncome();
+                                    // Step 5: Navigate to assessment module (will auto-load via demo flag)
+                                    goToStep(3);
                                     
-                                    // Step 5: Navigate to assessment and load data
                                     setTimeout(() => {
-                                        goToStep(3);
+                                        // Step 6: Analyze assessment
+                                        analyzeAssessment();
+                                        
+                                        // Step 7: Show comprehensive results
                                         setTimeout(() => {
-                                            loadDemoAssessmentData(true);
+                                            showComprehensiveResults();
                                             
-                                            // Step 6: Analyze assessment and generate recommendations
-                                            setTimeout(() => {
-                                                analyzeAssessment();
-                                                
-                                                // Step 7: Show comprehensive results
-                                                setTimeout(() => {
-                                                    showComprehensiveResults();
-                                                    
-                                                    // Reset button
-                                                    event.target.innerHTML = originalText;
-                                                    event.target.disabled = false;
-                                                    
-                                                    // Scroll to top smoothly
-                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                }, 500);
-                                            }, 500);
-                                        }, 300);
-                                    }, 300);
+                                            // Reset button and demo mode
+                                            event.target.innerHTML = originalText;
+                                            event.target.disabled = false;
+                                            isQuickDemoMode = false;
+                                            
+                                            // Scroll to top smoothly
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }, 500);
+                                    }, 500);
                                 }, 300);
                             }, 300);
                         }, 300);
@@ -3154,11 +3158,13 @@
                         console.error('Error in demo flow:', innerError);
                         event.target.innerHTML = originalText;
                         event.target.disabled = false;
+                        isQuickDemoMode = false;
                         alert('⚠️ Error in quick demo: ' + innerError.message);
                     }
                 }, 100);
             } catch (error) {
                 console.error('Error loading full demo:', error);
+                isQuickDemoMode = false;
                 alert('⚠️ Error loading quick demo: ' + error.message);
             }
         }
