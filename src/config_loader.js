@@ -176,3 +176,8 @@ class ConfigLoader {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ConfigLoader;
 }
+
+// Also export to window for browser
+if (typeof window !== 'undefined') {
+    window.ConfigLoader = ConfigLoader;
+}

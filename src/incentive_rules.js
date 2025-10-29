@@ -952,3 +952,8 @@ class IncentiveRules {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = IncentiveRules;
 }
+
+// Also export to window for browser
+if (typeof window !== 'undefined') {
+    window.IncentiveRules = IncentiveRules;
+}
