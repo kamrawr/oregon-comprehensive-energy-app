@@ -3153,6 +3153,7 @@
                                     // Step 5: Navigate to assessment module (will auto-load via demo flag)
                                     goToStep(3);
                                     
+                                    // Wait longer to ensure assessment data loads before analyzing
                                     setTimeout(() => {
                                         // Step 6: Analyze assessment
                                         try {
@@ -3178,8 +3179,8 @@
                                             // Scroll to top smoothly
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }, 500);
-                                    }, 500);
-                                }, 300);
+                                    }, 600);  // Increased delay to ensure demo data loads
+                                }, 400);
                             }, 300);
                         }, 300);
                     } catch (innerError) {
