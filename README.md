@@ -16,10 +16,12 @@
 - **🎯 4-Step Assessment** - Customer intake → Income qualification → Home evaluation → Personalized pathways
 - **💰 Comprehensive Program Coverage** - OHCS Weatherization, CPF, HEAR, HOMES, Energy Trust, CERTA
 - **📊 Intelligent Incentive Stacking** - Proper program combination rules with HEAR/HOMES exclusivity
+- **🏠 Dynamic HOMES Allocation** - $10K site cap intelligently distributed across measures, prioritizing health/safety and envelope
 - **🏘️ Priority Community Support** - Enhanced eligibility tracking for underserved communities
+- **🎛️ Flexible Program Options** - Opt-out of HOMES (audit requirement) and toggle no-cost CPF eligibility
 - **📱 Mobile Responsive** - Works on all devices
 - **📥 Downloadable Reports** - Export personalized assessment results
-- **🔄 Interactive Selection** - Choose priority measures with dual cost summaries
+- **🔄 Interactive Selection** - Choose priority measures with dual cost summaries and real-time updates
 
 ---
 
@@ -42,7 +44,7 @@ This tool helps Oregon homeowners:
 | **Oregon Weatherization (OHCS)** | ≤60% SMI or ≤200% FPL | 100% no-cost |
 | **Community Partner Fund (CPF)** | Tier 1: ≤80% AMI + (Priority OR CBO)<br>Tier 2: 81-150% AMI + (Priority AND CBO) | Enhanced rebates |
 | **HEAR (IRA Federal)** | ≤80% AMI (100%)<br>81-150% AMI (50%) | Electrification rebates |
-| **HOMES (IRA Federal)** | ≤400% AMI | $2,000-$8,000 whole-home |
+| **HOMES (IRA Federal)** | ≤400% AMI | Up to $10,000 flex funding (dynamically allocated) |
 | **CERTA** | All income levels | Tax exemption |
 | **Energy Trust Standard** | All income levels | Market-rate rebates |
 | **LIHEAP** | ≤150% FPL | Bill assistance |
@@ -173,6 +175,9 @@ Every module has a "📋 Load Demo Data" button:
 - ✅ Modular JavaScript architecture
 - ✅ Mobile-first responsive design
 - ✅ Exact income threshold lookups (JSON-based)
+- ✅ Dynamic HOMES allocation with $10K site cap
+- ✅ Real-time incentive recalculation on option toggles
+- ✅ No-cost CPF enhancement for eligible measures
 - ✅ Automated test suite (10/10 passing)
 - ✅ Comprehensive audit trail (95% confidence)
 
