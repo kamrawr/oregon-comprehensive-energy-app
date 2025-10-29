@@ -1694,15 +1694,43 @@
             const recommendations = [];
             let priority = 1;
 
-            // Health & Safety first
+            // Health & Safety first - Calculate cost based on issues
             if (data.healthSafety.length > 0 && !data.healthSafety.includes('none')) {
+                // Cost estimates per issue type
+                const issueCosts = {
+                    'combustion': 1500,  // CO monitor + venting inspection
+                    'moisture': 2500,    // Moisture remediation
+                    'mold': 3500,        // Mold remediation
+                    'asbestos': 5000,    // Asbestos testing/abatement
+                    'lead': 4000         // Lead testing/containment
+                };
+                
+                let totalCost = 500; // Base assessment cost
+                data.healthSafety.forEach(issue => {
+                    if (issueCosts[issue]) {
+                        totalCost += issueCosts[issue];
+                    }
+                });
+                
+                const issueDescriptions = data.healthSafety.map(issue => {
+                    const names = {
+                        'combustion': 'combustion appliances',
+                        'moisture': 'moisture/water issues',
+                        'mold': 'mold remediation',
+                        'asbestos': 'asbestos',
+                        'lead': 'lead paint'
+                    };
+                    return names[issue] || issue;
+                }).join(', ');
+                
                 recommendations.push({
                     priority: '🔴',
-                    measure: 'Health & Safety Assessment',
-                    description: 'Address health and safety concerns before proceeding with other upgrades',
-                    estimatedCost: 'Varies',
-                    incentive: 'May be covered under weatherization program',
-                    dependencies: 'Required before weatherization work'
+                    measure: 'Health & Safety Assessment and Repairs',
+                    description: `Address ${issueDescriptions} before proceeding with other upgrades`,
+                    estimatedCost: `$${totalCost.toLocaleString()}`,
+                    incentive: 'Calculated based on eligibility',
+                    dependencies: 'Required before weatherization work',
+                    healthSafetyIssues: data.healthSafety
                 });
             }
 
@@ -2018,6 +2046,7 @@
             }
             
             const mapping = {
+                'Health & Safety Assessment and Repairs': 'health_safety_repairs',
                 'Attic Insulation': 'attic_insulation',
                 'Wall Insulation': 'wall_insulation',
                 'Floor Insulation': 'floor_insulation',
@@ -2117,7 +2146,8 @@
                             packageDetails += `<button onclick="showPackageOptions(${idx})" style="margin-top: 0.5rem; padding: 0.25rem 0.75rem; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">View ${rec.packages.length} package options</button>`;
                         }
                     } else {
-                        packageDetails = '<em>See program details</em>';
+                        // For measures without packages (like health & safety), show generic incentive text
+                        packageDetails = '<em style="color: var(--muted);">May be covered under weatherization or enabling programs</em>';
                     }
                     
                     const coverage = rec.coverage ? `${rec.coverage}%` : 'N/A';
