@@ -27,64 +27,46 @@
  * CPF amounts may exceed remaining costs to provide customer assurance.
  */
 
-// Load ConfigLoader
-const ConfigLoader = require('./config_loader');
+// Load ConfigLoader (works in both Node.js and browser)
+if (typeof require !== 'undefined' && typeof module !== 'undefined') {
+    var ConfigLoader = require('./config_loader');
+}
 
 class IncentiveRules {
     constructor() {
         // Load configuration synchronously (for Node.js environment and tests)
+        // In browser, ConfigLoader is loaded via script tag
         const configLoader = new ConfigLoader();
         try {
-            const config = configLoader.loadConfigSync();
-            this.config = config;
-            this.incomeThresholds = config.income_thresholds;
-            this.programCaps = {
-                HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
-                HEAR_MODERATE: config.program_caps.hear_household_cap,
-                HOMES_MIN: config.program_caps.homes_modeled_min,
-                HOMES_MAX: config.program_caps.homes_modeled_max,
-                HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
-                CERTA_MAX: config.program_caps.certa_household_cap
-            };
-            this.homesCoverageRules = config.homes_coverage_rules;
-            this.measureIncentives = config.measure_incentives;
-            this.certaEligibleMeasures = config.certa_eligible_measures || [];
-            this.homesAllocationPriority = config.homes_allocation_priority || [];
+            // Try sync load for Node.js
+            const config = typeof require !== 'undefined' ? 
+                configLoader.loadConfigSync() : 
+                null; // Browser will load async later
+            
+            if (config) {
+                // Successfully loaded config (Node.js)
+                this.config = config;
+                this.incomeThresholds = config.income_thresholds;
+                this.programCaps = {
+                    HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
+                    HEAR_MODERATE: config.program_caps.hear_household_cap,
+                    HOMES_MIN: config.program_caps.homes_modeled_min,
+                    HOMES_MAX: config.program_caps.homes_modeled_max,
+                    HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
+                    CERTA_MAX: config.program_caps.certa_household_cap
+                };
+                this.homesCoverageRules = config.homes_coverage_rules;
+                this.measureIncentives = config.measure_incentives;
+                this.certaEligibleMeasures = config.certa_eligible_measures || [];
+                this.homesAllocationPriority = config.homes_allocation_priority || [];
+            } else {
+                // Browser environment - will load async
+                this.configLoader = configLoader;
+                this.initializeFallbacks();
+            }
         } catch (error) {
             console.warn('⚠️  Config load failed, using fallback defaults:', error.message);
-            // Fallback to hardcoded defaults if config loading fails
-            this.incomeThresholds = {
-                weatherization_smi_max: 60,
-                weatherization_fpl_max: 200,
-                cpf_tier1_ami_max: 80,
-                hear_moderate_ami_min: 81,
-                hear_moderate_ami_max: 150
-            };
-            this.programCaps = {
-                HEAR_LOW_INCOME: 14000,
-                HEAR_MODERATE: 14000,
-                HOMES_MIN: 2000,
-                HOMES_MAX: 8000,
-                HOMES_FLEX_MAX: 10000,
-                CERTA_MAX: 2000
-            };
-            this.measureIncentives = null;
-            this.certaEligibleMeasures = [
-                'attic_insulation',
-                'wall_insulation',
-                'floor_insulation',
-                'air_sealing',
-                'duct_sealing'
-            ];
-            this.homesAllocationPriority = [
-                'health_safety_repairs',
-                'attic_insulation',
-                'wall_insulation',
-                'floor_insulation',
-                'air_sealing',
-                'window_replacement',
-                'duct_sealing'
-            ];
+            this.initializeFallbacks();
         }
         
         // Income tier thresholds (these remain constant)
@@ -94,6 +76,78 @@ class IncentiveRules {
             HEAR_MODERATE: 'hear_moderate',        // 81-150% AMI - Standard + HEAR 50%
             STANDARD: 'standard'                   // >150% AMI - Standard only
         };
+    }
+
+    /**
+     * Initialize fallback values when config loading fails or browser async
+     */
+    initializeFallbacks() {
+        this.incomeThresholds = {
+            weatherization_smi_max: 60,
+            weatherization_fpl_max: 200,
+            cpf_tier1_ami_max: 80,
+            hear_moderate_ami_min: 81,
+            hear_moderate_ami_max: 150,
+            homes_ami_max: 150
+        };
+        this.programCaps = {
+            HEAR_LOW_INCOME: 14000,
+            HEAR_MODERATE: 14000,
+            HOMES_MIN: 2000,
+            HOMES_MAX: 8000,
+            HOMES_FLEX_MAX: 10000,
+            CERTA_MAX: 2000
+        };
+        this.homesCoverageRules = {
+            low_income: { ami_max: 80, coverage_percent: 100 },
+            moderate_income: { ami_min: 81, ami_max: 150, coverage_percent: 50 },
+            not_eligible: { ami_min: 151, coverage_percent: 0 }
+        };
+        this.measureIncentives = null;
+        this.certaEligibleMeasures = [
+            'attic_insulation',
+            'wall_insulation',
+            'floor_insulation',
+            'air_sealing',
+            'duct_sealing'
+        ];
+        this.homesAllocationPriority = [
+            'health_safety_repairs',
+            'attic_insulation',
+            'wall_insulation',
+            'floor_insulation',
+            'air_sealing',
+            'window_replacement',
+            'duct_sealing'
+        ];
+    }
+
+    /**
+     * Async initialization for browser (call after DOM ready)
+     */
+    async initializeAsync() {
+        if (this.configLoader && !this.config) {
+            try {
+                const config = await this.configLoader.loadConfig();
+                this.config = config;
+                this.incomeThresholds = config.income_thresholds;
+                this.programCaps = {
+                    HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
+                    HEAR_MODERATE: config.program_caps.hear_household_cap,
+                    HOMES_MIN: config.program_caps.homes_modeled_min,
+                    HOMES_MAX: config.program_caps.homes_modeled_max,
+                    HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
+                    CERTA_MAX: config.program_caps.certa_household_cap
+                };
+                this.homesCoverageRules = config.homes_coverage_rules;
+                this.measureIncentives = config.measure_incentives;
+                this.certaEligibleMeasures = config.certa_eligible_measures || [];
+                this.homesAllocationPriority = config.homes_allocation_priority || [];
+                console.log(`✅ Async loaded config v${config.version}`);
+            } catch (error) {
+                console.warn('⚠️  Async config load failed, using fallbacks:', error.message);
+            }
+        }
     }
 
     /**
