@@ -243,9 +243,6 @@ class IncentiveRules {
                     contact: 'Oregon DOE'
                 });
             }
-                contact: 'Oregon DOE'
-                });
-            }
             
             packages.push({
                 name: 'CPF + HOMES Package',

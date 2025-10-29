@@ -2371,7 +2371,7 @@
                     funding levels, and administrator approval.
                 </div>
                 <div class="form-grid">
-            `;
+                    <div class="info-panel">
                         <h4>📞 Oregon Weatherization</h4>
                         <p>Phone: 1-800-766-6861<br>
                         Website: oregon.gov/ohcs/energy-weatherization</p>
@@ -2613,44 +2613,63 @@
         
         // ===== DEMO DATA LOADER =====
         function loadDemoData() {
-            // Customer Info
-            document.getElementById('firstName').value = 'Jane';
-            document.getElementById('lastName').value = 'Smith';
-            document.getElementById('email').value = 'jane.smith@example.com';
-            document.getElementById('phone').value = '503-555-1234';
-            
-            // County
-            document.getElementById('county').value = 'Multnomah County';
-            
-            // Utilities - Select PGE and NW Natural
-            document.querySelectorAll('input[name="utilityElectric"]').forEach(cb => {
-                if (cb.value === 'pge') cb.checked = true;
-            });
-            document.querySelectorAll('input[name="utilityGas"]').forEach(cb => {
-                if (cb.value === 'nw_natural') cb.checked = true;
-            });
-            
-            // Housing
-            document.getElementById('housingType').value = 'single_family';
-            document.getElementById('ownershipStatus').value = 'own';
-            
-            // Priorities - Move top 3 concerns to ranking
-            const concernsToRank = ['high_bills', 'comfort', 'old_equipment'];
-            const pool = document.getElementById('concernsPool');
-            const ranking = document.getElementById('priorityRanking');
-            
-            concernsToRank.forEach(concernId => {
-                const card = pool.querySelector(`[data-id="${concernId}"]`);
-                if (card) {
-                    ranking.appendChild(card);
+            try {
+                // Customer Info
+                document.getElementById('firstName').value = 'Jane';
+                document.getElementById('lastName').value = 'Smith';
+                document.getElementById('email').value = 'jane.smith@example.com';
+                document.getElementById('phone').value = '503-555-1234';
+                
+                // County
+                document.getElementById('county').value = 'Multnomah County';
+                
+                // Utilities - Select PGE and NW Natural
+                document.querySelectorAll('input[name="utilityElectric"]').forEach(cb => {
+                    if (cb.value === 'pge') cb.checked = true;
+                });
+                document.querySelectorAll('input[name="utilityGas"]').forEach(cb => {
+                    if (cb.value === 'nw_natural') cb.checked = true;
+                });
+                
+                // Housing
+                document.getElementById('housingType').value = 'single_family';
+                document.getElementById('ownershipStatus').value = 'own';
+                
+                // Priority Community (select low-income and rural)
+                document.querySelectorAll('input[name="priorityCommunity"]').forEach(cb => {
+                    if (cb.value === 'low_income' || cb.value === 'rural') {
+                        cb.checked = true;
+                    }
+                });
+                
+                // CBO Partnership
+                document.getElementById('workingWithCBO').value = 'yes';
+                toggleCBODetails(); // Show the CBO name field
+                document.getElementById('cboName').value = 'Community Energy Project';
+                
+                // Priorities - Move top 3 concerns to ranking
+                const concernsToRank = ['high_bills', 'comfort', 'old_equipment'];
+                const pool = document.getElementById('concernsPool');
+                const ranking = document.getElementById('priorityRanking');
+                
+                if (pool && ranking) {
+                    concernsToRank.forEach(concernId => {
+                        const card = pool.querySelector(`[data-id="${concernId}"]`);
+                        if (card) {
+                            ranking.appendChild(card);
+                        }
+                    });
+                    updatePriorityRanks();
                 }
-            });
-            updatePriorityRanks();
-            
-            // Urgency
-            document.getElementById('urgency').value = 'high';
-            
-            alert('✅ Demo data loaded! Review the form and click "Continue" to proceed.');
+                
+                // Urgency
+                document.getElementById('urgency').value = 'high';
+                
+                alert('✅ Demo data loaded! Review the form and click "Continue" to proceed.');
+            } catch (error) {
+                console.error('Error loading demo data:', error);
+                alert('⚠️ Error loading demo data: ' + error.message);
+            }
         }
     </script>
 </body>
