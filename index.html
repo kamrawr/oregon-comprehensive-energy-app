@@ -633,6 +633,22 @@
     <div class="app-container">
         <!-- App Header -->
         <div class="app-header">
+            <div style="position: absolute; top: 1rem; right: 1rem;">
+                <button onclick="loadFullDemoAndSkip()" class="btn" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    border: none;
+                    border-radius: 999px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
+                    ⚡ Quick Demo Mode
+                </button>
+            </div>
             <h1>🏠 Oregon Comprehensive Energy Assessment</h1>
             <p class="subtitle">Complete energy efficiency evaluation with personalized incentive pathways</p>
             <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
@@ -2939,7 +2955,7 @@
         }
         
         // ===== DEMO DATA LOADER =====
-        function loadDemoData() {
+        function loadDemoData(silent = false) {
             try {
                 // Customer Info
                 document.getElementById('firstName').value = 'Jane';
@@ -2992,7 +3008,9 @@
                 // Urgency
                 document.getElementById('urgency').value = 'high';
                 
-                alert('✅ Demo data loaded! Review the form and click "Continue" to proceed.');
+                if (!silent) {
+                    alert('✅ Demo data loaded! Review the form and click "Continue" to proceed.');
+                }
             } catch (error) {
                 console.error('Error loading demo data:', error);
                 alert('⚠️ Error loading demo data: ' + error.message);
@@ -3000,8 +3018,8 @@
         }
         
         // ===== DEMO DATA - INCOME MODULE =====
-        function loadDemoIncomeData() {
-            try {
+        function loadDemoIncomeData(silent = false) {
+            try{
                 // Household size
                 document.getElementById('householdSize').value = '4';
                 
@@ -3014,7 +3032,9 @@
                 // Tax status - pre-tax (gross)
                 document.querySelector('input[name="taxStatus"][value="pretax"]').checked = true;
                 
-                alert('✅ Demo income data loaded! This represents a family of 4 at ~65% AMI in Multnomah County. Click "Calculate Eligibility" to see results.');
+                if (!silent) {
+                    alert('✅ Demo income data loaded! This represents a family of 4 at ~65% AMI in Multnomah County. Click "Calculate Eligibility" to see results.');
+                }
             } catch (error) {
                 console.error('Error loading demo income data:', error);
                 alert('⚠️ Error loading demo income data: ' + error.message);
@@ -3022,7 +3042,7 @@
         }
         
         // ===== DEMO DATA - ASSESSMENT MODULE =====
-        function loadDemoAssessmentData() {
+        function loadDemoAssessmentData(silent = false) {
             try {
                 // Property Details
                 document.getElementById('homeSquareFootage').value = '2000';
@@ -3058,10 +3078,78 @@
                     }
                 });
                 
-                alert('✅ Demo assessment data loaded! This represents a 1975 home with poor insulation, old equipment, and some health/safety issues. Click "Analyze Home Assessment" to see recommendations.');
+                if (!silent) {
+                    alert('✅ Demo assessment data loaded! This represents a 1975 home with poor insulation, old equipment, and some health/safety issues. Click "Analyze Home Assessment" to see recommendations.');
+                }
             } catch (error) {
                 console.error('Error loading demo assessment data:', error);
                 alert('⚠️ Error loading demo assessment data: ' + error.message);
+            }
+        }
+        
+        // ===== QUICK DEMO MODE - Load all data and skip to recommendations =====
+        function loadFullDemoAndSkip() {
+            try {
+                // Show loading message
+                const originalText = event.target.innerHTML;
+                event.target.innerHTML = '⏳ Loading Demo...';
+                event.target.disabled = true;
+                
+                setTimeout(() => {
+                    try {
+                        // Step 1: Load customer intake data (silently)
+                        loadDemoData(true);
+                        
+                        // Step 2: Submit intake form programmatically
+                        const intakeForm = document.getElementById('intakeForm');
+                        const intakeEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        if (!intakeForm.dispatchEvent(intakeEvent)) {
+                            // Form validation failed, call submitIntakeForm directly
+                            submitIntakeForm(intakeEvent);
+                        }
+                        
+                        // Brief delay for intake processing
+                        setTimeout(() => {
+                            // Step 3: Load income data (silently)
+                            loadDemoIncomeData(true);
+                            
+                            // Step 4: Calculate income programmatically
+                            setTimeout(() => {
+                                calculateIncome();
+                                
+                                // Step 5: Load assessment data (silently)
+                                setTimeout(() => {
+                                    loadDemoAssessmentData(true);
+                                    
+                                    // Step 6: Analyze assessment and generate recommendations
+                                    setTimeout(() => {
+                                        analyzeAssessment();
+                                        
+                                        // Step 7: Show comprehensive results
+                                        setTimeout(() => {
+                                            showComprehensiveResults();
+                                            
+                                            // Reset button
+                                            event.target.innerHTML = originalText;
+                                            event.target.disabled = false;
+                                            
+                                            // Scroll to top smoothly
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }, 500);
+                                    }, 500);
+                                }, 300);
+                            }, 300);
+                        }, 300);
+                    } catch (innerError) {
+                        console.error('Error in demo flow:', innerError);
+                        event.target.innerHTML = originalText;
+                        event.target.disabled = false;
+                        alert('⚠️ Error in quick demo: ' + innerError.message);
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error loading full demo:', error);
+                alert('⚠️ Error loading quick demo: ' + error.message);
             }
         }
     </script>
