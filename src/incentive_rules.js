@@ -128,14 +128,16 @@ class IncentiveRules {
             
             // Package 3: HOMES alternative (for envelope measures)
             if (measureRule.homes_eligible) {
+                // Use flex funding amount for envelope measures
+                const homesAmount = this.programCaps.HOMES_FLEX_MAX;
                 packages.push({
                     name: 'HOMES Package (Comprehensive Alternative)',
                     incentives: [{
                         program: 'HOMES (IRA Federal)',
-                        amount: '2,000-10,000',
+                        amount: homesAmount,
                         priority: 2,
                         contact: 'Oregon DOE',
-                        note: 'Whole-home rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
+                        note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
                     }],
                     note: 'Good for comprehensive projects - no waitlist, flexible funding'
                 });
@@ -246,13 +248,15 @@ class IncentiveRules {
         // HOMES covers comprehensive work including enabling repairs above CERTA cap
         // HOMES can flex up to $10K across non-HEAR funded measures per site
         if (measureRule.homes_eligible && cpfAmount) {
+            // Use flex funding amount ($10K) for envelope measures since it's more likely applicable
+            const homesAmount = this.programCaps.HOMES_FLEX_MAX;
             const incentives = [
                 {
                     program: 'HOMES (IRA Federal)',
-                    amount: `${this.programCaps.HOMES_MIN.toLocaleString()}-${this.programCaps.HOMES_MAX.toLocaleString()}`,
+                    amount: homesAmount,
                     priority: 1,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home rebate (≥20% savings) OR up to $10K flex funding for non-HEAR measures'
+                    note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
                 },
                 {
                     program: 'CPF - Energy Trust',
@@ -346,15 +350,17 @@ class IncentiveRules {
         
         // Package 2: HOMES + Standard
         if (measureRule.homes_eligible && standardAmount) {
+            // Use flex funding amount for envelope measures
+            const homesAmount = this.programCaps.HOMES_FLEX_MAX;
             packages.push({
                 name: 'HOMES + Standard',
                 incentives: [
                     {
                         program: 'HOMES (IRA Federal)',
-                        amount: '2,000-10,000',
+                        amount: homesAmount,
                         priority: 1,
                         contact: 'Oregon DOE',
-                        note: 'Federal whole-home rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
+                        note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
                     },
                     {
                         program: 'Energy Trust Standard',
@@ -401,12 +407,14 @@ class IncentiveRules {
             }];
             
             if (measureRule.homes_eligible) {
+                // Use flex funding amount for envelope measures
+                const homesAmount = this.programCaps.HOMES_FLEX_MAX;
                 incentives.push({
                     program: 'HOMES (IRA Federal)',
-                    amount: '2,000-10,000',
+                    amount: homesAmount,
                     priority: 2,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home performance rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
+                    note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
                 });
             }
             
