@@ -2318,10 +2318,12 @@
                     
                     if (rec.bestPackage && rec.bestPackage.incentives) {
                         packageDetails = `<strong>${rec.bestPackage.name}</strong><br>`;
-                        packageDetails += rec.bestPackage.incentives.map(inc => {
-                            const amount = typeof inc.amount === 'number' ? `$${inc.amount.toLocaleString()}` : inc.amount;
-                            return `<div style="margin: 0.25rem 0; font-size: 0.85rem;">${inc.program}: ${amount}</div>`;
-                        }).join('');
+                        packageDetails += rec.bestPackage.incentives
+                            .filter(inc => typeof inc.amount === 'number' ? inc.amount > 0 : true) // Filter out zero amounts
+                            .map(inc => {
+                                const amount = typeof inc.amount === 'number' ? `$${inc.amount.toLocaleString()}` : inc.amount;
+                                return `<div style="margin: 0.25rem 0; font-size: 0.85rem;">${inc.program}: ${amount}</div>`;
+                            }).join('');
                         
                         if (rec.bestPackage.note) {
                             packageDetails += `<div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--muted); font-style: italic;">${rec.bestPackage.note}</div>`;
@@ -2474,18 +2476,22 @@
             }
             
             // Recalculate totals for all measures
+            console.log('Recalculating totals after HOMES toggle...');
             appState.enrichedRecommendations.forEach(rec => {
                 if (rec.bestPackage && rec.bestPackage.incentives) {
                     const costCalc = incentiveRules.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
                     rec.totalIncentives = costCalc.totalIncentives;
                     rec.netCost = costCalc.netCost;
                     rec.coverage = costCalc.coverage;
+                    console.log(`  ${rec.measure}: Incentives=$${rec.totalIncentives.toLocaleString()}, Net=$${rec.netCost.toLocaleString()}, Coverage=${rec.coverage}%`);
                 }
             });
             
             // Update the display
+            console.log('Updating table and summaries...');
             updateRecommendationsTable();
             updateCostSummary();
+            console.log('HOMES toggle complete');
         }
         
         /**
@@ -2560,29 +2566,40 @@
             }
             
             // Recalculate totals for all measures
+            console.log('Recalculating totals after No-Cost toggle...');
             appState.enrichedRecommendations.forEach(rec => {
                 if (rec.bestPackage && rec.bestPackage.incentives) {
                     const costCalc = incentiveRules.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
                     rec.totalIncentives = costCalc.totalIncentives;
                     rec.netCost = costCalc.netCost;
                     rec.coverage = costCalc.coverage;
+                    console.log(`  ${rec.measure}: Incentives=$${rec.totalIncentives.toLocaleString()}, Net=$${rec.netCost.toLocaleString()}, Coverage=${rec.coverage}%`);
                 }
             });
             
             // Update the display
+            console.log('Updating table and summaries...');
             updateRecommendationsTable();
             updateCostSummary();
+            console.log('No-Cost toggle complete');
         }
         
         /**
          * Update the recommendations table with new incentive values
          */
         function updateRecommendationsTable() {
-            if (!appState.enrichedRecommendations) return;
+            if (!appState.enrichedRecommendations) {
+                console.error('updateRecommendationsTable: No enrichedRecommendations');
+                return;
+            }
             
+            console.log('Updating recommendations table...');
             appState.enrichedRecommendations.forEach((rec, idx) => {
                 const row = document.getElementById(`measure-row-${idx}`);
-                if (!row) return;
+                if (!row) {
+                    console.warn(`Row not found for measure ${idx}: ${rec.measure}`);
+                    return;
+                }
                 
                 // Update package details cell
                 let packageDetails = '';
