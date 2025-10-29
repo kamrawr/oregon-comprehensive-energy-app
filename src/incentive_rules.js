@@ -725,7 +725,9 @@ class IncentiveRules {
         }
         
         // Apply HOMES site cap ($10,000) - dynamically allocate across non-HEAR measures
-        this.applyHOMESAllocation(enrichedRecommendations);
+        // Pass customer tier to apply income-specific constraints
+        const customerTier = enrichedRecommendations[0]?.customerTier || null;
+        this.applyHOMESAllocation(enrichedRecommendations, customerTier);
         
         // Recalculate all measure totals after adjustments
         enrichedRecommendations.forEach(rec => {
@@ -744,9 +746,15 @@ class IncentiveRules {
      * Apply HOMES allocation across measures up to $10K site cap
      * Priority: Health/Safety > Envelope (insulation, air sealing) > Other
      * HOMES cannot stack with HEAR on the same measure
+     * 
+     * IMPORTANT: HOMES for moderate income (81-150% AMI) is limited to 50% of measure cost
+     * This means the $10K cap is harder to reach unless high-cost measures are selected
      */
-    applyHOMESAllocation(enrichedRecommendations) {
+    applyHOMESAllocation(enrichedRecommendations, customerTier = null) {
         let homesRemaining = this.programCaps.HOMES_FLEX_MAX; // $10,000 site cap
+        
+        // Check if customer is moderate income (affects HOMES percentage)
+        const isModerateIncome = customerTier === this.tiers.HEAR_MODERATE;
         
         // Priority order for HOMES allocation
         const priorityOrder = [
@@ -804,8 +812,15 @@ class IncentiveRules {
             
             const gap = Math.max(0, rec.estimatedCostNum - otherIncentives);
             
-            // Allocate HOMES up to the gap, but not exceeding remaining budget
-            const homesAmount = Math.min(gap, homesRemaining);
+            // For moderate income (81-150% AMI), HOMES limited to 50% of measure cost
+            // For low income (≤80% AMI), HOMES can cover full gap
+            let maxHomesForMeasure = gap;
+            if (isModerateIncome) {
+                maxHomesForMeasure = Math.min(gap, rec.estimatedCostNum * 0.50);
+            }
+            
+            // Allocate HOMES up to the max for this measure, but not exceeding remaining budget
+            const homesAmount = Math.min(maxHomesForMeasure, homesRemaining);
             
             if (homesAmount > 0) {
                 homesIncentive.amount = homesAmount;

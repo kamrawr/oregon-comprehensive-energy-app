@@ -2175,7 +2175,8 @@
                             netCost: costCalc.netCost,
                             coverage: costCalc.coverage,
                             estimatedCostNum: estimatedCost,
-                            selected: true // Default to selected
+                            selected: true, // Default to selected
+                            customerTier: eligibilityTier // Store for HOMES allocation
                         };
                     }
                     
@@ -2505,7 +2506,7 @@
             // Reapply HOMES allocation if not opted out
             if (!optOutChecked) {
                 console.log('Reapplying HOMES allocation...');
-                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations);
+                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations, appState.eligibilityTier);
             }
             
             // Recalculate totals for all measures
@@ -2595,7 +2596,7 @@
             // Reapply HOMES allocation if not opted out
             if (!optOutHOMES) {
                 console.log('Reapplying HOMES allocation after No-Cost toggle...');
-                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations);
+                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations, appState.eligibilityTier);
             }
             
             // Recalculate totals for all measures

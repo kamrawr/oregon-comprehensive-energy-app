@@ -418,7 +418,7 @@
         <!-- HOMES Allocation Analysis -->
         <div class="section">
             <h2>🏗️ HOMES Allocation Analysis</h2>
-            <p style="margin-bottom: 20px;">Dynamic allocation of the $10,000 HOMES site cap across priority measures.</p>
+            <p style="margin-bottom: 20px;">Dynamic allocation of the $10,000 HOMES site cap across priority measures. <strong>Note:</strong> For moderate income (81-150% AMI), HOMES is limited to 50% of each measure's cost, making the $10K cap harder to reach.</p>
             <div class="chart-container" id="homes-allocation-chart"></div>
         </div>
 
@@ -483,11 +483,11 @@
         ];
 
         const homesAllocationData = [
-            { measure: 'Health & Safety', priority: 1, avgAllocation: 4000, color: '#dc3545' },
-            { measure: 'Attic Insulation', priority: 2, avgAllocation: 2500, color: '#fd7e14' },
-            { measure: 'Wall Insulation', priority: 3, avgAllocation: 2000, color: '#ffc107' },
-            { measure: 'Air Sealing', priority: 4, avgAllocation: 1000, color: '#28a745' },
-            { measure: 'Window Replacement', priority: 5, avgAllocation: 500, color: '#17a2b8' }
+            { measure: 'Health & Safety', priority: 1, avgAllocation: 3500, color: '#dc3545', note: 'Low income: full gap' },
+            { measure: 'Attic Insulation', priority: 2, avgAllocation: 2000, color: '#fd7e14', note: 'Low income: full gap' },
+            { measure: 'Wall Insulation', priority: 3, avgAllocation: 1800, color: '#ffc107', note: 'Low income: full gap' },
+            { measure: 'Air Sealing', priority: 4, avgAllocation: 1200, color: '#28a745', note: 'Low income: full gap' },
+            { measure: 'Window Replacement', priority: 5, avgAllocation: 1500, color: '#17a2b8', note: 'Moderate: 50% of cost max' }
         ];
 
         const cpfComparisonData = [
