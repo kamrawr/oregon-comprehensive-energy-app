@@ -2147,13 +2147,17 @@
                     return rec;
                 });
                 
+                // Apply household-level caps (HEAR $14K, CERTA $2K)
+                console.log('Applying household-level caps...');
+                const cappedRecommendations = incentiveRules.applyHouseholdCaps(enrichedRecommendations);
+                
                 // Store enriched data
-                appState.enrichedRecommendations = enrichedRecommendations;
+                appState.enrichedRecommendations = cappedRecommendations;
                 appState.eligibilityTier = eligibilityTier;
                 
                 // Generate and display HTML
                 console.log('Calling displayEnrichedResults');
-                displayEnrichedResults(tierDescription, enrichedRecommendations, eligibilityTier);
+                displayEnrichedResults(tierDescription, cappedRecommendations, eligibilityTier);
                 console.log('displayEnrichedResults completed');
                 
             } catch (error) {

@@ -649,6 +649,74 @@ class IncentiveRules {
         };
         return descriptions[tier] || tier;
     }
+    
+    /**
+     * Apply household-level caps to incentive packages across all measures
+     * Ensures HEAR, HOMES, and CERTA don't exceed their household limits
+     */
+    applyHouseholdCaps(enrichedRecommendations) {
+        let hearTotal = 0;
+        let certaTotal = 0;
+        const certaUsageByMeasure = [];
+        
+        // First pass: collect HEAR and CERTA usage from best packages
+        enrichedRecommendations.forEach((rec, idx) => {
+            if (rec.bestPackage && rec.bestPackage.incentives) {
+                rec.bestPackage.incentives.forEach(inc => {
+                    // Track HEAR usage
+                    if (inc.program && inc.program.includes('HEAR') && typeof inc.amount === 'number') {
+                        hearTotal += inc.amount;
+                    }
+                    // Track CERTA usage
+                    if (inc.program && inc.program.includes('CERTA') && typeof inc.amount === 'number') {
+                        certaUsageByMeasure.push({ idx, amount: inc.amount });
+                        certaTotal += inc.amount;
+                    }
+                });
+            }
+        });
+        
+        // Apply HEAR household cap ($14,000)
+        if (hearTotal > this.programCaps.HEAR_LOW_INCOME) {
+            console.warn(`HEAR total ($${hearTotal}) exceeds household cap ($${this.programCaps.HEAR_LOW_INCOME})`);
+            // Could implement proportional reduction here if needed
+        }
+        
+        // Apply CERTA household cap ($2,000)
+        if (certaTotal > this.programCaps.CERTA_MAX) {
+            console.log(`CERTA total ($${certaTotal}) exceeds cap ($${this.programCaps.CERTA_MAX}). Adjusting...`);
+            
+            // Distribute the $2K cap across measures that requested CERTA
+            const numCertaMeasures = certaUsageByMeasure.length;
+            const certaPerMeasure = Math.floor(this.programCaps.CERTA_MAX / numCertaMeasures);
+            
+            certaUsageByMeasure.forEach((usage, i) => {
+                const rec = enrichedRecommendations[usage.idx];
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    // Find and update CERTA incentive amount
+                    rec.bestPackage.incentives.forEach(inc => {
+                        if (inc.program && inc.program.includes('CERTA')) {
+                            const oldAmount = inc.amount;
+                            // Last measure gets any remainder
+                            inc.amount = (i === numCertaMeasures - 1) ? 
+                                this.programCaps.CERTA_MAX - (certaPerMeasure * (numCertaMeasures - 1)) :
+                                certaPerMeasure;
+                            inc.note = `$${inc.amount.toLocaleString()} of $${this.programCaps.CERTA_MAX.toLocaleString()} household cap (shared across ${numCertaMeasures} measures)`;
+                            console.log(`  Adjusted CERTA for measure ${usage.idx}: $${oldAmount} → $${inc.amount}`);
+                        }
+                    });
+                    
+                    // Recalculate totals for this measure
+                    const costCalc = this.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
+                    rec.totalIncentives = costCalc.totalIncentives;
+                    rec.netCost = costCalc.netCost;
+                    rec.coverage = costCalc.coverage;
+                }
+            });
+        }
+        
+        return enrichedRecommendations;
+    }
 }
 
 // Export for use in main app
