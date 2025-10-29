@@ -1,6 +1,6 @@
 # 🏠 Oregon Comprehensive Energy Assessment Tool
 
-**Version 1.2** | Built by [Isaiah Kamrar](https://github.com/kamrawr) / [Community Consulting Partners LLC](mailto:dikamrar@gmail.com)
+**Version 1.2** | Built by [Isaiah Kamrar](https://github.com/kamrawr)
 
 [![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE.md)
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://kamrawr.github.io/oregon-comprehensive-energy-app/)
@@ -71,7 +71,7 @@ No dependencies, no build process, no npm install!
 
 ### Need Help Implementing This Tool?
 
-While this software is **freely available** to use, Community Consulting Partners LLC offers professional services for organizations that need customization, deployment assistance, or ongoing support.
+While this software is **freely available** to use, I offer professional services for organizations that need customization, deployment assistance, or ongoing support.
 
 #### 🔧 Implementation Package - **$2,500**
 **Get up and running with a branded deployment**
@@ -302,7 +302,7 @@ See [LICENSE.md](LICENSE.md) for full terms.
 ## 📞 Contact & Support
 
 **For Professional Services:**  
-Isaiah Kamrar | Community Consulting Partners LLC  
+Isaiah Kamrar  
 Email: dikamrar@gmail.com  
 Response time: Within 24 hours
 
@@ -357,6 +357,6 @@ GitHub Issues: [github.com/kamrawr/oregon-comprehensive-energy-app/issues](https
 
 **Built with ❤️ in Portland, Oregon**
 
-© 2025 Isaiah Kamrar / Community Consulting Partners LLC. All rights reserved.
+© 2025 Isaiah Kamrar. All rights reserved.
 
 [View Live Application →](https://kamrawr.github.io/oregon-comprehensive-energy-app/)

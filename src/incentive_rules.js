@@ -1,7 +1,7 @@
 /**
  * Incentive Rules Engine
  * 
- * Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+ * Copyright © 2025 Isaiah Kamrar
  * All Rights Reserved. Proprietary Software.
  * See LICENSE.md for terms and conditions.
  * 

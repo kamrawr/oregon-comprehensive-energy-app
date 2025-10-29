@@ -2,7 +2,7 @@
 
 **Oregon Comprehensive Energy Assessment Tool**
 
-Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC  
+Copyright © 2025 Isaiah Kamrar  
 All Rights Reserved.
 
 ---
@@ -31,10 +31,10 @@ This software and associated documentation files (the "Software") are made publi
 - **No Redistribution** – You may not redistribute modified or unmodified versions of the Software
 - **No SaaS/Hosting** – You may not offer the Software as a hosted service to third parties
 - **No White-Label Resale** – You may not rebrand and sell the Software as your own product
-- **No Competitive Services** – You may not use the Software to compete with Community Consulting Partners LLC's professional services
+- **No Competitive Services** – You may not use the Software to compete with Isaiah Kamrar's professional services
 
 #### Remove Attribution
-- **Attribution Required** – All deployments must retain visible attribution: "Powered by Community Consulting Partners LLC"
+- **Attribution Required** – All deployments must retain visible attribution: "Powered by Isaiah Kamrar"
 - **No Branding Removal** – You may not remove or obscure copyright notices, trademarks, or author credits
 
 ---
@@ -43,7 +43,7 @@ This software and associated documentation files (the "Software") are made publi
 
 **Need customization or implementation help?**
 
-While the Software is freely available, Isaiah Kamrar and Community Consulting Partners LLC offer professional services for organizations that need:
+While the Software is freely available, Isaiah Kamrar offers professional services for organizations that need:
 
 - **Custom Implementation** – Tailored deployment and configuration
 - **White-Label Licensing** – Remove attribution and rebrand for your organization  
@@ -61,7 +61,7 @@ While the Software is freely available, Isaiah Kamrar and Community Consulting P
 
 ## Intellectual Property
 
-All algorithms, calculation methodologies, data structures, user interface designs, and business logic contained in the Software are proprietary intellectual property of Isaiah Kamrar and Community Consulting Partners LLC.
+All algorithms, calculation methodologies, data structures, user interface designs, and business logic contained in the Software are proprietary intellectual property of Isaiah Kamrar.
 
 This includes, but is not limited to:
 - HOMES program allocation algorithms
@@ -76,7 +76,7 @@ This includes, but is not limited to:
 
 THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
-IN NO EVENT SHALL ISAIAH KAMRAR OR COMMUNITY CONSULTING PARTNERS LLC BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+IN NO EVENT SHALL ISAIAH KAMRAR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
 
 ---
 
@@ -94,8 +94,7 @@ This license shall be governed by and construed in accordance with the laws of t
 
 ## Contact & Service Inquiries
 
-**Isaiah Kamrar**  
-Community Consulting Partners LLC
+**Isaiah Kamrar**
 
 **For Professional Services:**  
 Email: dikamrar@gmail.com  
