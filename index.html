@@ -2251,6 +2251,24 @@
             if (recommendations.length > 0) {
                 html += `
                     <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan with Your Incentives</h3>
+                    
+                    <!-- HOMES Opt-Out Option -->
+                    <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: #fff8e1; border: 2px solid #ffc107; border-radius: 10px;">
+                        <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
+                            <input type="checkbox" id="optOutHOMES" onchange="toggleHOMESOptOut()" 
+                                   style="width: 22px; height: 22px; margin-top: 2px; accent-color: var(--brand); cursor: pointer;">
+                            <div>
+                                <span style="font-weight: 600; font-size: 1rem; display: block; margin-bottom: 0.5rem;">
+                                    📊 Opt out of HOMES rebate program
+                                </span>
+                                <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.5;">
+                                    HOMES provides up to $10,000 in funding but requires a comprehensive energy audit and modeled savings. 
+                                    If an audit isn't available or practical for your timeline, check this box to see incentive options without HOMES.
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                    
                     <div class="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; border: none; margin-bottom: 1.5rem;">
                         <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.2rem;">✅ SELECT YOUR PRIORITY MEASURES</h4>
                         <p style="margin: 0; font-size: 1.05rem; line-height: 1.6;">
@@ -2380,6 +2398,114 @@
             if (rollupDiv && appState.enrichedRecommendations) {
                 rollupDiv.innerHTML = generateProgramRollup(appState.enrichedRecommendations);
             }
+        }
+        
+        /**
+         * Toggle HOMES opt-out and recalculate incentives dynamically
+         */
+        function toggleHOMESOptOut() {
+            const optOutChecked = document.getElementById('optOutHOMES').checked;
+            console.log('HOMES opt-out toggled:', optOutChecked);
+            
+            if (!appState.enrichedRecommendations || !window.IncentiveRules) {
+                console.error('Cannot toggle HOMES: missing data or IncentiveRules');
+                return;
+            }
+            
+            const incentiveRules = new IncentiveRules();
+            
+            // Remove or restore HOMES incentives for each measure
+            appState.enrichedRecommendations.forEach(rec => {
+                if (!rec.bestPackage || !rec.bestPackage.incentives) return;
+                
+                if (optOutChecked) {
+                    // Remove HOMES incentives
+                    rec.bestPackage.incentives = rec.bestPackage.incentives.filter(inc => 
+                        !inc.program || !inc.program.includes('HOMES')
+                    );
+                    console.log(`Removed HOMES from ${rec.measure}`);
+                } else {
+                    // Check if HOMES should be added back (only if no HEAR on same measure)
+                    const hasHEAR = rec.bestPackage.incentives.some(inc => 
+                        inc.program && inc.program.includes('HEAR')
+                    );
+                    
+                    const hasHOMES = rec.bestPackage.incentives.some(inc => 
+                        inc.program && inc.program.includes('HOMES')
+                    );
+                    
+                    // Add HOMES back if eligible and doesn't have HEAR
+                    const measureRule = incentiveRules.getMeasureRules()[rec.measureId];
+                    if (!hasHEAR && !hasHOMES && measureRule && measureRule.homes_eligible) {
+                        rec.bestPackage.incentives.push({
+                            program: 'HOMES (IRA Federal)',
+                            amount: 0, // Will be allocated in applyHOMESAllocation
+                            priority: 1,
+                            contact: 'Oregon DOE',
+                            note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
+                        });
+                        console.log(`Added HOMES back to ${rec.measure}`);
+                    }
+                }
+            });
+            
+            // Reapply HOMES allocation if not opted out
+            if (!optOutChecked) {
+                console.log('Reapplying HOMES allocation...');
+                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations);
+            }
+            
+            // Recalculate totals for all measures
+            appState.enrichedRecommendations.forEach(rec => {
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    const costCalc = incentiveRules.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
+                    rec.totalIncentives = costCalc.totalIncentives;
+                    rec.netCost = costCalc.netCost;
+                    rec.coverage = costCalc.coverage;
+                }
+            });
+            
+            // Update the display
+            updateRecommendationsTable();
+            updateCostSummary();
+        }
+        
+        /**
+         * Update the recommendations table with new incentive values
+         */
+        function updateRecommendationsTable() {
+            if (!appState.enrichedRecommendations) return;
+            
+            appState.enrichedRecommendations.forEach((rec, idx) => {
+                const row = document.getElementById(`measure-row-${idx}`);
+                if (!row) return;
+                
+                // Update package details cell
+                let packageDetails = '';
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    packageDetails = `<strong>${rec.bestPackage.name}</strong><br>`;
+                    packageDetails += rec.bestPackage.incentives
+                        .filter(inc => typeof inc.amount === 'number' && inc.amount > 0) // Only show non-zero amounts
+                        .map(inc => {
+                            const amount = `$${inc.amount.toLocaleString()}`;
+                            return `<div style="margin: 0.25rem 0; font-size: 0.85rem;">${inc.program}: ${amount}</div>`;
+                        }).join('');
+                    
+                    if (rec.bestPackage.note) {
+                        packageDetails += `<div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--muted); font-style: italic;">${rec.bestPackage.note}</div>`;
+                    }
+                } else {
+                    packageDetails = '<em style="color: var(--muted);">May be covered under weatherization or enabling programs</em>';
+                }
+                
+                // Update cells
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 7) {
+                    cells[4].innerHTML = `<span style="color: var(--success); font-size: 0.9rem;">${packageDetails}</span>`;
+                    cells[5].innerHTML = `<strong style="color: var(--brand);">${rec.coverage ? rec.coverage + '%' : 'N/A'}</strong>`;
+                    cells[6].innerHTML = `<strong style="font-size: 1.1rem;">$${rec.netCost.toLocaleString()}</strong>`;
+                }
+            });
         }
         
         /**
