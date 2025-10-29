@@ -1,8 +1,8 @@
 # Implementation Status - Oregon Comprehensive Energy Assessment
 
-**Last Updated:** 2025-10-29 04:06 AM PST  
-**Phase:** Foundation (Phase 1) - In Progress  
-**Overall Completion:** 40%
+**Last Updated:** 2025-10-29 04:25 AM PST  
+**Phase:** Foundation (Phase 1) & Core Logic (Phase 2) - In Progress  
+**Overall Completion:** 55%
 
 ---
 
@@ -15,7 +15,7 @@
 - [x] Implementation roadmap established
 - [x] Success criteria defined
 
-### Phase 1: Foundation (70%)
+### Phase 1: Foundation (100% ✅)
 
 #### Configuration Files Created
 - [x] **utility_territories.yaml** (483 lines)
@@ -60,9 +60,40 @@ oregon-comprehensive-energy-app/
 
 ---
 
+### Phase 2: Core Logic (70% ✅)
+
+#### Multi-Select Utilities UI ✅
+- [x] Replaced single-select utility dropdown with multi-select checkboxes
+- [x] Implemented electric + gas utility selection (7 utilities total)
+- [x] Added validation: must select at least one electric utility
+- [x] Styled with visual separation (⚡ Electric / 🔥 Gas)
+- [x] Updated data model to store electricUtilities, gasUtilities, allUtilities arrays
+- [x] Form validation and error handling
+
+#### Drag-and-Drop Priority Ranking ✅
+- [x] Implemented full drag-and-drop interface for customer concerns
+- [x] Visual card-based design with icons (💰 🌡️ 💨 🔧 🏠 🪟 ⚠️)
+- [x] Two-panel layout: "Available Concerns" pool + "Priority Ranking" area
+- [x] Drag cards between panels to rank priorities
+- [x] Reorder cards within priority list
+- [x] Auto-assign priority ranks (#1, #2, #3, etc.)
+- [x] Calculate weight scores (7, 6, 5, 4, 3, 2, 1) based on ranking
+- [x] Store prioritized concerns with id, icon, text, rank, weight
+- [x] Display ranked concerns in final report with visual badges
+- [x] Empty state messaging in priority area
+- [x] Responsive hover and drag states
+
+#### Demo Data Loader ✅
+- [x] "Load Demo Data" button added to Step 1
+- [x] Auto-fills all customer intake fields
+- [x] Pre-selects PGE (electric) + NW Natural (gas)
+- [x] Moves 3 demo concerns to priority ranking (#1 High Bills, #2 Comfort, #3 Old Equipment)
+- [x] Sets urgency and housing type
+- [x] Provides confirmation alert
+
 ## 🚧 In Progress
 
-### Phase 1: Foundation (Remaining 30%)
+### Phase 2: Core Logic (Remaining 30%)
 
 #### Configuration Files - Still Needed
 - [ ] **measure_specifications.yaml**

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oregon Comprehensive Energy Assessment</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="src/incentive_calculator.js"></script>
+    <script src="src/report_generator.js"></script>
     <style>
         :root {
             --brand: #2c5530;
@@ -494,6 +496,93 @@
             }
         }
 
+        /* Concern Cards - Drag and Drop */
+        .concerns-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .concern-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .concern-card:hover {
+            border-color: var(--brand);
+            box-shadow: 0 4px 12px rgba(44, 85, 48, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .concern-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        
+        .concern-card.drag-over {
+            border-style: dashed;
+            border-color: var(--brand);
+            background: rgba(92, 184, 92, 0.1);
+        }
+        
+        .concern-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .concern-text {
+            flex: 1;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .concern-handle {
+            color: #d1d5db;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .priority-list .concern-card {
+            background: white;
+            border-color: white;
+            position: relative;
+        }
+        
+        .priority-list .concern-card::before {
+            content: attr(data-rank);
+            position: absolute;
+            left: -2.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--brand);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(44, 85, 48, 0.3);
+        }
+        
+        .priority-list .empty-state {
+            pointer-events: none;
+        }
+        
+        .priority-list:not(:empty) .empty-state {
+            display: none;
+        }
+
         /* Chart Container */
         .chart-container {
             position: relative;
@@ -574,9 +663,13 @@
             <div class="module active" id="module1">
                 <h2 class="module-title">Step 1: Customer Intake & Eligibility</h2>
                 
-                <div class="info-panel">
-                    <h4>Welcome to Your Energy Assessment</h4>
-                    <p>Let's start by gathering some basic information to determine your eligibility for energy assistance programs and create your customer profile.</p>
+                <div class="alert alert-info" style="margin-bottom: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="loadDemoData()" style="float: right; padding: 0.5rem 1rem;">
+                        📋 Load Demo Data
+                    </button>
+                    <h4 style="margin: 0 0 0.5rem 0;">Welcome to Your Energy Assessment</h4>
+                    <p style="margin: 0;">Let's start by gathering some basic information to determine your eligibility for energy assistance programs and create your customer profile.</p>
+                    <div style="clear: both;"></div>
                 </div>
 
                 <form id="intakeForm">
@@ -608,17 +701,53 @@
                                 <option value="">Select your county...</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="utilityProvider">Utility Provider *</label>
-                            <select id="utilityProvider" class="form-control" required>
-                                <option value="">Select your utility...</option>
-                                <option value="pge">Portland General Electric (PGE)</option>
-                                <option value="pacific_power">Pacific Power</option>
-                                <option value="nw_natural">NW Natural Gas</option>
-                                <option value="cascade">Cascade Natural Gas</option>
-                                <option value="avista">Avista</option>
-                                <option value="other">Other</option>
-                            </select>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Utility Providers (Select all that apply) *</label>
+                            <div style="background: #f9fafb; border: 2px solid #e1ecf4; border-radius: 10px; padding: 1rem; margin-top: 0.5rem;">
+                                <div style="margin-bottom: 1rem;">
+                                    <strong style="color: var(--brand); display: block; margin-bottom: 0.5rem;">⚡ Electric Utilities</strong>
+                                    <div class="checkbox-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityElectric" value="pge">
+                                            <span>Portland General Electric (PGE)</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityElectric" value="pacific_power">
+                                            <span>Pacific Power</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityElectric" value="eweb">
+                                            <span>Eugene Water & Electric Board (EWEB)</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityElectric" value="municipal">
+                                            <span>Municipal Utility (City-owned)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong style="color: var(--brand); display: block; margin-bottom: 0.5rem;">🔥 Gas Utilities (Optional)</strong>
+                                    <div class="checkbox-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityGas" value="nw_natural">
+                                            <span>NW Natural Gas</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityGas" value="cascade">
+                                            <span>Cascade Natural Gas</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityGas" value="avista">
+                                            <span>Avista</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="utilityGas" value="propane">
+                                            <span>Propane Only (No natural gas service)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <small style="display: block; margin-top: 0.75rem; color: var(--muted);">✓ Must select at least one electric utility</small>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="housingType">Housing Type *</label>
@@ -642,39 +771,76 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Priority Needs Assessment</h3>
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">🎯 Priority Needs Assessment</h3>
                     
-                    <div class="form-group">
-                        <label>What are your primary energy concerns? (Select all that apply)</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="high_bills">
-                                <span>High energy bills</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="comfort">
-                                <span>Home comfort (too hot/cold)</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="drafts">
-                                <span>Drafts and air leaks</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="old_equipment">
-                                <span>Old or inefficient heating/cooling equipment</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="insulation">
-                                <span>Poor insulation</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="windows">
-                                <span>Old or inefficient windows</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="concerns" value="health">
-                                <span>Health and safety concerns</span>
-                            </label>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">
+                            Rank Your Energy Concerns by Priority
+                        </label>
+                        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Drag and drop the cards below to rank your concerns from highest (top) to lowest priority. Only include concerns that apply to your home.
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                            <!-- Available Concerns Pool -->
+                            <div>
+                                <h4 style="color: var(--brand); font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="background: var(--secondary); color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem;">?</span>
+                                    Available Concerns
+                                </h4>
+                                <div id="concernsPool" class="concerns-list" style="min-height: 300px; background: #f9fafb; border: 2px dashed #d1d5db; border-radius: 8px; padding: 1rem;">
+                                    <div class="concern-card" draggable="true" data-id="high_bills" data-icon="💰">
+                                        <span class="concern-icon">💰</span>
+                                        <span class="concern-text">High energy bills</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="comfort" data-icon="🌡️">
+                                        <span class="concern-icon">🌡️</span>
+                                        <span class="concern-text">Home comfort (too hot/cold)</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="drafts" data-icon="💨">
+                                        <span class="concern-icon">💨</span>
+                                        <span class="concern-text">Drafts and air leaks</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="old_equipment" data-icon="🔧">
+                                        <span class="concern-icon">🔧</span>
+                                        <span class="concern-text">Old/inefficient heating/cooling</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="insulation" data-icon="🏠">
+                                        <span class="concern-icon">🏠</span>
+                                        <span class="concern-text">Poor insulation</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="windows" data-icon="🪟">
+                                        <span class="concern-icon">🪟</span>
+                                        <span class="concern-text">Old/inefficient windows</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                    <div class="concern-card" draggable="true" data-id="health" data-icon="⚠️">
+                                        <span class="concern-icon">⚠️</span>
+                                        <span class="concern-text">Health and safety concerns</span>
+                                        <span class="concern-handle">⋮⋮</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Priority Ranking Area -->
+                            <div>
+                                <h4 style="color: var(--brand); font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="background: var(--brand); color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem;">→</span>
+                                    Your Priority Ranking
+                                </h4>
+                                <div id="priorityRanking" class="concerns-list priority-list" style="min-height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid var(--brand); border-radius: 8px; padding: 1rem; position: relative;">
+                                    <div class="empty-state" style="color: white; text-align: center; padding: 2rem 1rem; opacity: 0.8;">
+                                        <div style="font-size: 3rem; margin-bottom: 1rem;">👆</div>
+                                        <p style="margin: 0; font-size: 0.95rem;">Drag concerns here to rank them</p>
+                                        <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem;">#1 = Highest Priority</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1065,6 +1231,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             populateCounties();
             initializeApp();
+            initializeDragAndDrop();
         });
 
         function populateCounties() {
@@ -1122,18 +1289,32 @@
                 form.reportValidity();
                 return;
             }
+            
+            // Validate at least one electric utility is selected
+            const electricUtilities = Array.from(document.querySelectorAll('input[name="utilityElectric"]:checked')).map(cb => cb.value);
+            const gasUtilities = Array.from(document.querySelectorAll('input[name="utilityGas"]:checked')).map(cb => cb.value);
+            
+            if (electricUtilities.length === 0) {
+                alert('Please select at least one electric utility provider.');
+                return;
+            }
 
             // Gather customer data
+            const prioritizedConcerns = getPrioritizedConcerns();
+            
             appState.customerData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 county: document.getElementById('county').value,
-                utilityProvider: document.getElementById('utilityProvider').value,
+                electricUtilities: electricUtilities,
+                gasUtilities: gasUtilities,
+                allUtilities: [...electricUtilities, ...gasUtilities],
                 housingType: document.getElementById('housingType').value,
                 ownershipStatus: document.getElementById('ownershipStatus').value,
-                concerns: Array.from(document.querySelectorAll('input[name="concerns"]:checked')).map(cb => cb.value),
+                prioritizedConcerns: prioritizedConcerns,
+                concerns: prioritizedConcerns.map(c => c.id), // Legacy format for compatibility
                 urgency: document.getElementById('urgency').value,
                 timestamp: new Date().toISOString()
             };
@@ -1482,6 +1663,51 @@
 
         // ===== MODULE 4: COMPREHENSIVE INSIGHTS =====
         function showComprehensiveResults() {
+            try {
+                // Initialize calculator and report generator
+                const calculator = new IncentiveCalculator(null, null, null);
+                const reportGen = new ReportGenerator();
+                
+                // Prepare customer profile with all required data
+                const customerProfile = {
+                    ...appState.customerData,
+                    ...appState.incomeData,
+                    householdSize: appState.incomeData.householdSize,
+                    annualIncome: appState.incomeData.annualIncome,
+                    amiPercent: appState.incomeData.amiPercent,
+                    fplPercent: appState.incomeData.fplPercent
+                };
+                
+                // Calculate incentives using new engine
+                const incentiveResults = calculator.calculateAvailableIncentives(
+                    customerProfile,
+                    appState.assessmentData
+                );
+                
+                // Generate comprehensive report
+                const reportHTML = reportGen.generateReport(
+                    appState.customerData,
+                    appState.incomeData,
+                    appState.assessmentData,
+                    incentiveResults
+                );
+                
+                // Display the full report
+                document.getElementById('comprehensiveResults').innerHTML = reportHTML;
+                
+                // Store for download
+                appState.lastGeneratedReport = reportHTML;
+                appState.incentiveResults = incentiveResults;
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                // Fallback to basic display
+                showBasicResults();
+            }
+        }
+        
+        // Fallback basic results function
+        function showBasicResults() {
             const eligibility = appState.eligibilityResults;
             const customer = appState.customerData;
             const income = appState.incomeData;
@@ -1597,7 +1823,31 @@
             `;
 
             // Priority concerns from intake
-            if (customer.concerns && customer.concerns.length > 0) {
+            if (customer.prioritizedConcerns && customer.prioritizedConcerns.length > 0) {
+                html += `
+                    <div class="alert alert-info">
+                        <h4 style="margin-bottom: 0.5rem;">🎯 Your Priority Concerns (Ranked)</h4>
+                        <div style="margin-top: 1rem;">
+                `;
+                
+                customer.prioritizedConcerns.forEach((concern, idx) => {
+                    html += `
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0; padding: 0.5rem; background: white; border-radius: 8px; border-left: 4px solid var(--brand);">
+                            <span style="background: var(--brand); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">#${idx + 1}</span>
+                            <span style="font-size: 1.2rem;">${concern.icon}</span>
+                            <span style="flex: 1; font-weight: 600;">${concern.text}</span>
+                            <span style="color: var(--muted); font-size: 0.85rem;">Weight: ${concern.weight}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Note:</strong> Our recommendations are prioritized to address your top concerns first.</p>
+                    </div>
+                `;
+            } else if (customer.concerns && customer.concerns.length > 0) {
+                // Fallback for old format
                 html += `
                     <div class="alert alert-info">
                         <h4 style="margin-bottom: 0.5rem;">Your Stated Concerns</h4>
@@ -1621,30 +1871,35 @@
 
         // ===== UTILITY FUNCTIONS =====
         function downloadReport() {
-            const reportContent = document.getElementById('comprehensiveResults').innerHTML;
-            const fullReport = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Energy Assessment Report - ${appState.customerData.customerId}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-                        th { background-color: #2c5530; color: white; }
-                        .alert { padding: 15px; margin: 15px 0; border-radius: 5px; }
-                        .alert-success { background-color: #d4edda; border-left: 4px solid #28a745; }
-                        .alert-info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
-                    </style>
-                </head>
-                <body>
-                    <h1>Oregon Comprehensive Energy Assessment Report</h1>
-                    <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
-                    ${reportContent}
-                </body>
-                </html>
-            `;
+            // Use the comprehensive generated report if available, otherwise fallback
+            let fullReport = appState.lastGeneratedReport;
+            
+            if (!fullReport) {
+                const reportContent = document.getElementById('comprehensiveResults').innerHTML;
+                fullReport = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Energy Assessment Report - ${appState.customerData.customerId}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                            th { background-color: #2c5530; color: white; }
+                            .alert { padding: 15px; margin: 15px 0; border-radius: 5px; }
+                            .alert-success { background-color: #d4edda; border-left: 4px solid #28a745; }
+                            .alert-info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Oregon Comprehensive Energy Assessment Report</h1>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                        ${reportContent}
+                    </body>
+                    </html>
+                `;
+            }
             
             const blob = new Blob([fullReport], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
@@ -1661,6 +1916,171 @@
             if (confirm('Are you sure you want to start a new assessment? Current data will be lost.')) {
                 location.reload();
             }
+        }
+        
+        // ===== DRAG AND DROP PRIORITY RANKING =====
+        let draggedElement = null;
+        
+        function initializeDragAndDrop() {
+            const pool = document.getElementById('concernsPool');
+            const ranking = document.getElementById('priorityRanking');
+            
+            // Set up drag events for all concern cards
+            document.querySelectorAll('.concern-card').forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Set up drop zones
+            [pool, ranking].forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+            
+            // Allow dropping on cards too for reordering
+            document.querySelectorAll('.concern-card').forEach(card => {
+                card.addEventListener('dragover', handleDragOverCard);
+                card.addEventListener('drop', handleDropOnCard);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        }
+        
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+        
+        function handleDragOverCard(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            if (this !== draggedElement) {
+                this.classList.add('drag-over');
+            }
+            return false;
+        }
+        
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+            
+            if (draggedElement && e.target.classList.contains('concerns-list')) {
+                e.target.appendChild(draggedElement);
+                updatePriorityRanks();
+            }
+            
+            return false;
+        }
+        
+        function handleDropOnCard(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+            
+            this.classList.remove('drag-over');
+            
+            if (draggedElement && this !== draggedElement) {
+                const parent = this.parentNode;
+                const allCards = [...parent.children].filter(el => el.classList.contains('concern-card'));
+                const draggedIndex = allCards.indexOf(draggedElement);
+                const targetIndex = allCards.indexOf(this);
+                
+                if (draggedIndex < targetIndex) {
+                    parent.insertBefore(draggedElement, this.nextSibling);
+                } else {
+                    parent.insertBefore(draggedElement, this);
+                }
+                
+                updatePriorityRanks();
+            }
+            
+            return false;
+        }
+        
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+        
+        function updatePriorityRanks() {
+            const ranking = document.getElementById('priorityRanking');
+            const cards = ranking.querySelectorAll('.concern-card');
+            
+            cards.forEach((card, index) => {
+                card.setAttribute('data-rank', `#${index + 1}`);
+            });
+        }
+        
+        function getPrioritizedConcerns() {
+            const ranking = document.getElementById('priorityRanking');
+            const cards = ranking.querySelectorAll('.concern-card');
+            
+            return Array.from(cards).map((card, index) => ({
+                id: card.getAttribute('data-id'),
+                icon: card.getAttribute('data-icon'),
+                text: card.querySelector('.concern-text').textContent,
+                rank: index + 1,
+                weight: 7 - index // Top item gets 7, descending
+            }));
+        }
+        
+        // ===== DEMO DATA LOADER =====
+        function loadDemoData() {
+            // Customer Info
+            document.getElementById('firstName').value = 'Jane';
+            document.getElementById('lastName').value = 'Smith';
+            document.getElementById('email').value = 'jane.smith@example.com';
+            document.getElementById('phone').value = '503-555-1234';
+            
+            // County
+            document.getElementById('county').value = 'Multnomah County';
+            
+            // Utilities - Select PGE and NW Natural
+            document.querySelectorAll('input[name="utilityElectric"]').forEach(cb => {
+                if (cb.value === 'pge') cb.checked = true;
+            });
+            document.querySelectorAll('input[name="utilityGas"]').forEach(cb => {
+                if (cb.value === 'nw_natural') cb.checked = true;
+            });
+            
+            // Housing
+            document.getElementById('housingType').value = 'single_family';
+            document.getElementById('ownershipStatus').value = 'own';
+            
+            // Priorities - Move top 3 concerns to ranking
+            const concernsToRank = ['high_bills', 'comfort', 'old_equipment'];
+            const pool = document.getElementById('concernsPool');
+            const ranking = document.getElementById('priorityRanking');
+            
+            concernsToRank.forEach(concernId => {
+                const card = pool.querySelector(`[data-id="${concernId}"]`);
+                if (card) {
+                    ranking.appendChild(card);
+                }
+            });
+            updatePriorityRanks();
+            
+            // Urgency
+            document.getElementById('urgency').value = 'high';
+            
+            alert('✅ Demo data loaded! Review the form and click "Continue" to proceed.');
         }
     </script>
 </body>
