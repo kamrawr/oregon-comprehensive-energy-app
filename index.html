@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oregon Comprehensive Energy Assessment</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="src/incentive_rules.js"></script>
     <script src="src/incentive_calculator.js"></script>
     <script src="src/report_generator.js"></script>
     <style>
@@ -632,6 +633,9 @@
         <div class="app-header">
             <h1>🏠 Oregon Comprehensive Energy Assessment</h1>
             <p class="subtitle">Complete energy efficiency evaluation with personalized incentive pathways</p>
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
+                Independent tool • Not affiliated with or endorsed by Energy Trust, OHCS, or Oregon DOE • For official eligibility, contact program administrators directly
+            </p>
         </div>
 
         <!-- Progress Tracker -->
@@ -669,6 +673,9 @@
                     </button>
                     <h4 style="margin: 0 0 0.5rem 0;">Welcome to Your Energy Assessment</h4>
                     <p style="margin: 0;">Let's start by gathering some basic information to determine your eligibility for energy assistance programs and create your customer profile.</p>
+                    <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: #666; font-style: italic;">
+                        <strong>Note:</strong> This is an informational tool only. Program eligibility and incentive amounts must be confirmed directly with program administrators.
+                    </p>
                     <div style="clear: both;"></div>
                 </div>
 
@@ -771,7 +778,56 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">🎯 Priority Needs Assessment</h3>
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">🎯 Priority Community & Program Access</h3>
+                    
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight: 600; color: var(--brand); margin-bottom: 0.5rem; display: block;">
+                            Priority Community Self-Identification (Optional but helps determine eligibility)
+                        </label>
+                        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Select all that apply. This information helps us identify enhanced incentive programs you may qualify for.
+                        </p>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="priorityCommunity" value="low_income">
+                                <span>Low-Income Household</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="priorityCommunity" value="tribal">
+                                <span>Tribal Member or Living on Tribal Land</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="priorityCommunity" value="rural">
+                                <span>Rural Community</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="priorityCommunity" value="community_of_color">
+                                <span>Community of Color</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="priorityCommunity" value="other_underserved">
+                                <span>Other Underserved Community</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workingWithCBO">Are you working with a Community-Based Organization (CBO)?</label>
+                        <select id="workingWithCBO" class="form-control" onchange="toggleCBODetails()">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="cboDetailsGroup" style="display: none; grid-column: 1 / -1;">
+                        <label for="cboName">Community Organization Name</label>
+                        <input type="text" id="cboName" class="form-control" placeholder="Enter organization name">
+                        <small style="color: var(--muted); display: block; margin-top: 0.5rem;">
+                            Working with a CBO may enable access to Community Partner Fund (CPF) and no-cost weatherization programs.
+                        </small>
+                    </div>
+
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">🎯 Your Energy Priorities</h3>
                     
                     <div class="form-group" style="grid-column: 1 / -1;">
                         <label style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">
@@ -874,6 +930,9 @@
                 <div class="info-panel">
                     <h4>Income Eligibility Assessment</h4>
                     <p>This information helps us determine which energy assistance programs you qualify for. All information is confidential.</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
+                        Results are estimates only. Contact program administrators for official eligibility determination.
+                    </p>
                 </div>
 
                 <form id="incomeForm">
@@ -1141,6 +1200,10 @@
                 <div class="info-panel">
                     <h4>Your Customized Retrofit Plan</h4>
                     <p>Based on your intake profile, income eligibility, and home assessment, here are your personalized recommendations with available incentives and financing options.</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
+                        <strong>Disclaimer:</strong> This tool is not affiliated with Energy Trust of Oregon, Oregon Housing & Community Services, or Oregon Department of Energy. 
+                        Incentive amounts and eligibility are estimates—applications must be submitted through official program channels for verification and approval.
+                    </p>
                 </div>
 
                 <div id="comprehensiveResults">
@@ -1162,6 +1225,25 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Footer Disclaimer -->
+        <div style="background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: var(--brand); font-size: 1.1rem; margin-bottom: 0.75rem;">📄 Important Disclaimer</h3>
+            <p style="font-size: 0.9rem; color: #666; line-height: 1.6; margin: 0;">
+                This Oregon Comprehensive Energy Assessment tool is an <strong>independent resource</strong> provided for informational and educational purposes only. 
+                It is <strong>not affiliated with, endorsed by, or officially connected to</strong> Energy Trust of Oregon, Oregon Housing & Community Services (OHCS), 
+                Oregon Department of Energy (ODOE), or any federal, state, or local energy assistance program.
+            </p>
+            <p style="font-size: 0.9rem; color: #666; line-height: 1.6; margin: 0.75rem 0 0 0;">
+                <strong>All eligibility determinations, incentive amounts, and program access must be confirmed directly with official program administrators.</strong> 
+                Estimates provided by this tool are based on 2025 program guidelines but are subject to change based on program availability, funding levels, and individual circumstances. 
+                To apply for programs or verify eligibility, please contact the respective program administrators using the contact information provided in your assessment results.
+            </p>
+            <p style="font-size: 0.85rem; color: #888; margin: 0.75rem 0 0 0; font-style: italic;">
+                Data sources: 2025 HUD Income Limits, Federal Poverty Guidelines, Energy Trust program guidelines, and publicly available program documentation. 
+                Last updated: 2025. Use at your own discretion.
+            </p>
+        </div>
     </div>
 
     <script>
@@ -1175,7 +1257,8 @@
             recommendations: []
         };
 
-        // ===== OREGON DATA =====
+        // ===== OREGON DATA (2025 OFFICIAL) =====
+        // Source: oregon-income-calculator repo (2025 HUD Income Limits)
         const oregonCounties = {
             "Baker County": { ami: 55800 },
             "Benton County": { ami: 76900 },
@@ -1215,16 +1298,19 @@
             "Yamhill County": { ami: 75600 }
         };
 
+        // 2025 Federal Poverty Guidelines (HHS)
         const fplData = {
             1: 15060, 2: 20440, 3: 25820, 4: 31200,
             5: 36580, 6: 41960, 7: 47340, 8: 52720
         };
 
+        // 2025 Household size adjustments for AMI/SMI
         const householdAdjustments = {
             1: 0.70, 2: 0.80, 3: 0.90, 4: 1.00,
             5: 1.08, 6: 1.16, 7: 1.24, 8: 1.32
         };
 
+        // 2025 Oregon State Median Income
         const oregonSMI = 78600;
 
         // ===== INITIALIZATION =====
@@ -1301,6 +1387,9 @@
 
             // Gather customer data
             const prioritizedConcerns = getPrioritizedConcerns();
+            const priorityCommunities = Array.from(document.querySelectorAll('input[name="priorityCommunity"]:checked')).map(cb => cb.value);
+            const workingWithCBO = document.getElementById('workingWithCBO').value === 'yes';
+            const cboName = workingWithCBO ? document.getElementById('cboName').value : null;
             
             appState.customerData = {
                 firstName: document.getElementById('firstName').value,
@@ -1316,6 +1405,9 @@
                 prioritizedConcerns: prioritizedConcerns,
                 concerns: prioritizedConcerns.map(c => c.id), // Legacy format for compatibility
                 urgency: document.getElementById('urgency').value,
+                priorityCommunities: priorityCommunities,
+                workingWithCBO: workingWithCBO,
+                cboName: cboName,
                 timestamp: new Date().toISOString()
             };
 
@@ -1336,6 +1428,15 @@
             const timestamp = Date.now().toString(36);
             const random = Math.random().toString(36).substring(2, 7);
             return `OR-${timestamp}-${random}`.toUpperCase();
+        }
+        
+        function toggleCBODetails() {
+            const workingWithCBO = document.getElementById('workingWithCBO').value === 'yes';
+            const cboDetailsGroup = document.getElementById('cboDetailsGroup');
+            cboDetailsGroup.style.display = workingWithCBO ? 'block' : 'none';
+            if (!workingWithCBO) {
+                document.getElementById('cboName').value = '';
+            }
         }
 
         // ===== MODULE 2: INCOME QUALIFICATION =====
@@ -1367,20 +1468,44 @@
                 county
             };
 
-            // Determine eligibility
+            // Determine eligibility with priority community consideration
+            const isPriorityCommunity = appState.customerData.priorityCommunities && appState.customerData.priorityCommunities.length > 0;
+            const workingWithCBO = appState.customerData.workingWithCBO;
+            
             appState.eligibilityResults = {
+                // Core income-based programs
                 liheap: percentages.fpl <= 150,
-                weatherization: percentages.smi <= 60,
-                lowIncomeHousing: percentages.ami <= 80,
+                // CORRECTED: Weatherization uses ≤60% SMI (not AMI) or ≤200% FPL
+                weatherization: percentages.smi <= 60 || percentages.fpl <= 200,
+                
+                // CPF eligibility: <150% AMI + (priority community OR CBO)
+                cpfEligible: percentages.ami < 150 && (isPriorityCommunity || workingWithCBO),
+                
+                // Standard income-qualified
                 energyTrust: percentages.ami <= 80,
+                lowIncomeHousing: percentages.ami <= 80,
                 firstTimeHomebuyer: percentages.ami <= 120,
-                standardPrograms: percentages.ami > 120
+                
+                // HEAR eligibility - ALL INCOME TIERS can access HEAR
+                hearLowIncome: percentages.ami > 60 && percentages.ami <= 80,    // 100% HEAR
+                hearModerate: percentages.ami > 80 && percentages.ami <= 150,    // 50% HEAR
+                hearWeatherization: percentages.smi <= 60 || percentages.fpl <= 200,  // Can access HEAR even with OHCS
+                
+                // HOMES eligibility - ALL INCOME TIERS can access HOMES
+                homesEligible: percentages.ami <= 400,  // Up to 400% AMI eligible
+                homesWeatherization: percentages.smi <= 60 || percentages.fpl <= 200,  // Can access HOMES even with OHCS
+                
+                // Market rate
+                standardPrograms: percentages.ami > 150,
+                
+                // Priority flags
+                isPriorityCommunity: isPriorityCommunity,
+                workingWithCBO: workingWithCBO
             };
 
             // Display results
             displayIncomeResults(annualIncome, percentages, householdSize);
         }
-
         function convertToAnnual(amount, frequency, taxStatus) {
             let annualAmount = amount;
             
@@ -1437,16 +1562,41 @@
             document.getElementById('incomeSummary').innerHTML = summaryHTML;
 
             const eligibility = appState.eligibilityResults;
+            
+            let priorityBadges = '';
+            if (eligibility.isPriorityCommunity) {
+                const communities = appState.customerData.priorityCommunities.map(c => c.replace(/_/g, ' ')).join(', ');
+                priorityBadges += `<span class="badge badge-warning">⭐ Priority Community: ${communities}</span>`;
+            }
+            if (eligibility.workingWithCBO && appState.customerData.cboName) {
+                priorityBadges += `<span class="badge badge-info">🤝 CBO Partner: ${appState.customerData.cboName}</span>`;
+            }
+            
             const programHTML = `
                 <div class="info-panel">
                     <h4>Program Eligibility Summary</h4>
+                    ${priorityBadges ? `<div style="margin: 1rem 0; padding: 1rem; background: #fff3cd; border-radius: 8px;"><strong>Priority Status:</strong><br>${priorityBadges}</div>` : ''}
                     <div style="margin-top: 1rem;">
-                        ${eligibility.liheap ? '<span class="badge badge-success">✓ LIHEAP Eligible (≤150% FPL)</span>' : '<span class="badge badge-danger">✗ Not LIHEAP Eligible</span>'}
-                        ${eligibility.weatherization ? '<span class="badge badge-success">✓ Weatherization Eligible (≤60% SMI)</span>' : '<span class="badge badge-danger">✗ Not Weatherization Eligible</span>'}
+                        ${eligibility.weatherization ? '<span class="badge badge-success">✓ Oregon Weatherization (NO COST - ≤60% SMI or ≤200% FPL) ⚠️ Check waitlist</span>' : ''}
+                        ${eligibility.cpfEligible ? '<span class="badge badge-success">✓ Community Partner Fund (CPF) - Enhanced Incentives</span>' : ''}
+                        ${eligibility.liheap ? '<span class="badge badge-success">✓ LIHEAP Bill Assistance (≤150% FPL)</span>' : ''}
                         ${eligibility.energyTrust ? '<span class="badge badge-success">✓ Energy Trust Income-Qualified (≤80% AMI)</span>' : ''}
-                        ${eligibility.lowIncomeHousing ? '<span class="badge badge-success">✓ Low-Income Housing Programs (≤80% AMI)</span>' : ''}
-                        ${eligibility.firstTimeHomebuyer ? '<span class="badge badge-success">✓ First-Time Homebuyer (≤120% AMI)</span>' : ''}
+                        ${(eligibility.hearLowIncome || eligibility.hearModerate || eligibility.hearWeatherization) ? '<span class="badge badge-success">✓ HEAR (IRA Federal) - All income tiers eligible</span>' : ''}
+                        ${eligibility.homesEligible ? '<span class="badge badge-success">✓ HOMES Whole-Home Rebate (IRA Federal) - All income tiers eligible</span>' : ''}
                         ${eligibility.standardPrograms ? '<span class="badge badge-info">Standard Energy Trust Programs Available</span>' : ''}
+                    </div>
+                    ${eligibility.weatherization ? `
+                        <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                            <strong>⚠️ Important:</strong> Oregon Weatherization may have waitlists. Check agency capacity. 
+                            Meanwhile, you can also access HOMES/HEAR programs for faster upgrades.
+                        </div>
+                    ` : ''}
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 8px;">
+                        <strong>Your Eligibility Tier:</strong> 
+                        ${eligibility.weatherization ? '<span style="color: #155724; font-size: 1.1rem;">🎉 NO-COST WEATHERIZATION (+ HOMES/HEAR available)</span>' : 
+                          eligibility.cpfEligible ? '<span style="color: #155724; font-size: 1.1rem;">⭐ ENHANCED INCENTIVES (CPF + HOMES/HEAR)</span>' : 
+                          eligibility.hearModerate ? '<span style="color: #0c5460; font-size: 1.1rem;">💰 MODERATE INCOME (Standard + HEAR/HOMES)</span>' :
+                          '<span style="color: #0c5460; font-size: 1.1rem;">📊 STANDARD PROGRAMS</span>'}
                     </div>
                 </div>
             `;
@@ -1533,20 +1683,37 @@
                 });
             }
 
-            // HVAC recommendations
+            // HVAC recommendations - Differentiate ducted vs ductless based on existing ductwork
             const heatingAge = parseInt(data.heatingAge) || 0;
             if (heatingAge > 15 || data.heatingType === 'baseboard' || data.heatingType === 'electric_furnace') {
-                const units = Math.ceil((parseInt(data.conditionedSpace) || 1800) / 900);
-                const cost = units * 8000;
-                const incentive = units * 500;
-                recommendations.push({
-                    priority: '🟡',
-                    measure: 'Heat Pump System',
-                    description: `Install ${units} ductless heat pump unit(s) for efficient heating/cooling`,
-                    estimatedCost: `$${cost.toLocaleString()}`,
-                    incentive: `$${incentive.toLocaleString()} Energy Trust + utility incentives`,
-                    dependencies: 'Insulation upgrades recommended first'
-                });
+                const hasGoodDucts = data.ductwork === 'good' || data.ductwork === 'fair';
+                const conditionedSpace = parseInt(data.conditionedSpace) || 1800;
+                
+                if (hasGoodDucts && (data.heatingType === 'electric_furnace' || data.heatingType === 'gas_furnace')) {
+                    // Recommend ducted heat pump for homes with existing duct system
+                    const cost = 15000;
+                    recommendations.push({
+                        priority: '🟡',
+                        measure: 'Heat Pump System',
+                        description: `Install ducted (central) heat pump system to utilize existing ductwork`,
+                        estimatedCost: `$${cost.toLocaleString()}`,
+                        incentive: `$1,500+ Energy Trust + utility incentives`,
+                        dependencies: 'Duct sealing recommended first'
+                    });
+                } else {
+                    // Recommend ductless for homes without ducts or with poor duct condition
+                    const units = Math.ceil(conditionedSpace / 900);
+                    const cost = units * 8000;
+                    const incentive = units * 500;
+                    recommendations.push({
+                        priority: '🟡',
+                        measure: 'Heat Pump System',
+                        description: `Install ${units} ductless heat pump unit(s) - no ductwork needed`,
+                        estimatedCost: `$${cost.toLocaleString()}`,
+                        incentive: `$${incentive.toLocaleString()} Energy Trust + utility incentives`,
+                        dependencies: 'Insulation upgrades recommended first'
+                    });
+                }
             }
 
             // Windows
@@ -1664,46 +1831,443 @@
         // ===== MODULE 4: COMPREHENSIVE INSIGHTS =====
         function showComprehensiveResults() {
             try {
-                // Initialize calculator and report generator
-                const calculator = new IncentiveCalculator(null, null, null);
-                const reportGen = new ReportGenerator();
+                // Initialize IncentiveRules engine
+                const incentiveRules = new IncentiveRules();
                 
-                // Prepare customer profile with all required data
-                const customerProfile = {
-                    ...appState.customerData,
-                    ...appState.incomeData,
-                    householdSize: appState.incomeData.householdSize,
-                    annualIncome: appState.incomeData.annualIncome,
-                    amiPercent: appState.incomeData.amiPercent,
-                    fplPercent: appState.incomeData.fplPercent
-                };
+                // Get customer eligibility tier
+                const amiPercent = appState.incomeData.percentages.ami;
+                const smiPercent = appState.incomeData.percentages.smi;
+                const fplPercent = appState.incomeData.percentages.fpl;
+                const eligibilityTier = incentiveRules.getEligibilityTier(amiPercent, smiPercent, fplPercent);
                 
-                // Calculate incentives using new engine
-                const incentiveResults = calculator.calculateAvailableIncentives(
-                    customerProfile,
-                    appState.assessmentData
-                );
+                // Build comprehensive results with tier info
+                const tierDescription = incentiveRules.getTierDescription(eligibilityTier);
                 
-                // Generate comprehensive report
-                const reportHTML = reportGen.generateReport(
-                    appState.customerData,
-                    appState.incomeData,
-                    appState.assessmentData,
-                    incentiveResults
-                );
+                // Calculate incentives for each recommended measure
+                const enrichedRecommendations = appState.recommendations.map(rec => {
+                    // Map measure names to IDs
+                    const measureId = mapMeasureToId(rec.measure);
+                    
+                    if (measureId) {
+                        const measureDetails = {
+                            housingType: appState.customerData.housingType,
+                            sqft: parseInt(appState.assessmentData.homeSquareFootage) || 2000,
+                            cpfEligible: eligibility.cpfEligible || false
+                        };
+                        
+                        const packages = incentiveRules.getIncentiveForMeasure(measureId, eligibilityTier, measureDetails);
+                        
+                        // Parse estimated cost
+                        const costMatch = rec.estimatedCost.match(/\$([0-9,]+)/);
+                        const estimatedCost = costMatch ? parseInt(costMatch[1].replace(/,/g, '')) : 5000;
+                        
+                        // Get best package and calculate costs
+                        const bestPackage = incentiveRules.getBestPackage(packages, estimatedCost);
+                        const costCalc = incentiveRules.calculateNetCost(estimatedCost, bestPackage);
+                        
+                        return {
+                            ...rec,
+                            measureId: measureId,
+                            packages: packages,
+                            bestPackage: bestPackage,
+                            totalIncentives: costCalc.totalIncentives,
+                            netCost: costCalc.netCost,
+                            coverage: costCalc.coverage,
+                            estimatedCostNum: estimatedCost,
+                            selected: true // Default to selected
+                        };
+                    }
+                    
+                    return rec;
+                });
                 
-                // Display the full report
-                document.getElementById('comprehensiveResults').innerHTML = reportHTML;
+                // Store enriched data
+                appState.enrichedRecommendations = enrichedRecommendations;
+                appState.eligibilityTier = eligibilityTier;
                 
-                // Store for download
-                appState.lastGeneratedReport = reportHTML;
-                appState.incentiveResults = incentiveResults;
+                // Generate and display HTML
+                displayEnrichedResults(tierDescription, enrichedRecommendations);
                 
             } catch (error) {
-                console.error('Error generating report:', error);
+                console.error('Error generating comprehensive results:', error);
                 // Fallback to basic display
                 showBasicResults();
             }
+        }
+        
+        function mapMeasureToId(measureName) {
+            const mapping = {
+                'Attic Insulation': 'attic_insulation',
+                'Wall Insulation': 'wall_insulation',
+                'Floor Insulation': 'floor_insulation',
+                'Heat Pump System': 'heat_pump_ductless',
+                'Window Upgrades': 'window_replacement',
+                'Air Sealing': 'air_sealing',
+                'Duct Sealing': 'duct_sealing',
+                'Heat Pump Water Heater': 'heat_pump_water_heater',
+                'Smart Thermostat': 'smart_thermostat',
+                'Electric Panel Upgrade': 'electric_panel_upgrade'
+            };
+            return mapping[measureName] || null;
+        }
+        
+        function displayEnrichedResults(tierDescription, recommendations) {
+            const customer = appState.customerData;
+            const income = appState.incomeData;
+            const eligibility = appState.eligibilityResults;
+            
+            let html = `
+                <div class="customer-id-display">
+                    <div class="id-label">Assessment ID</div>
+                    <div class="id-value">${customer.customerId}</div>
+                </div>
+
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Your Personalized Energy Pathway</h3>
+                
+                <div class="alert alert-success">
+                    <h4 style="margin-bottom: 0.5rem;">${tierDescription}</h4>
+                    <p><strong>Profile:</strong> ${customer.firstName} ${customer.lastName} | 
+                    ${income.householdSize} person household | 
+                    ${customer.county} | ${income.percentages.ami}% AMI</p>
+                </div>
+            `;
+            
+            // Priority community status
+            if (eligibility.isPriorityCommunity || eligibility.workingWithCBO) {
+                html += `
+                    <div class="info-panel" style="background: #fff3cd; border-left-color: #ffc107;">
+                        <h4>⭐ Priority Community Benefits</h4>
+                        <p>You qualify for enhanced programs:</p>
+                        <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                            ${eligibility.cpfEligible ? '<li><strong>Community Partner Fund (CPF)</strong> - Higher rebates for all measures</li>' : ''}
+                            ${eligibility.hearLowIncome ? '<li><strong>HEAR 100%</strong> - Full federal rebates on electrification</li>' : ''}
+                            ${eligibility.hearModerate ? '<li><strong>HEAR 50%</strong> - Federal rebates on electrification</li>' : ''}
+                            ${eligibility.workingWithCBO && customer.cboName ? `<li><strong>CBO Partnership</strong> - Working with ${customer.cboName}</li>` : ''}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Recommendations table with selection checkboxes
+            if (recommendations.length > 0) {
+                html += `
+                    <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan with Your Incentives</h3>
+                    <div class="alert alert-info">
+                        <strong>💡 Tip:</strong> Check the boxes to select priority measures for your customized report. 
+                        We'll generate two cost summaries: one for selected measures only, and one for the full scope.
+                    </div>
+                    <table class="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">Select</th>
+                                <th>Priority</th>
+                                <th>Measure</th>
+                                <th>Est. Cost</th>
+                                <th>Best Package</th>
+                                <th>Coverage</th>
+                                <th>Net Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                recommendations.forEach((rec, idx) => {
+                    let packageDetails = '';
+                    
+                    if (rec.bestPackage && rec.bestPackage.incentives) {
+                        packageDetails = `<strong>${rec.bestPackage.name}</strong><br>`;
+                        packageDetails += rec.bestPackage.incentives.map(inc => {
+                            const amount = typeof inc.amount === 'number' ? `$${inc.amount.toLocaleString()}` : inc.amount;
+                            return `<div style="margin: 0.25rem 0; font-size: 0.85rem;">${inc.program}: ${amount}</div>`;
+                        }).join('');
+                        
+                        if (rec.bestPackage.note) {
+                            packageDetails += `<div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--muted); font-style: italic;">${rec.bestPackage.note}</div>`;
+                        }
+                        
+                        // Show alternative packages if available
+                        if (rec.packages && rec.packages.length > 1) {
+                            packageDetails += `<button onclick="showPackageOptions(${idx})" style="margin-top: 0.5rem; padding: 0.25rem 0.75rem; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">View ${rec.packages.length} package options</button>`;
+                        }
+                    } else {
+                        packageDetails = '<em>See program details</em>';
+                    }
+                    
+                    const coverage = rec.coverage ? `${rec.coverage}%` : 'N/A';
+                    const netCost = rec.netCost !== undefined ? `$${rec.netCost.toLocaleString()}` : rec.estimatedCost;
+                    
+                    html += `
+                        <tr id="measure-row-${idx}">
+                            <td style="text-align: center;">
+                                <input type="checkbox" class="measure-checkbox" data-idx="${idx}" 
+                                       onchange="toggleMeasureSelection(${idx})" 
+                                       ${rec.selected ? 'checked' : ''}
+                                       style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--brand);">
+                            </td>
+                            <td style="font-size: 1.5rem; text-align: center;">${rec.priority}</td>
+                            <td><strong>${rec.measure}</strong><br><small style="color: var(--muted);">${rec.description}</small></td>
+                            <td><strong>${rec.estimatedCost}</strong></td>
+                            <td style="color: var(--success); font-size: 0.9rem;">${packageDetails}</td>
+                            <td><strong style="color: var(--brand);">${coverage}</strong></td>
+                            <td><strong style="font-size: 1.1rem;">${netCost}</strong></td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+                    
+                    <div id="costSummary" style="margin-top: 2rem;">
+                        ${generateCostSummary(recommendations)}
+                    </div>
+                `;
+            }
+            
+            // Next steps
+            html += generateNextStepsSection(eligibility);
+            
+            // Priority concerns
+            if (customer.prioritizedConcerns && customer.prioritizedConcerns.length > 0) {
+                html += generatePriorityConcernsSection(customer.prioritizedConcerns);
+            }
+            
+            document.getElementById('comprehensiveResults').innerHTML = html;
+        }
+        
+        function toggleMeasureSelection(idx) {
+            if (appState.enrichedRecommendations && appState.enrichedRecommendations[idx]) {
+                appState.enrichedRecommendations[idx].selected = !appState.enrichedRecommendations[idx].selected;
+                updateCostSummary();
+            }
+        }
+        
+        function updateCostSummary() {
+            const summaryDiv = document.getElementById('costSummary');
+            if (summaryDiv && appState.enrichedRecommendations) {
+                summaryDiv.innerHTML = generateCostSummary(appState.enrichedRecommendations);
+            }
+        }
+        
+        function generateCostSummary(recommendations) {
+            const selected = recommendations.filter(r => r.selected);
+            const all = recommendations;
+            
+            // Calculate selected totals
+            let selectedCost = 0;
+            let selectedIncentives = 0;
+            selected.forEach(r => {
+                selectedCost += r.estimatedCostNum || 0;
+                selectedIncentives += r.totalIncentives || 0;
+            });
+            const selectedNet = selectedCost - selectedIncentives;
+            
+            // Calculate full scope totals
+            let fullCost = 0;
+            let fullIncentives = 0;
+            all.forEach(r => {
+                fullCost += r.estimatedCostNum || 0;
+                fullIncentives += r.totalIncentives || 0;
+            });
+            const fullNet = fullCost - fullIncentives;
+            
+            return `
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Cost Summary</h3>
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--success);">
+                        <h4 style="color: var(--brand); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            ✅ Selected Measures (${selected.length})
+                        </h4>
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: white; border-radius: 8px;">
+                                <span style="font-weight: 600;">Total Cost:</span>
+                                <span style="font-size: 1.1rem; font-weight: bold;">$${selectedCost.toLocaleString()}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: white; border-radius: 8px;">
+                                <span style="font-weight: 600; color: var(--success);">Total Incentives:</span>
+                                <span style="font-size: 1.1rem; font-weight: bold; color: var(--success);">-$${selectedIncentives.toLocaleString()}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--brand); color: white; border-radius: 8px; margin-top: 0.5rem;">
+                                <span style="font-weight: bold; font-size: 1.1rem;">Your Net Cost:</span>
+                                <span style="font-size: 1.3rem; font-weight: bold;">$${selectedNet.toLocaleString()}</span>
+                            </div>
+                            <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
+                                ${Math.round((selectedIncentives / selectedCost) * 100) || 0}% covered by incentives
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--accent);">
+                        <h4 style="color: var(--accent-dark); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            📊 Full Scope (${all.length} measures)
+                        </h4>
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: white; border-radius: 8px;">
+                                <span style="font-weight: 600;">Total Cost:</span>
+                                <span style="font-size: 1.1rem; font-weight: bold;">$${fullCost.toLocaleString()}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: white; border-radius: 8px;">
+                                <span style="font-weight: 600; color: var(--success);">Total Incentives:</span>
+                                <span style="font-size: 1.1rem; font-weight: bold; color: var(--success);">-$${fullIncentives.toLocaleString()}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--accent); color: white; border-radius: 8px; margin-top: 0.5rem;">
+                                <span style="font-weight: bold; font-size: 1.1rem;">Your Net Cost:</span>
+                                <span style="font-size: 1.3rem; font-weight: bold;">$${fullNet.toLocaleString()}</span>
+                            </div>
+                            <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
+                                ${Math.round((fullIncentives / fullCost) * 100) || 0}% covered by incentives
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showPackageOptions(idx) {
+            const rec = appState.enrichedRecommendations[idx];
+            if (!rec || !rec.packages) return;
+            
+            let html = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;" onclick="this.remove()">
+                    <div style="background: white; border-radius: 15px; padding: 2rem; max-width: 800px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
+                        <h3 style="color: var(--brand); margin-bottom: 1rem;">${rec.measure} - Package Options</h3>
+                        <p style="color: var(--muted); margin-bottom: 1.5rem;">Choose the best incentive package for your situation:</p>
+            `;
+            
+            rec.packages.forEach((pkg, pkgIdx) => {
+                const costCalc = new IncentiveRules().calculateNetCost(rec.estimatedCostNum, pkg);
+                const isBest = pkg === rec.bestPackage;
+                
+                html += `
+                    <div style="background: ${isBest ? 'linear-gradient(135deg, #d4edda, #c3e6cb)' : '#f9fafb'}; border: 2px solid ${isBest ? 'var(--success)' : '#e5e7eb'}; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--brand); margin: 0;">${pkg.name} ${isBest ? '⭐ RECOMMENDED' : ''}</h4>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.9rem; color: var(--muted);">Net Cost</div>
+                                <div style="font-size: 1.3rem; font-weight: bold; color: var(--brand);">$${costCalc.netCost.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                `;
+                
+                pkg.incentives.forEach(inc => {
+                    const amount = typeof inc.amount === 'number' ? `$${inc.amount.toLocaleString()}` : inc.amount;
+                    html += `
+                        <div style="padding: 0.5rem; background: white; border-radius: 5px; margin: 0.5rem 0;">
+                            <strong>${inc.program}:</strong> ${amount}
+                            ${inc.note ? `<br><small style="color: var(--muted);">${inc.note}</small>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        ${pkg.note ? `<div style="color: var(--muted); font-style: italic; font-size: 0.9rem;">💡 ${pkg.note}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                        <button onclick="this.closest('div[style*=\'position: fixed\']').remove()" style="padding: 0.75rem 2rem; background: var(--brand); color: white; border: none; border-radius: 999px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 1rem;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        
+        function generateNextStepsSection(eligibility) {
+            let html = `
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Next Steps & Resources</h3>
+                <div class="form-grid">
+            `;
+            
+            if (eligibility.weatherization) {
+                html += `
+                    <div class="info-panel">
+                        <h4>🎉 Oregon Weatherization (PRIORITY)</h4>
+                        <p><strong>Phone:</strong> 1-800-766-6861<br>
+                        <strong>Website:</strong> oregon.gov/ohcs/energy-weatherization<br>
+                        <strong>Action:</strong> Apply immediately for no-cost comprehensive upgrades</p>
+                    </div>
+                `;
+            }
+            
+            if (eligibility.cpfEligible) {
+                html += `
+                    <div class="info-panel">
+                        <h4>⭐ Community Partner Fund (CPF)</h4>
+                        <p><strong>Contact:</strong> Energy Trust Community Partner<br>
+                        <strong>Website:</strong> energytrust.org/cpf<br>
+                        <strong>Action:</strong> Work with your CBO or find a partner to access enhanced rebates</p>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="info-panel">
+                    <h4>⚡ Energy Trust of Oregon</h4>
+                    <p><strong>Phone:</strong> 1-866-368-7878<br>
+                    <strong>Website:</strong> energytrust.org<br>
+                    <strong>Action:</strong> Find Trade Ally contractors at energytrust.org/find-a-contractor</p>
+                </div>
+            `;
+            
+            if (eligibility.hearLowIncome || eligibility.hearModerate) {
+                html += `
+                    <div class="info-panel">
+                        <h4>🇺🇸 HEAR Federal Program (IRA)</h4>
+                        <p><strong>Phone:</strong> Oregon DOE 1-800-221-8035<br>
+                        <strong>Website:</strong> oregon.gov/energy/incentives<br>
+                        <strong>Action:</strong> Check availability - program launching in phases</p>
+                    </div>
+                `;
+            }
+            
+            if (eligibility.liheap) {
+                html += `
+                    <div class="info-panel">
+                        <h4>💵 LIHEAP Bill Assistance</h4>
+                        <p><strong>Contact:</strong> Local Community Action Agency<br>
+                        <strong>Action:</strong> Get help with energy bills while planning upgrades</p>
+                    </div>
+                `;
+            }
+            
+            html += `
+                </div>
+            `;
+            
+            return html;
+        }
+        
+        function generatePriorityConcernsSection(concerns) {
+            let html = `
+                <div class="alert alert-info" style="margin-top: 2rem;">
+                    <h4 style="margin-bottom: 0.5rem;">🎯 Your Priority Concerns (Ranked)</h4>
+                    <div style="margin-top: 1rem;">
+            `;
+            
+            concerns.forEach((concern, idx) => {
+                html += `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0; padding: 0.5rem; background: white; border-radius: 8px; border-left: 4px solid var(--brand);">
+                        <span style="background: var(--brand); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">#${idx + 1}</span>
+                        <span style="font-size: 1.2rem;">${concern.icon}</span>
+                        <span style="flex: 1; font-weight: 600;">${concern.text}</span>
+                        <span style="color: var(--muted); font-size: 0.85rem;">Weight: ${concern.weight}</span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Note:</strong> Our recommendations are prioritized to address your top concerns first.</p>
+                </div>
+            `;
+            
+            return html;
         }
         
         // Fallback basic results function
@@ -1799,9 +2363,14 @@
 
             // Financing options
             html += `
-                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Financing & Resources</h3>
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Next Steps & Resources</h3>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: #666;">
+                    <strong>⚠️ Important:</strong> This assessment tool is provided for informational purposes only and is not affiliated with or endorsed by any program listed. 
+                    You must apply directly through official channels below to access programs and confirm eligibility. Incentive amounts are estimates and subject to program availability, 
+                    funding levels, and administrator approval.
+                </div>
                 <div class="form-grid">
-                    <div class="info-panel">
+            `;
                         <h4>📞 Oregon Weatherization</h4>
                         <p>Phone: 1-800-766-6861<br>
                         Website: oregon.gov/ohcs/energy-weatherization</p>
