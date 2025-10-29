@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oregon Comprehensive Energy Assessment</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="src/income_data_loader.js"></script>
     <script src="src/data_loader.js"></script>
     <script src="src/incentive_rules.js"></script>
     <script src="src/incentive_calculator.js"></script>
@@ -1324,6 +1325,9 @@
             eligibilityResults: {},
             recommendations: []
         };
+        
+        // Income data loader instance
+        const incomeDataLoader = new IncomeDataLoader();
 
         // ===== OREGON DATA (2025 OFFICIAL) =====
         // All data sourced from official government agencies - see docs/DATA_SOURCES.md
@@ -1397,7 +1401,15 @@
         const oregonSMI = 78600;
 
         // ===== INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load income data first
+            const loaded = await incomeDataLoader.loadData();
+            if (!loaded) {
+                console.error('Failed to load income data - falling back to legacy calculation');
+            } else {
+                console.log('✅ Income data loaded successfully');
+            }
+            
             populateCounties();
             initializeApp();
             initializeDragAndDrop();
@@ -1566,27 +1578,36 @@
                 // Source: DATA_SOURCES.md line 178 | OHCS WAP 2025 guidelines
                 weatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),
                 
-                // CORRECTED: CPF eligibility ≤80% AMI + (priority community OR CBO) - FILTERED if opt-out
+                // CPF eligibility rules (Energy Trust CPF program)
+                // Tier 1: ≤80% AMI + (priority community OR CBO)
+                // Tier 2: 81-150% AMI + (priority community AND CBO) - requires both
                 // Source: DATA_SOURCES.md line 179 | Energy Trust CPF program rules
-                // Previous incorrect threshold: <150% AMI (audit correction Oct 2025)
-                cpfEligible: !optOutFederal && percentages.ami <= 80 && (isPriorityCommunity || workingWithCBO),
+                // Note: >80% AMI tier NOT eligible for federal HEAR/HOMES unless opting out
+                cpfEligible: !optOutFederal && (
+                    (percentages.ami <= 80 && (isPriorityCommunity || workingWithCBO)) ||
+                    (percentages.ami > 80 && percentages.ami <= 150 && isPriorityCommunity && workingWithCBO)
+                ),
                 
                 // Standard income-qualified (Energy Trust is utility/state-funded, NOT federal)
                 energyTrust: percentages.ami <= 80,
                 lowIncomeHousing: percentages.ami <= 80,
                 firstTimeHomebuyer: percentages.ami <= 120,
                 
-                // HEAR eligibility - ALL INCOME TIERS can access HEAR - FILTERED if opt-out (federal IRA program)
-                // CORRECTED: Include all ≤80% AMI (including weatherization tier ≤60%)
+                // HEAR eligibility - Federal IRA program - FILTERED if opt-out
+                // ≤80% AMI: Eligible for HEAR 100%
+                // 81-150% AMI: Eligible ONLY if NOT in CPF Tier 2 (priority+CBO)
                 // Source: IRA Section 50122, incentive_eligibility_map.json line 43
-                // Rationale: Weatherization-eligible customers can choose HEAR if waitlist exists
+                // Note: CPF Tier 2 (81-150% AMI) customers choose CPF OR federal, not both
                 hearLowIncome: !optOutFederal && percentages.ami <= 80,    // 100% HEAR (all ≤80% AMI)
-                hearModerate: !optOutFederal && percentages.ami > 80 && percentages.ami <= 150,    // 50% HEAR
-                hearWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),  // Can access HEAR even with OHCS
+                hearModerate: !optOutFederal && percentages.ami > 80 && percentages.ami <= 150 && 
+                    !(isPriorityCommunity && workingWithCBO),  // NOT available if in CPF Tier 2
+                hearWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),
                 
-                // HOMES eligibility - ALL INCOME TIERS can access HOMES - FILTERED if opt-out (federal IRA program)
-                homesEligible: !optOutFederal && percentages.ami <= 400,  // Up to 400% AMI eligible
-                homesWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),  // Can access HOMES even with OHCS
+                // HOMES eligibility - Federal IRA program - FILTERED if opt-out
+                // Up to 400% AMI EXCEPT CPF Tier 2 customers (81-150% with priority+CBO)
+                homesEligible: !optOutFederal && percentages.ami <= 400 && 
+                    !(percentages.ami > 80 && percentages.ami <= 150 && isPriorityCommunity && workingWithCBO),
+                homesWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),
                 
                 // Market rate
                 standardPrograms: percentages.ami > 150,
@@ -1617,6 +1638,17 @@
         }
 
         function calculatePercentages(annualIncome, county, householdSize) {
+            // Try to use new income data loader first (exact values)
+            if (incomeDataLoader.isLoaded()) {
+                const result = incomeDataLoader.calculatePercentages(annualIncome, county, householdSize);
+                if (result) {
+                    console.log('✅ Using exact income thresholds from JSON file');
+                    return result;
+                }
+            }
+            
+            // Fallback to legacy calculation method
+            console.warn('⚠️ Falling back to legacy income calculation');
             const countyAMI = oregonCounties[county].ami;
             const adjustment = householdAdjustments[householdSize];
             const adjustedAMI = countyAMI * adjustment;

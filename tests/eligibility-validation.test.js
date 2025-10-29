@@ -42,9 +42,9 @@ const testScenarios = [
         }
     },
     
-    // Edge Case 3: 81% AMI (Just above CPF threshold)
+    // Edge Case 3: 81% AMI with BOTH priority AND CBO (NEW: CPF eligible 81-150%)
     {
-        name: "81% AMI - Above CPF Threshold",
+        name: "81% AMI - CPF Eligible with Priority AND CBO",
         ami: 81,
         smi: 81,
         fpl: 260,
@@ -53,9 +53,9 @@ const testScenarios = [
         optOutFederal: false,
         expected: {
             weatherization: false,
-            cpfEligible: false,  // >80% AMI (CORRECTED)
-            hearLowIncome: false,  // >80% AMI
-            hearModerate: true,  // 81-150% AMI
+            cpfEligible: true,  // 81-150% AMI with BOTH priority AND CBO
+            hearLowIncome: false,  // >80% AMI (NOT eligible for federal unless opt-out)
+            hearModerate: false,  // >80% CPF customers NOT eligible for federal HEAR
             energyTrust: false  // >80% AMI
         }
     },
@@ -114,6 +114,40 @@ const testScenarios = [
         }
     },
     
+    // Edge Case 6b: 100% AMI with only priority (NOT CPF, but HEAR eligible)
+    {
+        name: "100% AMI - Priority Only (HEAR eligible, no CPF)",
+        ami: 100,
+        smi: 100,
+        fpl: 300,
+        isPriorityCommunity: true,
+        workingWithCBO: false,
+        optOutFederal: false,
+        expected: {
+            cpfEligible: false,  // Requires BOTH priority AND CBO for 81-150%
+            hearModerate: true,  // Eligible since NOT in CPF Tier 2
+            homesEligible: true,  // Eligible since NOT in CPF Tier 2
+            energyTrust: false
+        }
+    },
+    
+    // Edge Case 6c: 100% AMI with only CBO (NOT CPF, but HEAR eligible)
+    {
+        name: "100% AMI - CBO Only (HEAR eligible, no CPF)",
+        ami: 100,
+        smi: 100,
+        fpl: 300,
+        isPriorityCommunity: false,
+        workingWithCBO: true,
+        optOutFederal: false,
+        expected: {
+            cpfEligible: false,  // Requires BOTH priority AND CBO for 81-150%
+            hearModerate: true,  // Eligible since NOT in CPF Tier 2
+            homesEligible: true,  // Eligible since NOT in CPF Tier 2
+            energyTrust: false
+        }
+    },
+    
     // Edge Case 7: Federal opt-out
     {
         name: "60% AMI - Federal Opt-Out",
@@ -158,15 +192,28 @@ function testEligibility(scenario) {
     const eligibility = {
         liheap: !optOutFederal && fpl <= 150,
         weatherization: !optOutFederal && (smi <= 60 || fpl <= 200),
-        cpfEligible: !optOutFederal && ami <= 80 && (isPriorityCommunity || workingWithCBO),
+        
+        // NEW CPF rules:
+        // Tier 1: ≤80% AMI + (priority OR CBO)
+        // Tier 2: 81-150% AMI + (priority AND CBO)
+        cpfEligible: !optOutFederal && (
+            (ami <= 80 && (isPriorityCommunity || workingWithCBO)) ||
+            (ami > 80 && ami <= 150 && isPriorityCommunity && workingWithCBO)
+        ),
+        
         energyTrust: ami <= 80,
         lowIncomeHousing: ami <= 80,
         firstTimeHomebuyer: ami <= 120,
+        
+        // HEAR NOT available to >80% AMI CPF customers (they chose CPF over federal)
         hearLowIncome: !optOutFederal && ami <= 80,
-        hearModerate: !optOutFederal && ami > 80 && ami <= 150,
+        hearModerate: !optOutFederal && ami > 80 && ami <= 150 && !(ami > 80 && isPriorityCommunity && workingWithCBO),
         hearWeatherization: !optOutFederal && (smi <= 60 || fpl <= 200),
-        homesEligible: !optOutFederal && ami <= 400,
+        
+        // HOMES NOT available to >80% AMI CPF customers
+        homesEligible: !optOutFederal && ami <= 400 && !(ami > 80 && ami <= 150 && isPriorityCommunity && workingWithCBO),
         homesWeatherization: !optOutFederal && (smi <= 60 || fpl <= 200),
+        
         standardPrograms: ami > 150,
         isPriorityCommunity: isPriorityCommunity,
         workingWithCBO: workingWithCBO,
