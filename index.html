@@ -2252,21 +2252,39 @@
                 html += `
                     <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan with Your Incentives</h3>
                     
-                    <!-- HOMES Opt-Out Option -->
-                    <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: #fff8e1; border: 2px solid #ffc107; border-radius: 10px;">
-                        <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
-                            <input type="checkbox" id="optOutHOMES" onchange="toggleHOMESOptOut()" 
-                                   style="width: 22px; height: 22px; margin-top: 2px; accent-color: var(--brand); cursor: pointer;">
-                            <div>
-                                <span style="font-weight: 600; font-size: 1rem; display: block; margin-bottom: 0.5rem;">
-                                    📊 Opt out of HOMES rebate program
-                                </span>
-                                <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.5;">
-                                    HOMES provides up to $10,000 in funding but requires a comprehensive energy audit and modeled savings. 
-                                    If an audit isn't available or practical for your timeline, check this box to see incentive options without HOMES.
-                                </p>
-                            </div>
-                        </label>
+                    <!-- Program Options -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <!-- HOMES Opt-Out Option -->
+                        <div style="padding: 1.25rem; background: #fff8e1; border: 2px solid #ffc107; border-radius: 10px;">
+                            <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
+                                <input type="checkbox" id="optOutHOMES" onchange="toggleHOMESOptOut()" 
+                                       style="width: 22px; height: 22px; margin-top: 2px; accent-color: var(--brand); cursor: pointer; flex-shrink: 0;">
+                                <div>
+                                    <span style="font-weight: 600; font-size: 1rem; display: block; margin-bottom: 0.5rem;">
+                                        📊 Opt out of HOMES
+                                    </span>
+                                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.5;">
+                                        HOMES requires energy audit. Uncheck to exclude if audit not available.
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- No-Cost Eligible Option -->
+                        <div style="padding: 1.25rem; background: #d4edda; border: 2px solid #28a745; border-radius: 10px;">
+                            <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
+                                <input type="checkbox" id="noCostEligible" onchange="toggleNoCostEligible()" checked
+                                       style="width: 22px; height: 22px; margin-top: 2px; accent-color: var(--success); cursor: pointer; flex-shrink: 0;">
+                                <div>
+                                    <span style="font-weight: 600; font-size: 1rem; display: block; margin-bottom: 0.5rem;">
+                                        🌟 No-Cost Eligible
+                                    </span>
+                                    <p style="margin: 0; color: #155724; font-size: 0.9rem; line-height: 1.5;">
+                                        Apply enhanced CPF/SWR no-cost incentives to insulation and heat pumps.
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; border: none; margin-bottom: 1.5rem;">
@@ -2407,7 +2425,7 @@
             const optOutChecked = document.getElementById('optOutHOMES').checked;
             console.log('HOMES opt-out toggled:', optOutChecked);
             
-            if (!appState.enrichedRecommendations || !window.IncentiveRules) {
+            if (!appState.enrichedRecommendations || typeof IncentiveRules === 'undefined') {
                 console.error('Cannot toggle HOMES: missing data or IncentiveRules');
                 return;
             }
@@ -2452,6 +2470,92 @@
             // Reapply HOMES allocation if not opted out
             if (!optOutChecked) {
                 console.log('Reapplying HOMES allocation...');
+                incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations);
+            }
+            
+            // Recalculate totals for all measures
+            appState.enrichedRecommendations.forEach(rec => {
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    const costCalc = incentiveRules.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
+                    rec.totalIncentives = costCalc.totalIncentives;
+                    rec.netCost = costCalc.netCost;
+                    rec.coverage = costCalc.coverage;
+                }
+            });
+            
+            // Update the display
+            updateRecommendationsTable();
+            updateCostSummary();
+        }
+        
+        /**
+         * Toggle No-Cost Eligible and recalculate incentives dynamically
+         * When enabled: Apply enhanced CPF/SWR no-cost incentives
+         * When disabled: Use standard CPF/SWR/Energy Trust incentives
+         */
+        function toggleNoCostEligible() {
+            const noCostChecked = document.getElementById('noCostEligible').checked;
+            console.log('No-Cost Eligible toggled:', noCostChecked);
+            
+            if (!appState.enrichedRecommendations || typeof IncentiveRules === 'undefined') {
+                console.error('Cannot toggle No-Cost: missing data or IncentiveRules');
+                return;
+            }
+            
+            const incentiveRules = new IncentiveRules();
+            const optOutHOMES = document.getElementById('optOutHOMES').checked;
+            
+            // Eligible measure types for no-cost treatment
+            const noCostMeasures = [
+                'attic_insulation',
+                'wall_insulation',
+                'floor_insulation',
+                'heat_pump_ducted',
+                'heat_pump_ductless'
+            ];
+            
+            appState.enrichedRecommendations.forEach(rec => {
+                if (!rec.bestPackage || !rec.bestPackage.incentives) return;
+                if (!noCostMeasures.includes(rec.measureId)) return;
+                
+                // Find CPF incentive
+                const cpfIncentive = rec.bestPackage.incentives.find(inc => 
+                    inc.program && inc.program.includes('CPF')
+                );
+                
+                if (cpfIncentive) {
+                    if (noCostChecked) {
+                        // Apply enhanced no-cost CPF - increase to cover full cost minus other incentives
+                        const otherIncentives = rec.bestPackage.incentives
+                            .filter(inc => !inc.program.includes('CPF'))
+                            .reduce((sum, inc) => sum + (typeof inc.amount === 'number' ? inc.amount : 0), 0);
+                        
+                        const gap = Math.max(0, rec.estimatedCostNum - otherIncentives);
+                        cpfIncentive.amount = Math.ceil(gap * 1.1); // 10% buffer for no-cost assurance
+                        cpfIncentive.note = 'Enhanced CPF no-cost coverage (may exceed remaining cost for assurance)';
+                        console.log(`Enhanced CPF for ${rec.measure}: $${cpfIncentive.amount.toLocaleString()}`);
+                    } else {
+                        // Revert to standard CPF amounts
+                        const measureRule = incentiveRules.getMeasureRules()[rec.measureId];
+                        if (measureRule) {
+                            const measureDetails = {
+                                housingType: appState.customerData.housingType,
+                                sqft: rec.sqft || parseInt(appState.assessmentData.homeSquareFootage) || 2000
+                            };
+                            const standardCPF = incentiveRules.getCPFAmount(rec.measureId, measureDetails);
+                            if (standardCPF && typeof standardCPF === 'number') {
+                                cpfIncentive.amount = standardCPF;
+                                cpfIncentive.note = 'Standard CPF incentive';
+                                console.log(`Standard CPF for ${rec.measure}: $${cpfIncentive.amount.toLocaleString()}`);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Reapply HOMES allocation if not opted out
+            if (!optOutHOMES) {
+                console.log('Reapplying HOMES allocation after No-Cost toggle...');
                 incentiveRules.applyHOMESAllocation(appState.enrichedRecommendations);
             }
             
