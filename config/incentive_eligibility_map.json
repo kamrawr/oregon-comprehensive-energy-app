@@ -1,0 +1,557 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-10-29",
+  "source": "residential-incentive-insights project",
+  "disclaimer": "Verify all amounts with official program administrators",
+  
+  "income_tiers": {
+    "swr_weatherization": {
+      "name": "Single-Family Weatherization (SWR/OHCS)",
+      "description": "Comprehensive no-cost weatherization",
+      "eligibility": {
+        "ami_max": 60,
+        "fpl_max": 200,
+        "logic": "Qualifies if income <= 60% SMI OR <= 200% FPL (whichever is higher)"
+      },
+      "coverage": "no_cost",
+      "programs": ["SWR"]
+    },
+    "cpf_income_qualified": {
+      "name": "Community Partner Funding (CPF)",
+      "description": "Enhanced incentives through community organizations",
+      "eligibility": {
+        "ami_max": 80,
+        "priority": "Low-income households, communities of color, rural areas"
+      },
+      "coverage": "36-120%",
+      "programs": ["CPF", "CERTA"]
+    },
+    "swr_moderate_income": {
+      "name": "Savings Within Reach (SWR)",
+      "description": "Increased incentives for moderate-income",
+      "eligibility": {
+        "ami_min": 60,
+        "ami_max": 80
+      },
+      "coverage": "50-80%",
+      "programs": ["SWR", "On-Bill Repayment"]
+    },
+    "hear_low_income": {
+      "name": "HEAR - Low Income (IRA Federal)",
+      "description": "100% rebate for electrification",
+      "eligibility": {
+        "ami_max": 80
+      },
+      "coverage": "100% of rebate amount",
+      "max_per_household": 14000,
+      "programs": ["HEAR"]
+    },
+    "hear_moderate_income": {
+      "name": "HEAR - Moderate Income (IRA Federal)",
+      "description": "50% rebate for electrification",
+      "eligibility": {
+        "ami_min": 81,
+        "ami_max": 150
+      },
+      "coverage": "50% of rebate amount",
+      "max_per_household": 14000,
+      "programs": ["HEAR"]
+    },
+    "homes_eligible": {
+      "name": "HOMES - Whole-Home Performance (IRA Federal)",
+      "description": "Performance-based rebate for energy savings",
+      "eligibility": {
+        "ami_max": 150
+      },
+      "coverage": "Based on modeled savings (20-35%+)",
+      "rebate_range": "2000-8000",
+      "programs": ["HOMES"]
+    },
+    "standard_market_rate": {
+      "name": "Energy Trust Standard Incentives",
+      "description": "Available to all qualifying households",
+      "eligibility": {
+        "income_limit": "none"
+      },
+      "coverage": "15-60%",
+      "programs": ["Energy Trust Standard"]
+    }
+  },
+
+  "measure_incentives": {
+    "heat_pump_ductless": {
+      "measure_name": "Ductless Heat Pump",
+      "typical_cost": "2500-8500",
+      "requirements": {
+        "efficiency": "HSPF2 ≥ 8.1",
+        "installation": "Trade Ally or BPI certified",
+        "replaces": "Electric resistance heating preferred"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": {
+          "amount": "full_coverage",
+          "description": "Covered at no cost through weatherization program"
+        },
+        "cpf_single_family": {
+          "amount": 1800,
+          "note": "Single-head, single-compressor"
+        },
+        "cpf_manufactured_home": {
+          "amount": 3500,
+          "note": "Enhanced rebate for manufactured homes"
+        },
+        "cpf_multifamily": {
+          "amount": 2000
+        },
+        "hear_low_income": {
+          "amount": 8000,
+          "coverage": "100%",
+          "stacks_with": ["utility_programs"]
+        },
+        "hear_moderate_income": {
+          "amount": 4000,
+          "coverage": "50%",
+          "stacks_with": ["utility_programs"]
+        },
+        "standard_market_rate": {
+          "amount": 800,
+          "stacks_with": ["homes", "utility_programs"]
+        }
+      },
+      "stacking_rules": {
+        "cannot_combine": ["cpf", "standard"],
+        "federal_state_stacking": "HEAR + CPF allowed for income-qualified",
+        "optimal_low_income": "CPF ($1,800-$3,500) + HEAR ($8,000) = $9,800-$11,500",
+        "optimal_moderate": "Standard ($800) + HEAR ($4,000) + HOMES (if eligible) = $4,800+"
+      }
+    },
+    
+    "heat_pump_ducted": {
+      "measure_name": "Ducted Heat Pump (Central)",
+      "typical_cost": "8000-15000",
+      "requirements": {
+        "efficiency": "HSPF2 ≥ 7.5",
+        "installation": "Trade Ally required",
+        "replaces": "Electric forced air furnace or gas furnace"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": {
+          "amount": "full_coverage"
+        },
+        "cpf_single_family": {
+          "amount": 4000,
+          "note": "Replaces electric forced air furnace"
+        },
+        "cpf_multifamily": {
+          "amount": 5000
+        },
+        "cpf_no_cost_ducted": {
+          "amount": "full_coverage",
+          "requirements": ["Income qualified", "Replaces electric forced air furnace"]
+        },
+        "cpf_extended_capacity": {
+          "amount": 2000,
+          "replace_furnace_bonus": 4000,
+          "total": 6000,
+          "requirements": ["Qualifying product list", "Aux heat lockout", "No backup gas"]
+        },
+        "hear_low_income": {
+          "amount": 8000,
+          "coverage": "100%"
+        },
+        "hear_moderate_income": {
+          "amount": 4000,
+          "coverage": "50%"
+        },
+        "standard_market_rate": {
+          "amount": 1500
+        }
+      },
+      "stacking_rules": {
+        "optimal_low_income": "CPF No-Cost OR CPF ($4,000-$6,000) + HEAR ($8,000) = up to $14,000",
+        "optimal_moderate": "Standard ($1,500) + HEAR ($4,000) = $5,500"
+      }
+    },
+
+    "attic_insulation": {
+      "measure_name": "Attic Insulation",
+      "typical_cost_per_sqft": "1.0-4.5",
+      "requirements": {
+        "r_value_target": "R-38 minimum (single family), R-30 (floor), R-22 (manufactured)",
+        "documentation": "Photos, square footage, before/after R-values"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": {
+          "amount": "full_coverage",
+          "coverage_percent": "60-120%"
+        },
+        "cpf": {
+          "amount_per_sqft": 1.5,
+          "typical_coverage": "60-120%",
+          "note": "Can exceed 100% with CERTA structural repairs"
+        },
+        "swr_moderate": {
+          "coverage_percent": "50-60%"
+        },
+        "certa_enabling": {
+          "amount": 2000,
+          "purpose": "Repairs for wiring, rot, moisture barriers",
+          "stacks_with": ["cpf", "standard"]
+        },
+        "hear_insulation": {
+          "amount": 1600,
+          "note": "Federal weatherization rebate"
+        },
+        "homes_contribution": {
+          "amount": "2000-8000",
+          "note": "Whole-home performance rebate (requires energy modeling)"
+        },
+        "standard_market_rate": {
+          "amount_per_sqft": 0.10,
+          "coverage_percent": "50-60%"
+        }
+      },
+      "stacking_rules": {
+        "optimal_low_income": "CPF (full sqft rate) + CERTA ($2,000 if needed) + HEAR ($1,600) = potentially >100% coverage",
+        "optimal_moderate": "Standard + HEAR ($1,600) + HOMES ($2,000-$8,000 if comprehensive)",
+        "best_approach": "Combine with air sealing and other envelope work for HOMES qualification"
+      }
+    },
+
+    "wall_insulation": {
+      "measure_name": "Wall Insulation",
+      "typical_cost_per_sqft": "2.0-4.5",
+      "requirements": {
+        "existing_r_value": "R-4 or less",
+        "installation": "Dense-pack or injection foam"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "cpf": {
+          "amount_per_sqft": 1.0,
+          "note": "Lower rate than attic due to higher complexity"
+        },
+        "standard_market_rate": {
+          "amount_per_sqft": 0.08
+        },
+        "hear_insulation": 1600,
+        "homes_contribution": "2000-8000"
+      }
+    },
+
+    "floor_insulation": {
+      "measure_name": "Floor/Crawlspace Insulation",
+      "typical_cost_per_sqft": "1.5-3.5",
+      "requirements": {
+        "r_value_target": "R-30 (single family), R-22 (manufactured)",
+        "moisture_barrier": "Required in crawlspace"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "cpf": {
+          "amount_per_sqft": 1.2
+        },
+        "standard_market_rate": {
+          "amount_per_sqft": 0.10
+        },
+        "hear_insulation": 1600,
+        "certa_moisture": 2000
+      }
+    },
+
+    "air_sealing": {
+      "measure_name": "Air Sealing",
+      "typical_cost": "800-1500",
+      "requirements": {
+        "testing": "Blower door test required",
+        "documentation": "CFM50 and ACH50 measurements"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "cpf": 800,
+        "standard_market_rate": 400,
+        "hear_insulation": "included_in_1600",
+        "homes_contribution": "contributes_to_whole_home"
+      }
+    },
+
+    "heat_pump_water_heater": {
+      "measure_name": "Heat Pump Water Heater (HPWH)",
+      "typical_cost": "3600-6500",
+      "requirements": {
+        "efficiency": "UEF ≥ 3.0",
+        "electrical": "30A circuit required",
+        "space": "120 cu ft of air"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "cpf": {
+          "amount": 240,
+          "note": "Can be fully funded in priority communities"
+        },
+        "hear_low_income": {
+          "amount": 1750,
+          "coverage": "100%"
+        },
+        "hear_moderate_income": {
+          "amount": 875,
+          "coverage": "50%"
+        },
+        "standard_market_rate": {
+          "amount": 240
+        }
+      },
+      "stacking_rules": {
+        "optimal_low_income": "CPF ($240) + HEAR ($1,750) = $1,990",
+        "optimal_moderate": "Standard ($240) + HEAR ($875) = $1,115",
+        "best_with": "Panel upgrade, heat pump installation"
+      }
+    },
+
+    "electric_panel_upgrade": {
+      "measure_name": "Electrical Panel Upgrade",
+      "typical_cost": "2000-4000",
+      "requirements": {
+        "minimum": "200 amp service",
+        "purpose": "Required for electrification measures"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "certa_enabling": {
+          "amount": 2000,
+          "note": "Enables other energy upgrades"
+        },
+        "hear_low_income": {
+          "amount": 4000,
+          "coverage": "100%"
+        },
+        "hear_moderate_income": {
+          "amount": 2000,
+          "coverage": "50%"
+        },
+        "standard_market_rate": {
+          "amount": 0,
+          "note": "No standard incentive; use HEAR or CERTA"
+        }
+      }
+    },
+
+    "electrical_wiring": {
+      "measure_name": "Electrical Wiring Upgrades",
+      "typical_cost": "1000-3000",
+      "requirements": {
+        "purpose": "Required for electrification measures"
+      },
+      "incentive_tiers": {
+        "hear_low_income": {
+          "amount": 2500,
+          "coverage": "100%"
+        },
+        "hear_moderate_income": {
+          "amount": 1250,
+          "coverage": "50%"
+        },
+        "certa_enabling": {
+          "amount": 2000
+        }
+      }
+    },
+
+    "smart_thermostat": {
+      "measure_name": "Smart Thermostat",
+      "typical_cost": "113-239",
+      "requirements": {
+        "compatibility": "Must be on approved model list",
+        "setup": "Wi-Fi and app configuration",
+        "heat_pump_lockout": "≤ 35°F for heat pumps"
+      },
+      "incentive_tiers": {
+        "cpf_direct_install": {
+          "amount": 250,
+          "coverage": "≈100%",
+          "note": "Direct install by community partners"
+        },
+        "standard_market_rate": {
+          "amount": 250,
+          "coverage": "≈100%"
+        }
+      },
+      "stacking_rules": {
+        "no_federal_rebate": "Not covered by HEAR/HOMES",
+        "best_with": "Heat pump installation to optimize performance"
+      }
+    },
+
+    "windows": {
+      "measure_name": "Window Replacement",
+      "typical_cost_per_window": 600,
+      "requirements": {
+        "u_factor": "≤0.22 (Tier 1) or 0.23-0.27 (Tier 2)",
+        "installation": "Proper flashing and drainage"
+      },
+      "incentive_tiers": {
+        "cpf_enhanced": {
+          "amount_per_sqft": "1.0-1.5",
+          "note": "May cover full cost with co-funding"
+        },
+        "standard_market_rate": {
+          "amount_per_window": 50,
+          "max_per_home": 500
+        },
+        "homes_contribution": "contributes_to_whole_home"
+      },
+      "guidance": {
+        "low_roi": "Prioritize for health/safety (condensation, noise)",
+        "best_use": "Equity-driven CPF projects or comprehensive HOMES upgrades"
+      }
+    },
+
+    "home_energy_assessment": {
+      "measure_name": "Home Energy Assessment/Audit",
+      "typical_cost": "439-615",
+      "requirements": {
+        "certification": "BPI or equivalent certified auditor",
+        "deliverables": "Comprehensive report with recommendations"
+      },
+      "incentive_tiers": {
+        "cpf_multifamily": {
+          "amount": 500,
+          "coverage": "100%"
+        },
+        "standard_market_rate": {
+          "amount": 250,
+          "coverage": "50-100%"
+        },
+        "homes_required": {
+          "amount": "included",
+          "note": "Required for HOMES rebate qualification"
+        }
+      }
+    },
+
+    "duct_sealing": {
+      "measure_name": "Duct Sealing and Insulation",
+      "typical_cost": "800-1500",
+      "requirements": {
+        "testing": "Duct leakage test (CFM25)",
+        "target": "< 10% leakage to outside"
+      },
+      "incentive_tiers": {
+        "swr_weatherization": "full_coverage",
+        "cpf": 600,
+        "standard_market_rate": 400,
+        "homes_contribution": "contributes_to_whole_home"
+      }
+    }
+  },
+
+  "program_stacking_matrix": {
+    "rules": {
+      "weatherization_standalone": {
+        "description": "SWR Weatherization is comprehensive and standalone",
+        "cannot_stack_with": ["cpf", "standard", "hear", "homes"],
+        "covers": "All weatherization measures at no cost"
+      },
+      "cpf_exclusivity": {
+        "description": "CPF and Standard are mutually exclusive",
+        "logic": "NOT (cpf AND standard)"
+      },
+      "hear_homes_exclusivity": {
+        "description": "HEAR and HOMES are mutually exclusive for same measures",
+        "logic": "NOT (hear AND homes) for same equipment",
+        "exception": "Can use HEAR for heat pump + HOMES for envelope if comprehensive"
+      },
+      "federal_state_utility_stacking": {
+        "description": "Federal + State + Utility incentives can stack",
+        "allowed_combinations": [
+          "HEAR + CPF + Utility",
+          "HEAR + Standard + Utility",
+          "HOMES + Standard + Utility",
+          "HOMES + CPF + Utility"
+        ]
+      },
+      "certa_universal": {
+        "description": "CERTA stacks with all programs",
+        "purpose": "Enables projects by covering structural repairs",
+        "stacks_with": ["all"]
+      }
+    },
+
+    "optimal_pathways": {
+      "very_low_income_ami_60": {
+        "priority": 1,
+        "pathway": "SWR Weatherization Program",
+        "coverage": "Comprehensive no-cost services",
+        "contact": "Oregon Housing & Community Services: 1-800-766-6861"
+      },
+      "low_income_ami_60_80": {
+        "priority": 2,
+        "pathway": "CPF + HEAR + CERTA",
+        "heat_pump": "CPF ($1,800-$6,000) + HEAR ($8,000) = up to $14,000",
+        "insulation": "CPF (full rate) + CERTA ($2,000) + HEAR ($1,600) = >100% coverage",
+        "water_heater": "CPF ($240) + HEAR ($1,750) = $1,990",
+        "contact": "Community Partner Organization + Oregon DOE"
+      },
+      "moderate_income_ami_81_150": {
+        "priority": 3,
+        "pathway": "Standard + HEAR + HOMES",
+        "heat_pump": "Standard ($800-$1,500) + HEAR 50% ($4,000) = $4,800-$5,500",
+        "comprehensive": "Standard + HEAR 50% + HOMES ($2,000-$8,000) if ≥20% savings",
+        "water_heater": "Standard ($240) + HEAR 50% ($875) = $1,115",
+        "contact": "Energy Trust Trade Ally + Oregon DOE"
+      },
+      "market_rate_over_150_ami": {
+        "priority": 4,
+        "pathway": "Standard + HOMES (if comprehensive)",
+        "heat_pump": "Standard ($800-$1,500)",
+        "comprehensive": "Standard + HOMES ($2,000-$8,000) if whole-home ≥20% savings",
+        "financing": "Energy Trust On-Bill, PACE, or conventional",
+        "contact": "Energy Trust Trade Ally: 1-866-368-7878"
+      }
+    }
+  },
+
+  "eligibility_determination_logic": {
+    "step_1_check_weatherization": {
+      "condition": "ami <= 60 OR fpl <= 200",
+      "result": "STOP - Direct to SWR Weatherization (no-cost comprehensive)",
+      "action": "Provide contact: 1-800-766-6861"
+    },
+    "step_2_check_cpf_eligible": {
+      "condition": "ami > 60 AND ami <= 80",
+      "result": "CPF Income-Qualified + HEAR (100%) + CERTA",
+      "action": "Maximize stacking with federal HEAR rebates"
+    },
+    "step_3_check_hear_moderate": {
+      "condition": "ami > 80 AND ami <= 150",
+      "result": "Standard + HEAR (50%) + HOMES (if comprehensive)",
+      "action": "Consider whole-home approach for HOMES qualification"
+    },
+    "step_4_market_rate": {
+      "condition": "ami > 150",
+      "result": "Standard + HOMES (if comprehensive)",
+      "action": "Focus on high-ROI measures; consider financing"
+    }
+  },
+
+  "official_contacts": {
+    "energy_trust": {
+      "name": "Energy Trust of Oregon",
+      "phone": "1-866-368-7878",
+      "website": "energytrust.org",
+      "programs": ["Standard", "Savings Within Reach", "Community Partner Funding"]
+    },
+    "oregon_weatherization": {
+      "name": "Oregon Housing & Community Services (OHCS)",
+      "phone": "1-800-766-6861",
+      "website": "oregon.gov/ohcs/energy-weatherization",
+      "programs": ["Single-Family Weatherization"]
+    },
+    "oregon_doe": {
+      "name": "Oregon Department of Energy",
+      "phone": "1-800-221-8035",
+      "website": "oregon.gov/energy",
+      "programs": ["CERTA", "HOMES (IRA)", "HEAR (IRA)"]
+    }
+  }
+}

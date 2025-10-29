@@ -17,6 +17,50 @@ class IncentiveCalculator {
         this.programs = programRules;
         this.territories = utilityTerritories;
         this.measures = measureSpecs;
+        this.eligibilityMap = null; // Will be loaded from config
+    }
+    
+    /**
+     * Load incentive eligibility map configuration
+     */
+    async loadEligibilityMap() {
+        if (!this.eligibilityMap) {
+            try {
+                const response = await fetch('config/incentive_eligibility_map.json');
+                this.eligibilityMap = await response.json();
+            } catch (error) {
+                console.error('Could not load eligibility map:', error);
+                this.eligibilityMap = {};
+            }
+        }
+        return this.eligibilityMap;
+    }
+    
+    /**
+     * Determine which income tier customer qualifies for
+     */
+    determineIncomeTier(customerProfile) {
+        const ami = customerProfile.amiPercent;
+        const fpl = customerProfile.fplPercent;
+        const smi = customerProfile.smiPercent || (customerProfile.annualIncome / 78600 * 100);
+        
+        // Step 1: Check Weatherization (highest priority)
+        if (ami <= 60 || fpl <= 200) {
+            return 'swr_weatherization';
+        }
+        
+        // Step 2: Check CPF Income-Qualified (60-80% AMI)
+        if (ami > 60 && ami <= 80) {
+            return 'cpf_income_qualified';
+        }
+        
+        // Step 3: Check HEAR Moderate Income (81-150% AMI)
+        if (ami > 80 && ami <= 150) {
+            return 'hear_moderate_income';
+        }
+        
+        // Step 4: Market Rate (>150% AMI)
+        return 'standard_market_rate';
     }
 
     /**
@@ -301,7 +345,7 @@ class IncentiveCalculator {
         // Check each eligible program for this measure
         [...eligiblePrograms.federal, ...eligiblePrograms.state, ...eligiblePrograms.utility]
             .forEach(program => {
-                const incentive = this.getMeasureIncentive(measure, program, ami);
+                const incentive = this.getMeasureIncentive(measure, program, ami, customerProfile);
                 if (incentive && incentive.amount > 0) {
                     incentives.push(incentive);
                 }
@@ -317,9 +361,11 @@ class IncentiveCalculator {
 
     /**
      * Get incentive amount for a measure from a specific program
+     * Uses eligibility map to determine correct incentive tier
      */
-    getMeasureIncentive(measure, program, ami) {
+    getMeasureIncentive(measure, program, ami, customerProfile) {
         const measureId = measure.measure;
+        const incomeTier = this.determineIncomeTier(customerProfile || {amiPercent: ami});
 
         // === HEAR PROGRAM ===
         if (program.id === 'hear') {
