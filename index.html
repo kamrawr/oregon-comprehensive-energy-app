@@ -828,6 +828,24 @@
                         </small>
                     </div>
 
+                    <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem;">
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1.5rem;">
+                            <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer;">
+                                <input type="checkbox" id="optOutFederalPrograms" style="width: 22px; height: 22px; accent-color: var(--brand-light);">
+                                <span style="font-weight: 600; font-size: 1rem;">
+                                    I want to opt out of federally-funded programs (CPF no-cost track, OHCS Weatherization, HEAR, HOMES)
+                                </span>
+                            </label>
+                            <p style="color: #856404; font-size: 0.9rem; margin-top: 0.75rem; line-height: 1.5;">
+                                <strong>Why opt out?</strong> Some people prefer not to participate in federal programs due to documentation requirements, waitlists, or personal preference. 
+                                Checking this box will show you only state and utility-funded programs (Energy Trust of Oregon, state rebates, etc.).
+                            </p>
+                            <p style="color: #721c24; font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;">
+                                ⚠️ <strong>Note:</strong> Opting out may significantly reduce or eliminate available incentives, especially for income-qualified customers.
+                            </p>
+                        </div>
+                    </div>
+
                     <h3 style="color: var(--brand); margin: 2rem 0 1rem;">🎯 Your Energy Priorities</h3>
                     
                     <div class="form-group" style="grid-column: 1 / -1;">
@@ -1438,6 +1456,7 @@
             const priorityCommunities = Array.from(document.querySelectorAll('input[name="priorityCommunity"]:checked')).map(cb => cb.value);
             const workingWithCBO = document.getElementById('workingWithCBO').value === 'yes';
             const cboName = workingWithCBO ? document.getElementById('cboName').value : null;
+            const optOutFederalPrograms = document.getElementById('optOutFederalPrograms').checked;
             
             appState.customerData = {
                 firstName: document.getElementById('firstName').value,
@@ -1456,6 +1475,7 @@
                 priorityCommunities: priorityCommunities,
                 workingWithCBO: workingWithCBO,
                 cboName: cboName,
+                optOutFederalPrograms: optOutFederalPrograms,
                 timestamp: new Date().toISOString()
             };
 
@@ -1519,36 +1539,38 @@
             // Determine eligibility with priority community consideration
             const isPriorityCommunity = appState.customerData.priorityCommunities && appState.customerData.priorityCommunities.length > 0;
             const workingWithCBO = appState.customerData.workingWithCBO;
+            const optOutFederal = appState.customerData.optOutFederalPrograms || false;
             
             appState.eligibilityResults = {
-                // Core income-based programs
-                liheap: percentages.fpl <= 150,
-                // CORRECTED: Weatherization uses ≤60% SMI (not AMI) or ≤200% FPL
-                weatherization: percentages.smi <= 60 || percentages.fpl <= 200,
+                // Core income-based programs (LIHEAP is federal but not part of opt-out - it's bill assistance)
+                liheap: !optOutFederal && percentages.fpl <= 150,
+                // CORRECTED: Weatherization uses ≤60% SMI (not AMI) or ≤200% FPL - FILTERED if opt-out
+                weatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),
                 
-                // CPF eligibility: <150% AMI + (priority community OR CBO)
-                cpfEligible: percentages.ami < 150 && (isPriorityCommunity || workingWithCBO),
+                // CPF eligibility: <150% AMI + (priority community OR CBO) - FILTERED if opt-out (federally-funded no-cost track)
+                cpfEligible: !optOutFederal && percentages.ami < 150 && (isPriorityCommunity || workingWithCBO),
                 
-                // Standard income-qualified
+                // Standard income-qualified (Energy Trust is utility/state-funded, NOT federal)
                 energyTrust: percentages.ami <= 80,
                 lowIncomeHousing: percentages.ami <= 80,
                 firstTimeHomebuyer: percentages.ami <= 120,
                 
-                // HEAR eligibility - ALL INCOME TIERS can access HEAR
-                hearLowIncome: percentages.ami > 60 && percentages.ami <= 80,    // 100% HEAR
-                hearModerate: percentages.ami > 80 && percentages.ami <= 150,    // 50% HEAR
-                hearWeatherization: percentages.smi <= 60 || percentages.fpl <= 200,  // Can access HEAR even with OHCS
+                // HEAR eligibility - ALL INCOME TIERS can access HEAR - FILTERED if opt-out (federal IRA program)
+                hearLowIncome: !optOutFederal && percentages.ami > 60 && percentages.ami <= 80,    // 100% HEAR
+                hearModerate: !optOutFederal && percentages.ami > 80 && percentages.ami <= 150,    // 50% HEAR
+                hearWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),  // Can access HEAR even with OHCS
                 
-                // HOMES eligibility - ALL INCOME TIERS can access HOMES
-                homesEligible: percentages.ami <= 400,  // Up to 400% AMI eligible
-                homesWeatherization: percentages.smi <= 60 || percentages.fpl <= 200,  // Can access HOMES even with OHCS
+                // HOMES eligibility - ALL INCOME TIERS can access HOMES - FILTERED if opt-out (federal IRA program)
+                homesEligible: !optOutFederal && percentages.ami <= 400,  // Up to 400% AMI eligible
+                homesWeatherization: !optOutFederal && (percentages.smi <= 60 || percentages.fpl <= 200),  // Can access HOMES even with OHCS
                 
                 // Market rate
                 standardPrograms: percentages.ami > 150,
                 
                 // Priority flags
                 isPriorityCommunity: isPriorityCommunity,
-                workingWithCBO: workingWithCBO
+                workingWithCBO: workingWithCBO,
+                optOutFederalPrograms: optOutFederal
             };
 
             // Display results
@@ -1620,9 +1642,18 @@
                 priorityBadges += `<span class="badge badge-info">🤝 CBO Partner: ${appState.customerData.cboName}</span>`;
             }
             
+            // Show opt-out notification if applicable
+            const optOutNotice = eligibility.optOutFederalPrograms ? `
+                <div style="margin: 1rem 0; padding: 1rem; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px;">
+                    <strong>🚫 Federal Program Opt-Out Active</strong><br>
+                    <span style="font-size: 0.9rem;">You have chosen to opt out of federally-funded programs (CPF, OHCS Weatherization, HEAR, HOMES). Only state and utility-funded programs will be shown.</span>
+                </div>
+            ` : '';
+            
             const programHTML = `
                 <div class="info-panel">
                     <h4>Program Eligibility Summary</h4>
+                    ${optOutNotice}
                     ${priorityBadges ? `<div style="margin: 1rem 0; padding: 1rem; background: #fff3cd; border-radius: 8px;"><strong>Priority Status:</strong><br>${priorityBadges}</div>` : ''}
                     <div style="margin-top: 1rem;">
                         ${eligibility.weatherization ? '<span class="badge badge-success">✓ Oregon Weatherization (NO COST - ≤60% SMI or ≤200% FPL) ⚠️ Check waitlist</span>' : ''}
