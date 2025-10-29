@@ -36,6 +36,18 @@ class IncentiveRules {
     constructor() {
         // Load configuration synchronously (for Node.js environment and tests)
         // In browser, ConfigLoader is loaded via script tag
+        if (typeof ConfigLoader === 'undefined') {
+            console.warn('⚠️  ConfigLoader not available, using fallback defaults');
+            this.initializeFallbacks();
+            this.tiers = {
+                WEATHERIZATION: 'weatherization',
+                CPF_LOW_INCOME: 'cpf_low',
+                HEAR_MODERATE: 'hear_moderate',
+                STANDARD: 'standard'
+            };
+            return;
+        }
+        
         const configLoader = new ConfigLoader();
         try {
             // Try sync load for Node.js
