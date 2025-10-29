@@ -948,12 +948,16 @@
                 </div>
 
                 <div class="info-panel">
+                    <button type="button" class="btn btn-secondary" onclick="loadDemoIncomeData()" style="float: right; padding: 0.5rem 1rem;">
+                        📋 Load Demo Data
+                    </button>
                     <h4>Income Eligibility Assessment</h4>
                     <p>This information helps us determine which energy assistance programs you qualify for. All information is confidential.</p>
                     <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
                         Results are estimates only. Contact program administrators for official eligibility determination.<br>
                         <strong>Using 2025 Data:</strong> HUD Income Limits, HHS Poverty Guidelines | Last verified: Oct 29, 2025
                     </p>
+                    <div style="clear: both;"></div>
                 </div>
 
                 <form id="incomeForm">
@@ -1032,8 +1036,12 @@
                 <h2 class="module-title">Step 3: Home Energy Assessment</h2>
                 
                 <div class="info-panel">
+                    <button type="button" class="btn btn-secondary" onclick="loadDemoAssessmentData()" style="float: right; padding: 0.5rem 1rem;">
+                        📋 Load Demo Data
+                    </button>
                     <h4>Comprehensive Home Energy Evaluation</h4>
                     <p>Provide details about your home's current condition and systems. Use "N/A" for unknown items.</p>
+                    <div style="clear: both;"></div>
                 </div>
 
                 <form id="assessmentForm">
@@ -2767,6 +2775,72 @@
             } catch (error) {
                 console.error('Error loading demo data:', error);
                 alert('⚠️ Error loading demo data: ' + error.message);
+            }
+        }
+        
+        // ===== DEMO DATA - INCOME MODULE =====
+        function loadDemoIncomeData() {
+            try {
+                // Household size
+                document.getElementById('householdSize').value = '4';
+                
+                // Income - $55,000 annual (65% AMI for Multnomah County family of 4)
+                document.getElementById('income').value = '55000';
+                
+                // Frequency
+                document.getElementById('frequency').value = 'annual';
+                
+                // Tax status - pre-tax (gross)
+                document.querySelector('input[name="taxStatus"][value="pretax"]').checked = true;
+                
+                alert('✅ Demo income data loaded! This represents a family of 4 at ~65% AMI in Multnomah County. Click "Calculate Eligibility" to see results.');
+            } catch (error) {
+                console.error('Error loading demo income data:', error);
+                alert('⚠️ Error loading demo income data: ' + error.message);
+            }
+        }
+        
+        // ===== DEMO DATA - ASSESSMENT MODULE =====
+        function loadDemoAssessmentData() {
+            try {
+                // Property Details
+                document.getElementById('homeSquareFootage').value = '2000';
+                document.getElementById('conditionedSpace').value = '1800';
+                document.getElementById('homeAge').value = '1975';
+                document.getElementById('foundationType').value = 'crawlspace';
+                document.getElementById('roofCondition').value = 'fair';
+                
+                // Building Envelope
+                document.getElementById('atticInsulation').value = 'poor';
+                document.getElementById('wallInsulation').value = 'partial';
+                document.getElementById('floorInsulation').value = 'poor';
+                document.getElementById('windowType').value = 'single';
+                document.getElementById('doorSealing').value = 'poor';
+                
+                // HVAC Systems
+                document.getElementById('heatingType').value = 'gas_furnace';
+                document.getElementById('heatingAge').value = '20';
+                document.getElementById('coolingType').value = 'none';
+                document.getElementById('ductwork').value = 'fair';
+                
+                // Water Heating
+                document.getElementById('waterHeaterType').value = 'gas_tank';
+                document.getElementById('waterHeaterAge').value = '15';
+                document.getElementById('waterHeaterLocation').value = 'basement';
+                
+                // Health & Safety - Select a few issues
+                document.querySelectorAll('input[name="healthSafety"]').forEach(cb => {
+                    if (cb.value === 'combustion' || cb.value === 'moisture') {
+                        cb.checked = true;
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+                
+                alert('✅ Demo assessment data loaded! This represents a 1975 home with poor insulation, old equipment, and some health/safety issues. Click "Analyze Home Assessment" to see recommendations.');
+            } catch (error) {
+                console.error('Error loading demo assessment data:', error);
+                alert('⚠️ Error loading demo assessment data: ' + error.message);
             }
         }
     </script>
