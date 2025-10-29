@@ -1994,7 +1994,7 @@
                 
                 // Generate and display HTML
                 console.log('Calling displayEnrichedResults');
-                displayEnrichedResults(tierDescription, enrichedRecommendations);
+                displayEnrichedResults(tierDescription, enrichedRecommendations, eligibilityTier);
                 console.log('displayEnrichedResults completed');
                 
             } catch (error) {
@@ -2031,7 +2031,7 @@
             return mapping[measureName] || null;
         }
         
-        function displayEnrichedResults(tierDescription, recommendations) {
+        function displayEnrichedResults(tierDescription, recommendations, eligibilityTier) {
             const customer = appState.customerData;
             const income = appState.incomeData;
             const eligibility = appState.eligibilityResults;
@@ -2072,9 +2072,16 @@
             if (recommendations.length > 0) {
                 html += `
                     <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan with Your Incentives</h3>
-                    <div class="alert alert-info">
-                        <strong>💡 Tip:</strong> Check the boxes to select priority measures for your customized report. 
-                        We'll generate two cost summaries: one for selected measures only, and one for the full scope.
+                    <div class="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; border: none; margin-bottom: 1.5rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.2rem;">✅ SELECT YOUR PRIORITY MEASURES</h4>
+                        <p style="margin: 0; font-size: 1.05rem; line-height: 1.6;">
+                            <strong>Use the checkboxes below to select which measures you want to prioritize.</strong> 
+                            The cost summary will automatically update to show:
+                        </p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; line-height: 1.8;">
+                            <li><strong>Selected Measures</strong> - Your chosen priority upgrades with total costs</li>
+                            <li><strong>Full Scope</strong> - All recommended measures for comparison</li>
+                        </ul>
                     </div>
                     <table class="recommendations-table">
                         <thead>
