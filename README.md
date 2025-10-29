@@ -8,6 +8,8 @@
 
 🔗 **Live Application:** https://kamrawr.github.io/oregon-comprehensive-energy-app/
 
+📊 **Test Visualization & Impact Simulator:** https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
+
 ---
 
 ## ✨ Features
@@ -22,6 +24,7 @@
 - **📱 Mobile Responsive** - Works on all devices
 - **📥 Downloadable Reports** - Export personalized assessment results
 - **🔄 Interactive Selection** - Choose priority measures with dual cost summaries and real-time updates
+- **📈 Interactive Visualizations** - Explore test results, program coverage, and simulate long-term impact
 
 ---
 
@@ -59,6 +62,14 @@ This tool helps Oregon homeowners:
 2. Click **"📋 Load Demo Data"** to see a sample assessment
 3. Walk through all 4 steps
 4. Explore package options and cost summaries
+
+### **Explore Test Results & Impact**
+
+1. Visit: https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
+2. View interactive test scenario results and analysis
+3. Explore program coverage visualizations by income tier
+4. Use the impact simulator to estimate long-term effects
+5. Analyze HOMES allocation and CPF no-cost coverage
 
 ### **Run Locally**
 
@@ -111,7 +122,10 @@ oregon-comprehensive-energy-app/
 │
 ├── tests/                              # Test suite
 │   ├── eligibility-validation.test.js # 10 edge case tests (NEW)
+│   ├── comprehensive-scenarios.test.js # 20 scenario tests (NEW)
 │   └── README.md                      # Test documentation (NEW)
+│
+├── visualization.html                  # Interactive test & impact visualization (NEW)
 │
 └── docs/                               # Documentation
     ├── DATA_SOURCES.md                # Official data references
@@ -146,6 +160,24 @@ node tests/eligibility-validation.test.js
 - Priority community requirements
 
 **Documentation:** `tests/README.md`
+
+### **Interactive Visualization**
+
+Explore test results and simulate program impact:
+
+```
+Open: visualization.html
+```
+
+**Features:**
+- 📊 Test scenario analysis across 20+ comprehensive tests
+- 📈 Program coverage by income tier visualizations
+- 🎯 Impact simulator for long-term projections
+- 🏗️ HOMES allocation priority analysis
+- 💸 CPF no-cost coverage comparisons
+- 📉 Interactive D3.js charts and graphs
+
+**Live Demo:** https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
 
 ### **Demo Data**
 

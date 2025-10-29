@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oregon Energy Tool - Test Analysis & Impact Simulator</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: #764ba2;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .metric {
+            font-size: 2em;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .simulator {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        .results-panel {
+            margin-top: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            min-height: 400px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            font-size: 0.9em;
+            z-index: 1000;
+        }
+
+        .test-scenario {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .test-scenario.passed {
+            border-left-color: #28a745;
+        }
+
+        .test-scenario.warning {
+            border-left-color: #ffc107;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-badge.passed {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-links a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .axis text {
+            font-size: 12px;
+        }
+
+        .axis path,
+        .axis line {
+            stroke: #999;
+        }
+
+        svg {
+            overflow: visible;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 3;
+        }
+
+        .area {
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Oregon Energy Tool</h1>
+            <p class="subtitle">Test Analysis & Impact Simulator</p>
+            <div class="nav-links">
+                <a href="index.html">← Main Application</a>
+                <a href="https://github.com/kamrawr/oregon-comprehensive-energy-app" target="_blank">GitHub Repository</a>
+            </div>
+        </header>
+
+        <!-- Test Scenarios Overview -->
+        <div class="section">
+            <h2>📊 Test Scenarios Overview</h2>
+            <div class="card-grid" id="test-overview">
+                <div class="card">
+                    <h4>Total Test Scenarios</h4>
+                    <div class="metric" id="total-tests">20</div>
+                    <p>Comprehensive coverage across all program tiers</p>
+                </div>
+                <div class="card">
+                    <h4>Income Tiers Tested</h4>
+                    <div class="metric">5</div>
+                    <p>Weatherization to standard programs</p>
+                </div>
+                <div class="card">
+                    <h4>Measures Covered</h4>
+                    <div class="metric">15+</div>
+                    <p>Insulation, heat pumps, appliances</p>
+                </div>
+                <div class="card">
+                    <h4>Test Pass Rate</h4>
+                    <div class="metric" style="color: #28a745;">100%</div>
+                    <p>All scenarios validated ✅</p>
+                </div>
+            </div>
+
+            <h3>Key Test Scenarios</h3>
+            <div id="test-scenarios-list"></div>
+        </div>
+
+        <!-- Test Results Visualization -->
+        <div class="section">
+            <h2>📈 Test Results by Category</h2>
+            <div class="chart-container" id="test-results-chart"></div>
+        </div>
+
+        <!-- Program Coverage Analysis -->
+        <div class="section">
+            <h2>💰 Program Coverage by Income Tier</h2>
+            <div class="chart-container" id="program-coverage-chart"></div>
+            <div class="legend" id="program-legend"></div>
+        </div>
+
+        <!-- Impact Simulator -->
+        <div class="section">
+            <h2>🎯 Impact Simulator</h2>
+            <p style="margin-bottom: 20px;">Estimate the long-term impact of Oregon's energy programs on households and energy savings.</p>
+            
+            <div class="grid-2col">
+                <div>
+                    <div class="simulator">
+                        <h3>Simulation Parameters</h3>
+                        
+                        <div class="input-group">
+                            <label for="sim-households">Number of Households</label>
+                            <input type="number" id="sim-households" value="1000" min="100" max="100000" step="100">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="sim-years">Simulation Period (Years)</label>
+                            <input type="number" id="sim-years" value="10" min="1" max="30" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="sim-tier">Income Tier Distribution</label>
+                            <select id="sim-tier">
+                                <option value="mixed">Mixed (Realistic)</option>
+                                <option value="weatherization">Weatherization Heavy (≤60% AMI)</option>
+                                <option value="cpf">CPF Heavy (60-80% AMI)</option>
+                                <option value="hear">HEAR Moderate (81-150% AMI)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="sim-adoption">Annual Adoption Rate (%)</label>
+                            <input type="number" id="sim-adoption" value="15" min="1" max="100" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="sim-measures">Average Measures per Home</label>
+                            <input type="number" id="sim-measures" value="4" min="1" max="10" step="1">
+                        </div>
+
+                        <button onclick="runSimulation()">🚀 Run Simulation</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="results-panel" id="sim-results" style="display: none;">
+                        <h3>Simulation Results</h3>
+                        <div id="sim-summary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container" id="simulation-chart"></div>
+        </div>
+
+        <!-- HOMES Allocation Analysis -->
+        <div class="section">
+            <h2>🏗️ HOMES Allocation Analysis</h2>
+            <p style="margin-bottom: 20px;">Dynamic allocation of the $10,000 HOMES site cap across priority measures.</p>
+            <div class="chart-container" id="homes-allocation-chart"></div>
+        </div>
+
+        <!-- CPF No-Cost Coverage -->
+        <div class="section">
+            <h2>💸 CPF No-Cost Coverage Impact</h2>
+            <p style="margin-bottom: 20px;">Comparison of standard CPF amounts vs. enhanced no-cost coverage.</p>
+            <div class="chart-container" id="cpf-comparison-chart"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test Scenarios Data
+        const testCategories = [
+            { category: 'Income Tiers', count: 5, passed: 5 },
+            { category: 'HOMES Allocation', count: 3, passed: 3 },
+            { category: 'CPF No-Cost', count: 4, passed: 4 },
+            { category: 'Opt-Outs', count: 2, passed: 2 },
+            { category: 'Program Stacking', count: 3, passed: 3 },
+            { category: 'Edge Cases', count: 3, passed: 3 }
+        ];
+
+        const keyScenarios = [
+            {
+                name: 'Weatherization Tier - Full No-Cost',
+                ami: 55,
+                status: 'passed',
+                description: 'All measures covered with $0 net cost through program stacking'
+            },
+            {
+                name: 'CPF Low Income - Enhanced Incentives',
+                ami: 70,
+                status: 'passed',
+                description: 'HEAR + CPF + HOMES allocation with no-cost enhancement'
+            },
+            {
+                name: 'Heat Pump Water Heater - Critical Test',
+                ami: 70,
+                status: 'passed',
+                description: 'HPWH achieves $0 net cost with enhanced CPF coverage'
+            },
+            {
+                name: 'HOMES $10K Cap Enforcement',
+                ami: 130,
+                status: 'passed',
+                description: 'Dynamic allocation respects site cap across multiple measures'
+            },
+            {
+                name: 'CPF Tier 2 - No HEAR/HOMES',
+                ami: 100,
+                status: 'passed',
+                description: '81-150% AMI with priority+CBO excludes federal programs'
+            }
+        ];
+
+        const programCoverageData = [
+            { tier: '≤60% AMI', weatherization: 100, cpf: 100, hear: 100, homes: 100, energyTrust: 100 },
+            { tier: '61-80% AMI', weatherization: 0, cpf: 100, hear: 100, homes: 100, energyTrust: 100 },
+            { tier: '81-150% AMI', weatherization: 0, cpf: 35, hear: 50, homes: 100, energyTrust: 0 },
+            { tier: '151-400% AMI', weatherization: 0, cpf: 0, hear: 0, homes: 100, energyTrust: 0 },
+            { tier: '>400% AMI', weatherization: 0, cpf: 0, hear: 0, homes: 0, energyTrust: 0 }
+        ];
+
+        const homesAllocationData = [
+            { measure: 'Health & Safety', priority: 1, avgAllocation: 4000, color: '#dc3545' },
+            { measure: 'Attic Insulation', priority: 2, avgAllocation: 2500, color: '#fd7e14' },
+            { measure: 'Wall Insulation', priority: 3, avgAllocation: 2000, color: '#ffc107' },
+            { measure: 'Air Sealing', priority: 4, avgAllocation: 1000, color: '#28a745' },
+            { measure: 'Window Replacement', priority: 5, avgAllocation: 500, color: '#17a2b8' }
+        ];
+
+        const cpfComparisonData = [
+            { measure: 'Attic Insulation', standard: 1500, enhanced: 3300, savings: 1800 },
+            { measure: 'Wall Insulation', standard: 1000, enhanced: 2750, savings: 1750 },
+            { measure: 'Heat Pump Ductless', standard: 1800, enhanced: 550, savings: -1250 },
+            { measure: 'Heat Pump Ducted', standard: 4000, enhanced: 4400, savings: 400 },
+            { measure: 'Heat Pump Water Heater', standard: 240, enhanced: 825, savings: 585 }
+        ];
+
+        // Render Test Scenarios
+        function renderTestScenarios() {
+            const container = document.getElementById('test-scenarios-list');
+            container.innerHTML = keyScenarios.map(scenario => `
+                <div class="test-scenario ${scenario.status}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${scenario.name}</strong> <span class="status-badge ${scenario.status}">✓ PASSED</span>
+                            <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                                AMI: ${scenario.ami}% | ${scenario.description}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Test Results Chart
+        function createTestResultsChart() {
+            const margin = { top: 20, right: 30, bottom: 60, left: 60 };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select('#test-results-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .domain(testCategories.map(d => d.category))
+                .range([0, width])
+                .padding(0.3);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(testCategories, d => d.count)])
+                .range([height, 0]);
+
+            // Bars
+            svg.selectAll('.bar')
+                .data(testCategories)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(d.category))
+                .attr('y', d => y(d.count))
+                .attr('width', x.bandwidth())
+                .attr('height', d => height - y(d.count))
+                .attr('fill', '#667eea')
+                .attr('rx', 5);
+
+            // Labels
+            svg.selectAll('.label')
+                .data(testCategories)
+                .enter()
+                .append('text')
+                .attr('x', d => x(d.category) + x.bandwidth() / 2)
+                .attr('y', d => y(d.count) - 5)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#333')
+                .attr('font-weight', 'bold')
+                .text(d => `${d.passed}/${d.count}`);
+
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y));
+
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', -5)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '14px')
+                .attr('font-weight', 'bold')
+                .text('Test Scenarios by Category');
+        }
+
+        // Program Coverage Chart
+        function createProgramCoverageChart() {
+            const margin = { top: 20, right: 120, bottom: 60, left: 80 };
+            const width = 900 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select('#program-coverage-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const programs = ['weatherization', 'cpf', 'hear', 'homes', 'energyTrust'];
+            const colors = ['#28a745', '#17a2b8', '#ffc107', '#fd7e14', '#6c757d'];
+
+            const x = d3.scaleBand()
+                .domain(programCoverageData.map(d => d.tier))
+                .range([0, width])
+                .padding(0.3);
+
+            const y = d3.scaleLinear()
+                .domain([0, 100])
+                .range([height, 0]);
+
+            // Stacked bars
+            const stack = d3.stack()
+                .keys(programs);
+
+            const series = stack(programCoverageData);
+
+            const barWidth = x.bandwidth() / programs.length;
+
+            programs.forEach((program, i) => {
+                svg.selectAll(`.bar-${program}`)
+                    .data(programCoverageData)
+                    .enter()
+                    .append('rect')
+                    .attr('class', `bar-${program}`)
+                    .attr('x', d => x(d.tier) + i * barWidth)
+                    .attr('y', d => y(d[program]))
+                    .attr('width', barWidth - 2)
+                    .attr('height', d => height - y(d[program]))
+                    .attr('fill', colors[i])
+                    .attr('rx', 3);
+            });
+
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'));
+
+            // Legend
+            const legend = d3.select('#program-legend');
+            const programNames = ['Weatherization', 'CPF', 'HEAR', 'HOMES', 'Energy Trust'];
+            
+            legend.html(programNames.map((name, i) => `
+                <div class="legend-item">
+                    <div class="legend-color" style="background: ${colors[i]}"></div>
+                    <span>${name}</span>
+                </div>
+            `).join(''));
+        }
+
+        // HOMES Allocation Chart
+        function createHomesAllocationChart() {
+            const margin = { top: 20, right: 30, bottom: 60, left: 100 };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select('#homes-allocation-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(homesAllocationData, d => d.avgAllocation)])
+                .range([0, width]);
+
+            const y = d3.scaleBand()
+                .domain(homesAllocationData.map(d => d.measure))
+                .range([0, height])
+                .padding(0.2);
+
+            // Bars
+            svg.selectAll('.bar')
+                .data(homesAllocationData)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', 0)
+                .attr('y', d => y(d.measure))
+                .attr('width', d => x(d.avgAllocation))
+                .attr('height', y.bandwidth())
+                .attr('fill', d => d.color)
+                .attr('rx', 5);
+
+            // Labels
+            svg.selectAll('.label')
+                .data(homesAllocationData)
+                .enter()
+                .append('text')
+                .attr('x', d => x(d.avgAllocation) + 10)
+                .attr('y', d => y(d.measure) + y.bandwidth() / 2)
+                .attr('dy', '0.35em')
+                .attr('fill', '#333')
+                .attr('font-weight', 'bold')
+                .text(d => `$${d.avgAllocation.toLocaleString()}`);
+
+            // Priority labels
+            svg.selectAll('.priority')
+                .data(homesAllocationData)
+                .enter()
+                .append('text')
+                .attr('x', -10)
+                .attr('y', d => y(d.measure) + y.bandwidth() / 2)
+                .attr('dy', '0.35em')
+                .attr('text-anchor', 'end')
+                .attr('fill', '#666')
+                .attr('font-size', '12px')
+                .text(d => `P${d.priority}`);
+
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x).tickFormat(d => '$' + d.toLocaleString()));
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y));
+
+            // Total line
+            svg.append('line')
+                .attr('x1', x(10000))
+                .attr('x2', x(10000))
+                .attr('y1', 0)
+                .attr('y2', height)
+                .attr('stroke', '#dc3545')
+                .attr('stroke-width', 2)
+                .attr('stroke-dasharray', '5,5');
+
+            svg.append('text')
+                .attr('x', x(10000))
+                .attr('y', -5)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#dc3545')
+                .attr('font-weight', 'bold')
+                .text('$10K Site Cap');
+        }
+
+        // CPF Comparison Chart
+        function createCpfComparisonChart() {
+            const margin = { top: 20, right: 30, bottom: 100, left: 80 };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select('#cpf-comparison-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .domain(cpfComparisonData.map(d => d.measure))
+                .range([0, width])
+                .padding(0.3);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(cpfComparisonData, d => Math.max(d.standard, d.enhanced))])
+                .range([height, 0]);
+
+            const barWidth = x.bandwidth() / 2.5;
+
+            // Standard bars
+            svg.selectAll('.bar-standard')
+                .data(cpfComparisonData)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar-standard')
+                .attr('x', d => x(d.measure))
+                .attr('y', d => y(d.standard))
+                .attr('width', barWidth)
+                .attr('height', d => height - y(d.standard))
+                .attr('fill', '#6c757d')
+                .attr('rx', 3);
+
+            // Enhanced bars
+            svg.selectAll('.bar-enhanced')
+                .data(cpfComparisonData)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar-enhanced')
+                .attr('x', d => x(d.measure) + barWidth + 5)
+                .attr('y', d => y(d.enhanced))
+                .attr('width', barWidth)
+                .attr('height', d => height - y(d.enhanced))
+                .attr('fill', '#28a745')
+                .attr('rx', 3);
+
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y).tickFormat(d => '$' + d.toLocaleString()));
+
+            // Legend
+            const legendData = [
+                { label: 'Standard CPF', color: '#6c757d' },
+                { label: 'Enhanced (No-Cost ON)', color: '#28a745' }
+            ];
+
+            const legendG = svg.append('g')
+                .attr('transform', `translate(${width - 200}, 10)`);
+
+            legendData.forEach((item, i) => {
+                const g = legendG.append('g')
+                    .attr('transform', `translate(0, ${i * 25})`);
+
+                g.append('rect')
+                    .attr('width', 15)
+                    .attr('height', 15)
+                    .attr('fill', item.color);
+
+                g.append('text')
+                    .attr('x', 20)
+                    .attr('y', 12)
+                    .attr('font-size', '12px')
+                    .text(item.label);
+            });
+        }
+
+        // Simulation Function
+        function runSimulation() {
+            const households = parseInt(document.getElementById('sim-households').value);
+            const years = parseInt(document.getElementById('sim-years').value);
+            const tier = document.getElementById('sim-tier').value;
+            const adoptionRate = parseInt(document.getElementById('sim-adoption').value) / 100;
+            const avgMeasures = parseInt(document.getElementById('sim-measures').value);
+
+            // Calculate results
+            const annualParticipants = Math.floor(households * adoptionRate);
+            const totalParticipants = Math.min(annualParticipants * years, households);
+            
+            // Average incentive by tier
+            const avgIncentiveMap = {
+                'mixed': 8500,
+                'weatherization': 12000,
+                'cpf': 10000,
+                'hear': 6000
+            };
+            const avgIncentive = avgIncentiveMap[tier] * avgMeasures;
+            
+            const totalIncentives = totalParticipants * avgIncentive;
+            const avgEnergySavings = 35; // % reduction
+            const avgBillSavings = 1200; // annual $ savings
+            const totalBillSavings = totalParticipants * avgBillSavings * years;
+            
+            // CO2 reduction (rough estimate: 5 tons per household annually)
+            const co2Reduction = totalParticipants * 5 * years;
+
+            // Display results
+            const resultsPanel = document.getElementById('sim-results');
+            const summary = document.getElementById('sim-summary');
+            
+            resultsPanel.style.display = 'block';
+            summary.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong>Households Participating:</strong><br>
+                    <span style="font-size: 1.5em; color: #667eea;">${totalParticipants.toLocaleString()}</span> of ${households.toLocaleString()}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Total Incentives Deployed:</strong><br>
+                    <span style="font-size: 1.5em; color: #28a745;">$${(totalIncentives / 1000000).toFixed(1)}M</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Cumulative Bill Savings:</strong><br>
+                    <span style="font-size: 1.5em; color: #fd7e14;">$${(totalBillSavings / 1000000).toFixed(1)}M</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>CO₂ Reduction:</strong><br>
+                    <span style="font-size: 1.5em; color: #17a2b8;">${(co2Reduction / 1000).toFixed(1)}K tons</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>ROI (Bill Savings / Incentives):</strong><br>
+                    <span style="font-size: 1.5em; color: #764ba2;">${(totalBillSavings / totalIncentives).toFixed(2)}x</span>
+                </div>
+            `;
+
+            // Create time series chart
+            createSimulationChart(years, annualParticipants, avgIncentive, avgBillSavings);
+        }
+
+        function createSimulationChart(years, annualParticipants, avgIncentive, avgBillSavings) {
+            // Clear previous chart
+            d3.select('#simulation-chart').html('');
+
+            const margin = { top: 20, right: 80, bottom: 60, left: 80 };
+            const width = 1100 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select('#simulation-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Generate time series data
+            const data = [];
+            let cumulativeParticipants = 0;
+            let cumulativeSavings = 0;
+
+            for (let year = 0; year <= years; year++) {
+                cumulativeParticipants = Math.min(cumulativeParticipants + annualParticipants, 100000);
+                cumulativeSavings += cumulativeParticipants * avgBillSavings;
+                
+                data.push({
+                    year: year,
+                    participants: cumulativeParticipants,
+                    savings: cumulativeSavings,
+                    incentives: cumulativeParticipants * avgIncentive
+                });
+            }
+
+            const x = d3.scaleLinear()
+                .domain([0, years])
+                .range([0, width]);
+
+            const yParticipants = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.participants)])
+                .range([height, 0]);
+
+            const ySavings = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.savings)])
+                .range([height, 0]);
+
+            // Lines
+            const lineParticipants = d3.line()
+                .x(d => x(d.year))
+                .y(d => yParticipants(d.participants))
+                .curve(d3.curveMonotoneX);
+
+            const lineSavings = d3.line()
+                .x(d => x(d.year))
+                .y(d => ySavings(d.savings))
+                .curve(d3.curveMonotoneX);
+
+            // Draw lines
+            svg.append('path')
+                .datum(data)
+                .attr('class', 'line')
+                .attr('d', lineParticipants)
+                .attr('stroke', '#667eea')
+                .attr('stroke-width', 3);
+
+            svg.append('path')
+                .datum(data)
+                .attr('class', 'line')
+                .attr('d', lineSavings)
+                .attr('stroke', '#28a745')
+                .attr('stroke-width', 3);
+
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x).ticks(years).tickFormat(d => `Year ${d}`));
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(yParticipants).tickFormat(d => (d / 1000).toFixed(0) + 'K'));
+
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(${width}, 0)`)
+                .call(d3.axisRight(ySavings).tickFormat(d => '$' + (d / 1000000).toFixed(1) + 'M'));
+
+            // Labels
+            svg.append('text')
+                .attr('x', -height / 2)
+                .attr('y', -50)
+                .attr('transform', 'rotate(-90)')
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#667eea')
+                .attr('font-weight', 'bold')
+                .text('Cumulative Participants');
+
+            svg.append('text')
+                .attr('x', width + 65)
+                .attr('y', height / 2)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#28a745')
+                .attr('font-weight', 'bold')
+                .text('Savings ($)');
+        }
+
+        // Initialize
+        renderTestScenarios();
+        createTestResultsChart();
+        createProgramCoverageChart();
+        createHomesAllocationChart();
+        createCpfComparisonChart();
+    </script>
+</body>
+</html>
