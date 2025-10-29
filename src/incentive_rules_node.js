@@ -27,11 +27,59 @@
  * CPF amounts may exceed remaining costs to provide customer assurance.
  */
 
+// Load ConfigLoader (works in both Node.js and browser)
+if (typeof require !== 'undefined' && typeof module !== 'undefined') {
+    var ConfigLoader = require('./config_loader');
+}
+
 class IncentiveRules {
     constructor() {
-        // BROWSER VERSION: Hardcoded values for reliability
-        // For Node.js config-driven version, see incentive_rules_node.js
-        this.initializeHardcodedValues();
+        // Load configuration synchronously (for Node.js environment and tests)
+        // In browser, ConfigLoader is loaded via script tag
+        if (typeof ConfigLoader === 'undefined') {
+            console.warn('⚠️  ConfigLoader not available, using fallback defaults');
+            this.initializeFallbacks();
+            this.tiers = {
+                WEATHERIZATION: 'weatherization',
+                CPF_LOW_INCOME: 'cpf_low',
+                HEAR_MODERATE: 'hear_moderate',
+                STANDARD: 'standard'
+            };
+            return;
+        }
+        
+        const configLoader = new ConfigLoader();
+        try {
+            // Try sync load for Node.js
+            const config = typeof require !== 'undefined' ? 
+                configLoader.loadConfigSync() : 
+                null; // Browser will load async later
+            
+            if (config) {
+                // Successfully loaded config (Node.js)
+                this.config = config;
+                this.incomeThresholds = config.income_thresholds;
+                this.programCaps = {
+                    HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
+                    HEAR_MODERATE: config.program_caps.hear_household_cap,
+                    HOMES_MIN: config.program_caps.homes_modeled_min,
+                    HOMES_MAX: config.program_caps.homes_modeled_max,
+                    HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
+                    CERTA_MAX: config.program_caps.certa_household_cap
+                };
+                this.homesCoverageRules = config.homes_coverage_rules;
+                this.measureIncentives = config.measure_incentives;
+                this.certaEligibleMeasures = config.certa_eligible_measures || [];
+                this.homesAllocationPriority = config.homes_allocation_priority || [];
+            } else {
+                // Browser environment - will load async
+                this.configLoader = configLoader;
+                this.initializeFallbacks();
+            }
+        } catch (error) {
+            console.warn('⚠️  Config load failed, using fallback defaults:', error.message);
+            this.initializeFallbacks();
+        }
         
         // Income tier thresholds (these remain constant)
         this.tiers = {
@@ -43,9 +91,9 @@ class IncentiveRules {
     }
 
     /**
-     * Initialize hardcoded values (browser version)
+     * Initialize fallback values when config loading fails or browser async
      */
-    initializeHardcodedValues() {
+    initializeFallbacks() {
         this.incomeThresholds = {
             weatherization_smi_max: 60,
             weatherization_fpl_max: 200,
@@ -84,16 +132,34 @@ class IncentiveRules {
             'window_replacement',
             'duct_sealing'
         ];
-        
-        // Income tier thresholds
-        this.tiers = {
-            WEATHERIZATION: 'weatherization',
-            CPF_LOW_INCOME: 'cpf_low',
-            HEAR_MODERATE: 'hear_moderate',
-            STANDARD: 'standard'
-        };
-        
-        console.log('✅ IncentiveRules initialized with hardcoded values (browser version)');
+    }
+
+    /**
+     * Async initialization for browser (call after DOM ready)
+     */
+    async initializeAsync() {
+        if (this.configLoader && !this.config) {
+            try {
+                const config = await this.configLoader.loadConfig();
+                this.config = config;
+                this.incomeThresholds = config.income_thresholds;
+                this.programCaps = {
+                    HEAR_LOW_INCOME: config.program_caps.hear_household_cap,
+                    HEAR_MODERATE: config.program_caps.hear_household_cap,
+                    HOMES_MIN: config.program_caps.homes_modeled_min,
+                    HOMES_MAX: config.program_caps.homes_modeled_max,
+                    HOMES_FLEX_MAX: config.program_caps.homes_flex_site_cap,
+                    CERTA_MAX: config.program_caps.certa_household_cap
+                };
+                this.homesCoverageRules = config.homes_coverage_rules;
+                this.measureIncentives = config.measure_incentives;
+                this.certaEligibleMeasures = config.certa_eligible_measures || [];
+                this.homesAllocationPriority = config.homes_allocation_priority || [];
+                console.log(`✅ Async loaded config v${config.version}`);
+            } catch (error) {
+                console.warn('⚠️  Async config load failed, using fallbacks:', error.message);
+            }
+        }
     }
 
     /**
