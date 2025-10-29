@@ -127,17 +127,16 @@ class IncentiveRules {
             }
             
             // Package 3: HOMES alternative (for envelope measures)
+            // Amount is placeholder - will be dynamically allocated in applyHOMESAllocation()
             if (measureRule.homes_eligible) {
-                // Use flex funding amount for envelope measures
-                const homesAmount = this.programCaps.HOMES_FLEX_MAX;
                 packages.push({
                     name: 'HOMES Package (Comprehensive Alternative)',
                     incentives: [{
                         program: 'HOMES (IRA Federal)',
-                        amount: homesAmount,
+                        amount: 0, // Placeholder - dynamically allocated up to $10K site cap
                         priority: 2,
                         contact: 'Oregon DOE',
-                        note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
+                        note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
                     }],
                     note: 'Good for comprehensive projects - no waitlist, flexible funding'
                 });
@@ -247,16 +246,15 @@ class IncentiveRules {
         // Package 2: HOMES + CPF + CERTA (for envelope measures)
         // HOMES covers comprehensive work including enabling repairs above CERTA cap
         // HOMES can flex up to $10K across non-HEAR funded measures per site
+        // Amount is placeholder - will be dynamically allocated in applyHOMESAllocation()
         if (measureRule.homes_eligible && cpfAmount) {
-            // Use flex funding amount ($10K) for envelope measures since it's more likely applicable
-            const homesAmount = this.programCaps.HOMES_FLEX_MAX;
             const incentives = [
                 {
                     program: 'HOMES (IRA Federal)',
-                    amount: homesAmount,
+                    amount: 0, // Placeholder - dynamically allocated up to $10K site cap
                     priority: 1,
                     contact: 'Oregon DOE',
-                    note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
+                    note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
                 },
                 {
                     program: 'CPF - Energy Trust',
@@ -349,18 +347,17 @@ class IncentiveRules {
         }
         
         // Package 2: HOMES + Standard
+        // Amount is placeholder - will be dynamically allocated in applyHOMESAllocation()
         if (measureRule.homes_eligible && standardAmount) {
-            // Use flex funding amount for envelope measures
-            const homesAmount = this.programCaps.HOMES_FLEX_MAX;
             packages.push({
                 name: 'HOMES + Standard',
                 incentives: [
                     {
                         program: 'HOMES (IRA Federal)',
-                        amount: homesAmount,
+                        amount: 0, // Placeholder - dynamically allocated up to $10K site cap
                         priority: 1,
                         contact: 'Oregon DOE',
-                        note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
+                        note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
                     },
                     {
                         program: 'Energy Trust Standard',
@@ -407,14 +404,13 @@ class IncentiveRules {
             }];
             
             if (measureRule.homes_eligible) {
-                // Use flex funding amount for envelope measures
-                const homesAmount = this.programCaps.HOMES_FLEX_MAX;
+                // Amount is placeholder - will be dynamically allocated in applyHOMESAllocation()
                 incentives.push({
                     program: 'HOMES (IRA Federal)',
-                    amount: homesAmount,
+                    amount: 0, // Placeholder - dynamically allocated up to $10K site cap
                     priority: 2,
                     contact: 'Oregon DOE',
-                    note: 'Flex funding for envelope upgrades (up to $10K per site for non-HEAR measures)'
+                    note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
                 });
             }
             
@@ -665,6 +661,12 @@ class IncentiveRules {
     /**
      * Apply household-level caps to incentive packages across all measures
      * Ensures HEAR, HOMES, and CERTA don't exceed their household limits
+     * 
+     * HOMES Strategy:
+     * - $10K maximum per site (not per measure)
+     * - Cannot be stacked with HEAR on the same measure
+     * - Dynamically allocated to fill gaps after HEAR, prioritizing health/safety and envelope
+     * - CPF layers on top to achieve no-cost outcomes
      */
     applyHouseholdCaps(enrichedRecommendations) {
         let hearTotal = 0;
@@ -691,25 +693,21 @@ class IncentiveRules {
         // Apply HEAR household cap ($14,000)
         if (hearTotal > this.programCaps.HEAR_LOW_INCOME) {
             console.warn(`HEAR total ($${hearTotal}) exceeds household cap ($${this.programCaps.HEAR_LOW_INCOME})`);
-            // Could implement proportional reduction here if needed
         }
         
         // Apply CERTA household cap ($2,000)
         if (certaTotal > this.programCaps.CERTA_MAX) {
             console.log(`CERTA total ($${certaTotal}) exceeds cap ($${this.programCaps.CERTA_MAX}). Adjusting...`);
             
-            // Distribute the $2K cap across measures that requested CERTA
             const numCertaMeasures = certaUsageByMeasure.length;
             const certaPerMeasure = Math.floor(this.programCaps.CERTA_MAX / numCertaMeasures);
             
             certaUsageByMeasure.forEach((usage, i) => {
                 const rec = enrichedRecommendations[usage.idx];
                 if (rec.bestPackage && rec.bestPackage.incentives) {
-                    // Find and update CERTA incentive amount
                     rec.bestPackage.incentives.forEach(inc => {
                         if (inc.program && inc.program.includes('CERTA')) {
                             const oldAmount = inc.amount;
-                            // Last measure gets any remainder
                             inc.amount = (i === numCertaMeasures - 1) ? 
                                 this.programCaps.CERTA_MAX - (certaPerMeasure * (numCertaMeasures - 1)) :
                                 certaPerMeasure;
@@ -717,17 +715,108 @@ class IncentiveRules {
                             console.log(`  Adjusted CERTA for measure ${usage.idx}: $${oldAmount} → $${inc.amount}`);
                         }
                     });
-                    
-                    // Recalculate totals for this measure
-                    const costCalc = this.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
-                    rec.totalIncentives = costCalc.totalIncentives;
-                    rec.netCost = costCalc.netCost;
-                    rec.coverage = costCalc.coverage;
                 }
             });
         }
         
+        // Apply HOMES site cap ($10,000) - dynamically allocate across non-HEAR measures
+        this.applyHOMESAllocation(enrichedRecommendations);
+        
+        // Recalculate all measure totals after adjustments
+        enrichedRecommendations.forEach(rec => {
+            if (rec.bestPackage && rec.bestPackage.incentives) {
+                const costCalc = this.calculateNetCost(rec.estimatedCostNum, rec.bestPackage);
+                rec.totalIncentives = costCalc.totalIncentives;
+                rec.netCost = costCalc.netCost;
+                rec.coverage = costCalc.coverage;
+            }
+        });
+        
         return enrichedRecommendations;
+    }
+    
+    /**
+     * Apply HOMES allocation across measures up to $10K site cap
+     * Priority: Health/Safety > Envelope (insulation, air sealing) > Other
+     * HOMES cannot stack with HEAR on the same measure
+     */
+    applyHOMESAllocation(enrichedRecommendations) {
+        let homesRemaining = this.programCaps.HOMES_FLEX_MAX; // $10,000 site cap
+        
+        // Priority order for HOMES allocation
+        const priorityOrder = [
+            'health_safety_repairs',
+            'attic_insulation',
+            'wall_insulation', 
+            'floor_insulation',
+            'air_sealing',
+            'window_replacement',
+            'duct_sealing'
+        ];
+        
+        // Sort measures by priority
+        const sortedMeasures = enrichedRecommendations
+            .map((rec, idx) => ({ rec, idx }))
+            .sort((a, b) => {
+                const aPriority = priorityOrder.indexOf(a.rec.measureId);
+                const bPriority = priorityOrder.indexOf(b.rec.measureId);
+                const aVal = aPriority === -1 ? 999 : aPriority;
+                const bVal = bPriority === -1 ? 999 : bPriority;
+                return aVal - bVal;
+            });
+        
+        console.log('🏠 Allocating HOMES funding across measures (max $10K site cap)...');
+        
+        sortedMeasures.forEach(({ rec, idx }) => {
+            if (homesRemaining <= 0) return;
+            if (!rec.bestPackage || !rec.bestPackage.incentives) return;
+            
+            // Check if measure has HEAR (HOMES can't stack with HEAR on same measure)
+            const hasHEAR = rec.bestPackage.incentives.some(inc => 
+                inc.program && inc.program.includes('HEAR')
+            );
+            
+            if (hasHEAR) {
+                console.log(`  ⊗ ${rec.measure}: Has HEAR, skipping HOMES (can't stack)`);
+                // Remove HOMES from this measure if present
+                rec.bestPackage.incentives = rec.bestPackage.incentives.filter(inc => 
+                    !inc.program || !inc.program.includes('HOMES')
+                );
+                return;
+            }
+            
+            // Find existing HOMES entry
+            const homesIncentive = rec.bestPackage.incentives.find(inc => 
+                inc.program && inc.program.includes('HOMES')
+            );
+            
+            if (!homesIncentive) return; // Measure not HOMES-eligible
+            
+            // Calculate gap after other incentives (excluding HOMES)
+            const otherIncentives = rec.bestPackage.incentives
+                .filter(inc => !inc.program.includes('HOMES'))
+                .reduce((sum, inc) => sum + (typeof inc.amount === 'number' ? inc.amount : 0), 0);
+            
+            const gap = Math.max(0, rec.estimatedCostNum - otherIncentives);
+            
+            // Allocate HOMES up to the gap, but not exceeding remaining budget
+            const homesAmount = Math.min(gap, homesRemaining);
+            
+            if (homesAmount > 0) {
+                homesIncentive.amount = homesAmount;
+                homesIncentive.note = `$${homesAmount.toLocaleString()} of $${this.programCaps.HOMES_FLEX_MAX.toLocaleString()} site cap (fills gap after other incentives)`;
+                homesRemaining -= homesAmount;
+                console.log(`  ✓ ${rec.measure}: Allocated $${homesAmount.toLocaleString()} HOMES (${homesRemaining.toLocaleString()} remaining)`);
+            } else {
+                // Remove HOMES if no amount allocated
+                rec.bestPackage.incentives = rec.bestPackage.incentives.filter(inc => 
+                    !inc.program || !inc.program.includes('HOMES')
+                );
+                console.log(`  ⊗ ${rec.measure}: No HOMES needed (fully covered by other incentives)`);
+            }
+        });
+        
+        console.log(`🏠 HOMES allocation complete. Used: $${(this.programCaps.HOMES_FLEX_MAX - homesRemaining).toLocaleString()} / $${this.programCaps.HOMES_FLEX_MAX.toLocaleString()}`);
     }
 }
 
