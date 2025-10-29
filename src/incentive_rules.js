@@ -789,17 +789,18 @@ class IncentiveRules {
      * Priority: Health/Safety > Envelope (insulation, air sealing) > Other
      * HOMES cannot stack with HEAR on the same measure
      * 
-     * HOMES Coverage by Income (IRA Program Rules):
-     * - ≤80% AMI: 100% of costs covered (up to $10K site cap)
-     * - 81-150% AMI: 50% of costs covered (up to $10K site cap)
+     * HOMES Coverage by Income (IRA Program Rules - loaded from config):
+     * - ≤80% AMI: 100% of costs covered (up to site cap)
+     * - 81-150% AMI: 50% of costs covered (up to site cap)
      * - >150% AMI: NOT ELIGIBLE for HOMES
      */
     applyHOMESAllocation(enrichedRecommendations, customerTier = null) {
-        let homesRemaining = this.programCaps.HOMES_FLEX_MAX; // $10,000 site cap
+        // Use config-driven site cap (0-10K range)
+        let homesRemaining = this.programCaps.HOMES_FLEX_MAX;
         
-        // Check eligibility - HOMES only available ≤150% AMI
+        // Check eligibility - HOMES only available ≤homes_ami_max (150% AMI per config)
         if (customerTier === this.tiers.STANDARD) {
-            console.log('🏠 HOMES not available for >150% AMI customers');
+            console.log(`🏠 HOMES not available for >${this.incomeThresholds.homes_ami_max}% AMI customers`);
             // Remove any HOMES incentives from standard tier customers
             enrichedRecommendations.forEach(rec => {
                 if (rec.bestPackage && rec.bestPackage.incentives) {
@@ -811,7 +812,8 @@ class IncentiveRules {
             return;
         }
         
-        // Check if customer is moderate income (affects HOMES percentage)
+        // Check if customer is moderate income (affects HOMES percentage based on config)
+        // Moderate income = 81-150% AMI per config
         const isModerateIncome = customerTier === this.tiers.HEAR_MODERATE;
         
         // Priority order for HOMES allocation (loaded from config)
@@ -828,7 +830,7 @@ class IncentiveRules {
                 return aVal - bVal;
             });
         
-        console.log('🏠 Allocating HOMES funding across measures (max $10K site cap)...');
+        console.log(`🏠 Allocating HOMES funding across measures (max $${this.programCaps.HOMES_FLEX_MAX.toLocaleString()} site cap)...`);
         
         sortedMeasures.forEach(({ rec, idx }) => {
             if (homesRemaining <= 0) return;
@@ -862,11 +864,13 @@ class IncentiveRules {
             
             const gap = Math.max(0, rec.estimatedCostNum - otherIncentives);
             
-            // For moderate income (81-150% AMI), HOMES limited to 50% of measure cost
-            // For low income (≤80% AMI), HOMES can cover full gap
+            // Apply HOMES coverage limits based on income tier (from config)
+            // Low income (≤80% AMI): 100% coverage
+            // Moderate income (81-150% AMI): 50% coverage
             let maxHomesForMeasure = gap;
             if (isModerateIncome) {
-                maxHomesForMeasure = Math.min(gap, rec.estimatedCostNum * 0.50);
+                const moderateCoveragePercent = this.homesCoverageRules.moderate_income.coverage_percent / 100;
+                maxHomesForMeasure = Math.min(gap, rec.estimatedCostNum * moderateCoveragePercent);
             }
             
             // Allocate HOMES up to the max for this measure, but not exceeding remaining budget
