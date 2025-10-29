@@ -3114,33 +3114,39 @@
                         
                         // Brief delay for intake processing
                         setTimeout(() => {
-                            // Step 3: Load income data (silently)
-                            loadDemoIncomeData(true);
-                            
-                            // Step 4: Calculate income programmatically
+                            // Step 3: Navigate to income module and load data
+                            goToStep(2);
                             setTimeout(() => {
-                                calculateIncome();
+                                loadDemoIncomeData(true);
                                 
-                                // Step 5: Load assessment data (silently)
+                                // Step 4: Calculate income programmatically
                                 setTimeout(() => {
-                                    loadDemoAssessmentData(true);
+                                    calculateIncome();
                                     
-                                    // Step 6: Analyze assessment and generate recommendations
+                                    // Step 5: Navigate to assessment and load data
                                     setTimeout(() => {
-                                        analyzeAssessment();
-                                        
-                                        // Step 7: Show comprehensive results
+                                        goToStep(3);
                                         setTimeout(() => {
-                                            showComprehensiveResults();
+                                            loadDemoAssessmentData(true);
                                             
-                                            // Reset button
-                                            event.target.innerHTML = originalText;
-                                            event.target.disabled = false;
-                                            
-                                            // Scroll to top smoothly
-                                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                                        }, 500);
-                                    }, 500);
+                                            // Step 6: Analyze assessment and generate recommendations
+                                            setTimeout(() => {
+                                                analyzeAssessment();
+                                                
+                                                // Step 7: Show comprehensive results
+                                                setTimeout(() => {
+                                                    showComprehensiveResults();
+                                                    
+                                                    // Reset button
+                                                    event.target.innerHTML = originalText;
+                                                    event.target.disabled = false;
+                                                    
+                                                    // Scroll to top smoothly
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }, 500);
+                                            }, 500);
+                                        }, 300);
+                                    }, 300);
                                 }, 300);
                             }, 300);
                         }, 300);
