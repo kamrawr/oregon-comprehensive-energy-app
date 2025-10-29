@@ -1187,7 +1187,7 @@
                         <button type="button" class="btn btn-secondary" onclick="editAssessment()">
                             ← Edit Assessment
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="goToStep(4)">
+                        <button type="button" class="btn btn-primary" onclick="proceedToResults()">
                             View Personalized Incentives →
                         </button>
                     </div>
@@ -1843,6 +1843,9 @@
                 const fplPercent = appState.incomeData.percentages.fpl;
                 const eligibilityTier = incentiveRules.getEligibilityTier(amiPercent, smiPercent, fplPercent);
                 
+                // For weatherization-eligible, show CPF tier incentives
+                const displayTier = eligibilityTier === 'weatherization' ? 'cpf_low' : eligibilityTier;
+                
                 // Build comprehensive results with tier info
                 const tierDescription = incentiveRules.getTierDescription(eligibilityTier);
                 
@@ -1856,10 +1859,10 @@
                         const measureDetails = {
                             housingType: appState.customerData.housingType,
                             sqft: parseInt(appState.assessmentData.homeSquareFootage) || 2000,
-                            cpfEligible: eligibility.cpfEligible || false
+                            cpfEligible: eligibility.cpfEligible || eligibility.weatherization
                         };
                         
-                        const packages = incentiveRules.getIncentiveForMeasure(measureId, eligibilityTier, measureDetails);
+                        const packages = incentiveRules.getIncentiveForMeasure(measureId, displayTier, measureDetails);
                         
                         // Parse estimated cost
                         const costMatch = rec.estimatedCost.match(/\$([0-9,]+)/);
@@ -2025,7 +2028,20 @@
                 html += `
                         </tbody>
                     </table>
-                    
+                `;
+                
+                // Add note for weatherization-eligible customers
+                if (eligibilityTier === 'weatherization') {
+                    html += `
+                        <div class="alert alert-success" style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.5rem;">🎉 No-Cost Weatherization Available</h4>
+                            <p style="margin-bottom: 0.5rem;">You qualify for Oregon's no-cost weatherization program (OHCS). The incentive packages shown above demonstrate the value of upgrades through alternative programs (CPF, HEAR, HOMES) in case weatherization has a waitlist or you prefer faster alternatives.</p>
+                            <p style="margin: 0; font-weight: 600;">All measures shown could be covered at $0 cost through weatherization. Contact 1-800-766-6861 to apply.</p>
+                        </div>
+                    `;
+                }
+                
+                html += `
                     <div id="costSummary" style="margin-top: 2rem;">
                         ${generateCostSummary(recommendations)}
                     </div>
@@ -2437,14 +2453,13 @@
             document.getElementById('comprehensiveResults').innerHTML = html;
         }
 
-        // When user reaches step 4, generate comprehensive results
-        const originalGoToStep = goToStep;
-        goToStep = function(step) {
-            originalGoToStep(step);
-            if (step === 4 && appState.recommendations.length > 0) {
+        // Override the button to call comprehensive results
+        function proceedToResults() {
+            goToStep(4);
+            if (appState.recommendations.length > 0) {
                 showComprehensiveResults();
             }
-        };
+        }
 
         // ===== UTILITY FUNCTIONS =====
         function downloadReport() {
