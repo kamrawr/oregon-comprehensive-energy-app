@@ -351,7 +351,7 @@ class IncentiveCalculator {
         // === CPF (Income-Qualified Energy Trust) ===
         if (program.id === 'cpf') {
             if (measureId === 'heat_pump_ductless') {
-                const isManufacturedHome = measure.housingType === 'manufactured';
+                const isManufacturedHome = customerProfile.housingType === 'manufactured';
                 return {
                     program: 'CPF - Energy Trust',
                     amount: isManufacturedHome ? 3500 : 1800,
@@ -367,12 +367,13 @@ class IncentiveCalculator {
                     applicationProcess: 'Apply through Community Partner organization'
                 };
             }
-            if (measureId === 'attic_insulation') {
+            if (measureId === 'attic_insulation' || measureId === 'wall_insulation' || measureId === 'floor_insulation') {
                 const sqft = measure.sqft || 1000;
+                const ratePerSqft = measureId === 'wall_insulation' ? 1.0 : 1.5; // Wall: $1.0-1.5, Attic/Floor: higher
                 return {
                     program: 'CPF - Energy Trust',
-                    amount: Math.floor(sqft * 0.15),
-                    perSqft: 0.15,
+                    amount: Math.floor(sqft * ratePerSqft),
+                    perSqft: ratePerSqft,
                     sqft: sqft,
                     requirements: ['Income verification', 'R-value improvement'],
                     applicationProcess: 'Apply through Community Partner organization'
@@ -383,6 +384,14 @@ class IncentiveCalculator {
                     program: 'CPF - Energy Trust',
                     amount: 800,
                     requirements: ['Income verification', 'Blower door testing'],
+                    applicationProcess: 'Apply through Community Partner organization'
+                };
+            }
+            if (measureId === 'heat_pump_water_heater') {
+                return {
+                    program: 'CPF - Energy Trust',
+                    amount: 240,
+                    requirements: ['Income verification', 'UEF ≥ 3.0'],
                     applicationProcess: 'Apply through Community Partner organization'
                 };
             }
@@ -586,12 +595,13 @@ class IncentiveCalculator {
     getUtilitySpecificPrograms(utility) {
         const programs = [];
         
-        if (utility === 'pge') {
+        if (utility === 'pge' || utility === 'pacific_power') {
             programs.push({
-                id: 'pge_smart_thermostat',
-                name: 'PGE Smart Thermostat Rebate',
-                amount: 50,
-                utility: 'pge'
+                id: 'smart_thermostat',
+                name: 'Smart Thermostat Incentive',
+                amount: 250,
+                utility: utility,
+                description: 'Smart thermostat rebate (≈100% coverage)'
             });
         }
         
