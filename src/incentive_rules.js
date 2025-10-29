@@ -5,8 +5,11 @@
  * 
  * FUNDING PRIORITY STRATEGY:
  * 1. HEAR/HOMES federal funding applied FIRST (primary funding source)
- * 2. CPF fills gaps to achieve no-cost measures for eligible households
- * 3. CERTA covers enabling repairs (electrical/structural prep)
+ *    - HEAR: $14,000 household cap, measure-specific limits apply
+ *    - HOMES: $2,000-$8,000 based on whole-home energy savings (≥20%)
+ * 2. CERTA: Capped at $2,000 for enabling repairs
+ *    - If enabling costs exceed $2K, HOMES can cover the gap
+ * 3. CPF fills remaining gaps to achieve no-cost measures for eligible households
  * 
  * Goal: Maximize use of federal dollars, then state/utility programs to achieve
  * no-cost or near-no-cost upgrades for income-qualified households.
@@ -21,6 +24,15 @@ class IncentiveRules {
             CPF_LOW_INCOME: 'cpf_low',            // 60-80% AMI - Enhanced + HEAR 100%
             HEAR_MODERATE: 'hear_moderate',        // 81-150% AMI - Standard + HEAR 50%
             STANDARD: 'standard'                   // >150% AMI - Standard only
+        };
+        
+        // Program-level caps (IRA federal programs)
+        this.programCaps = {
+            HEAR_LOW_INCOME: 14000,      // $14,000 household cap (≤80% or ≤150% FPL)
+            HEAR_MODERATE: 14000,         // $14,000 household cap (81-150% AMI)
+            HOMES_MIN: 2000,              // $2,000 minimum HOMES rebate
+            HOMES_MAX: 8000,              // $8,000 maximum HOMES rebate
+            CERTA_MAX: 2000               // $2,000 CERTA cap for enabling repairs
         };
     }
 
@@ -198,7 +210,7 @@ class IncentiveRules {
                     coverage: `${hearPercentage}%`,
                     priority: 1,
                     contact: 'Oregon DOE: 1-800-221-8035',
-                    note: 'Primary federal funding - applied first'
+                    note: `Primary federal funding - $${this.programCaps.HEAR_LOW_INCOME.toLocaleString()} household cap applies`
                 },
                 {
                     program: 'CPF - Energy Trust',
@@ -209,14 +221,14 @@ class IncentiveRules {
                 }
             ];
             
-            // Add CERTA for insulation/sealing/duct projects
+            // Add CERTA for insulation/sealing/duct projects (capped at $2K)
             if (this.isCERTAEligible(measureId)) {
                 incentives.push({
                     program: 'CERTA (Enabling Repairs)',
-                    amount: 2000,
+                    amount: this.programCaps.CERTA_MAX,
                     priority: 3,
                     contact: 'Oregon DOE',
-                    note: 'For electrical/structural prep work'
+                    note: `Capped at $${this.programCaps.CERTA_MAX.toLocaleString()} for enabling work`
                 });
             }
             
@@ -228,15 +240,15 @@ class IncentiveRules {
         }
         
         // Package 2: HOMES + CPF + CERTA (for envelope measures)
-        // HOMES covers comprehensive work, CPF fills gaps
+        // HOMES covers comprehensive work including enabling repairs above CERTA cap
         if (measureRule.homes_eligible && cpfAmount) {
             const incentives = [
                 {
                     program: 'HOMES (IRA Federal)',
-                    amount: '2,000-8,000',
+                    amount: `${this.programCaps.HOMES_MIN.toLocaleString()}-${this.programCaps.HOMES_MAX.toLocaleString()}`,
                     priority: 1,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home rebate (≥20% savings) - applied first'
+                    note: 'Whole-home rebate (≥20% savings) - covers enabling work if needed'
                 },
                 {
                     program: 'CPF - Energy Trust',
@@ -247,14 +259,15 @@ class IncentiveRules {
                 }
             ];
             
-            // Add CERTA for insulation/sealing/duct projects
+            // Add CERTA for insulation/sealing/duct projects (capped at $2K)
+            // Note: If enabling costs exceed $2K, HOMES covers the gap
             if (this.isCERTAEligible(measureId)) {
                 incentives.push({
-                    program: 'CERTA',
-                    amount: 2000,
+                    program: 'CERTA (Enabling Repairs)',
+                    amount: this.programCaps.CERTA_MAX,
                     priority: 3,
                     contact: 'Oregon DOE',
-                    note: 'For enabling repairs'
+                    note: `Up to $${this.programCaps.CERTA_MAX.toLocaleString()}; HOMES covers gaps above this`
                 });
             }
             
@@ -276,10 +289,11 @@ class IncentiveRules {
             
             if (measureRule.certa_eligible) {
                 incentives.push({
-                    program: 'CERTA',
-                    amount: 2000,
+                    program: 'CERTA (Enabling Repairs)',
+                    amount: this.programCaps.CERTA_MAX,
                     priority: 2,
-                    contact: 'Oregon DOE'
+                    contact: 'Oregon DOE',
+                    note: `Capped at $${this.programCaps.CERTA_MAX.toLocaleString()}`
                 });
             }
             
@@ -312,7 +326,7 @@ class IncentiveRules {
                         amount: hearAmount,
                         priority: 1,
                         contact: 'Oregon DOE: 1-800-221-8035',
-                        note: 'Federal funding applied first'
+                        note: `Federal funding applied first - $${this.programCaps.HEAR_MODERATE.toLocaleString()} household cap applies`
                     },
                     {
                         program: 'Energy Trust Standard',
