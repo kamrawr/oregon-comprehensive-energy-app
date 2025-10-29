@@ -1,0 +1,653 @@
+# BPI-2400 Standard Compliant Assessment Data Schema
+# Version: 1.0
+# Standard Reference: BPI-2400-S-2013 (Home Energy Professional Certifications)
+# Last Updated: 2025-10-29
+
+assessment_data_model:
+  
+  # ===== GENERAL PROPERTY INFORMATION =====
+  
+  property_identification:
+    address:
+      type: object
+      required: true
+      fields:
+        street: {type: string, required: true}
+        city: {type: string, required: true}
+        state: {type: string, default: "OR", required: true}
+        zip_code: {type: string, pattern: "^[0-9]{5}$", required: true}
+        county: {type: string, required: true}
+    
+    parcel_id:
+      type: string
+      required: false
+      description: "Tax assessor parcel number"
+    
+    year_built:
+      type: integer
+      required: false
+      min: 1800
+      max: 2025
+    
+    occupancy:
+      type: enum
+      values: [owner_occupied, renter_occupied, vacant]
+      required: true
+  
+  # ===== BUILDING GEOMETRY =====
+  
+  geometry:
+    conditioned_floor_area:
+      type: number
+      unit: square_feet
+      required: true
+      min: 100
+      max: 15000
+      description: "Total conditioned (heated/cooled) floor area"
+    
+    conditioned_volume:
+      type: number
+      unit: cubic_feet
+      required: false
+      calculation: "floor_area * average_ceiling_height"
+      default_ceiling_height: 8
+    
+    number_of_stories:
+      type: integer
+      required: true
+      min: 1
+      max: 4
+      values: [1, 1.5, 2, 2.5, 3]
+    
+    number_of_bedrooms:
+      type: integer
+      required: true
+      min: 0
+      max: 10
+    
+    number_of_bathrooms:
+      type: number
+      required: false
+      step: 0.5
+    
+    building_orientation:
+      type: enum
+      values: [N, NE, E, SE, S, SW, W, NW]
+      required: false
+      description: "Primary facade orientation"
+    
+    attached_garage:
+      type: boolean
+      required: true
+      default: false
+  
+  # ===== ENVELOPE COMPONENTS =====
+  
+  envelope:
+    
+    walls:
+      construction_type:
+        type: enum
+        values: [wood_frame_2x4, wood_frame_2x6, masonry, concrete, log, other]
+        required: true
+      
+      gross_wall_area:
+        type: number
+        unit: square_feet
+        required: false
+        calculation: "perimeter * wall_height * stories"
+      
+      net_wall_area:
+        type: number
+        unit: square_feet
+        required: false
+        calculation: "gross_wall_area - window_area - door_area"
+      
+      existing_insulation:
+        type: object
+        fields:
+          insulation_type: {type: enum, values: [none, fiberglass_batt, blown_cellulose, foam, other]}
+          r_value: {type: number, required: true, min: 0, max: 40}
+          thickness_inches: {type: number, required: false}
+          condition: {type: enum, values: [poor, fair, good, excellent]}
+      
+      exterior_finish:
+        type: enum
+        values: [vinyl_siding, wood_siding, brick, stucco, fiber_cement, other]
+        required: false
+    
+    ceiling_attic:
+      attic_type:
+        type: enum
+        values: [vented_attic, unvented_attic, cathedral_ceiling, flat_roof, no_attic]
+        required: true
+      
+      ceiling_area:
+        type: number
+        unit: square_feet
+        required: true
+        note: "Same as conditioned floor area unless multi-story"
+      
+      attic_access_type:
+        type: enum
+        values: [hatch, scuttle, pull_down_stairs, walk_up_stairs, no_access]
+        required: false
+      
+      existing_insulation:
+        type: object
+        fields:
+          insulation_type: {type: enum, values: [none, fiberglass_batt, blown_fiberglass, blown_cellulose, foam, other]}
+          r_value: {type: number, required: true, min: 0, max: 60}
+          depth_inches: {type: number, required: false}
+          coverage_percent: {type: number, min: 0, max: 100, default: 100}
+          condition: {type: enum, values: [poor, fair, good, excellent]}
+      
+      ventilation:
+        adequate: {type: boolean, required: false}
+        soffit_vents: {type: boolean}
+        ridge_vents: {type: boolean}
+        gable_vents: {type: boolean}
+        notes: {type: string}
+    
+    foundation:
+      foundation_type:
+        type: enum
+        values: [slab_on_grade, vented_crawlspace, unvented_crawlspace, conditioned_basement, unconditioned_basement]
+        required: true
+      
+      floor_area:
+        type: number
+        unit: square_feet
+        required: false
+        note: "Floor area above crawlspace or basement"
+      
+      crawlspace_height:
+        type: number
+        unit: inches
+        required: false
+        condition: "foundation_type contains crawlspace"
+      
+      floor_insulation:
+        type: object
+        fields:
+          insulation_type: {type: enum, values: [none, fiberglass_batt, rigid_foam, spray_foam, other]}
+          r_value: {type: number, min: 0, max: 40}
+          condition: {type: enum, values: [poor, fair, good, excellent]}
+      
+      foundation_wall_insulation:
+        type: object
+        required: false
+        condition: "basement or conditioned crawlspace"
+        fields:
+          insulation_type: {type: enum, values: [none, fiberglass_batt, rigid_foam, spray_foam]}
+          r_value: {type: number, min: 0, max: 30}
+      
+      ground_cover:
+        present: {type: boolean, required: false, condition: "crawlspace"}
+        material: {type: enum, values: [none, 6mil_poly, reinforced_poly, other]}
+        coverage_percent: {type: number, min: 0, max: 100}
+      
+      moisture_issues:
+        present: {type: boolean, required: true}
+        description: {type: string, required: false}
+    
+    windows:
+      total_count:
+        type: integer
+        required: true
+        min: 0
+        max: 100
+      
+      total_window_area:
+        type: number
+        unit: square_feet
+        required: false
+        calculation: "sum of all window areas"
+      
+      window_type:
+        type: enum
+        values: [single_pane, double_pane, triple_pane, mixed]
+        required: true
+      
+      frame_material:
+        type: enum
+        values: [wood, vinyl, aluminum, fiberglass, mixed]
+        required: false
+      
+      glazing_type:
+        type: enum
+        values: [clear, low_e, tinted, mixed]
+        required: false
+      
+      u_factor:
+        type: number
+        required: false
+        min: 0.15
+        max: 1.5
+        note: "Can be measured or inferred from type"
+      
+      shgc:
+        type: number
+        required: false
+        min: 0.0
+        max: 1.0
+        description: "Solar Heat Gain Coefficient"
+      
+      condition:
+        type: enum
+        values: [poor, fair, good, excellent]
+        required: true
+      
+      operable_windows_count:
+        type: integer
+        required: false
+    
+    doors:
+      total_count:
+        type: integer
+        required: true
+        min: 1
+        max: 20
+      
+      exterior_doors:
+        type: array
+        items:
+          door_type: {type: enum, values: [solid_wood, hollow_core, insulated_steel, sliding_glass, french_door]}
+          weatherstripping: {type: enum, values: [none, poor, fair, good]}
+          storm_door: {type: boolean}
+      
+      total_door_area:
+        type: number
+        unit: square_feet
+        required: false
+  
+  # ===== HVAC SYSTEMS =====
+  
+  hvac:
+    
+    heating:
+      primary_system:
+        system_type:
+          type: enum
+          values: [gas_furnace, oil_furnace, electric_furnace, electric_baseboard, heat_pump_ducted, heat_pump_ductless, boiler_hydronic, wood_stove, pellet_stove, other]
+          required: true
+        
+        fuel_type:
+          type: enum
+          values: [natural_gas, propane, fuel_oil, electricity, wood, pellets, other]
+          required: true
+        
+        capacity:
+          type: number
+          unit: btuh
+          required: false
+          description: "Input or output capacity in BTU/hour"
+        
+        efficiency:
+          rating_type: {type: enum, values: [AFUE, HSPF, HSPF2, COP, Percent]}
+          rating_value: {type: number, required: false}
+        
+        age:
+          type: integer
+          unit: years
+          required: false
+          min: 0
+          max: 50
+        
+        manufacturer:
+          type: string
+          required: false
+        
+        model_number:
+          type: string
+          required: false
+        
+        distribution_type:
+          type: enum
+          values: [forced_air_ducted, ductless, hydronic_radiators, electric_zonal, radiant_floor, none]
+          required: true
+        
+        condition:
+          type: enum
+          values: [failed, poor, fair, good, excellent]
+          required: true
+        
+        location:
+          type: enum
+          values: [conditioned_space, unconditioned_attic, unconditioned_basement, unconditioned_crawl, garage, closet, other]
+          required: false
+    
+    cooling:
+      present:
+        type: boolean
+        required: true
+        default: false
+      
+      system_type:
+        type: enum
+        values: [none, central_ac, heat_pump, window_units, portable_units, evaporative_cooler]
+        required: true
+      
+      capacity:
+        type: number
+        unit: btuh_or_tons
+        required: false
+      
+      efficiency:
+        rating_type: {type: enum, values: [SEER, SEER2, EER, EER2]}
+        rating_value: {type: number, required: false}
+      
+      age:
+        type: integer
+        unit: years
+        required: false
+      
+      condition:
+        type: enum
+        values: [failed, poor, fair, good, excellent]
+        required: false
+    
+    ventilation:
+      mechanical_ventilation_present:
+        type: boolean
+        required: true
+        default: false
+      
+      ventilation_type:
+        type: enum
+        values: [none, exhaust_only, supply_only, balanced, erv, hrv]
+        required: true
+      
+      cfm_capacity:
+        type: number
+        unit: cubic_feet_per_minute
+        required: false
+      
+      bathroom_exhaust_fans:
+        count: {type: integer, min: 0}
+        vented_to_exterior: {type: boolean}
+      
+      kitchen_exhaust_fan:
+        present: {type: boolean}
+        vented_to_exterior: {type: boolean}
+      
+      dryer_vent:
+        vented_to_exterior: {type: boolean, required: true}
+        condition: {type: enum, values: [poor, fair, good]}
+    
+    ductwork:
+      present:
+        type: boolean
+        required: true
+        default: false
+      
+      location:
+        type: enum
+        values: [none, conditioned_space, unconditioned_attic, unconditioned_crawlspace, unconditioned_basement, garage, mixed]
+        required: true
+      
+      insulation_r_value:
+        type: number
+        required: false
+        min: 0
+        max: 12
+      
+      condition:
+        type: enum
+        values: [poor, fair, good, excellent]
+        required: false
+      
+      visible_leakage:
+        type: enum
+        values: [none, minor, moderate, major, severe]
+        required: false
+      
+      total_length_estimate:
+        type: number
+        unit: linear_feet
+        required: false
+      
+      duct_material:
+        type: enum
+        values: [sheet_metal, flex_duct, duct_board, mixed]
+        required: false
+  
+  # ===== DOMESTIC HOT WATER =====
+  
+  water_heating:
+    system_type:
+      type: enum
+      values: [storage_tank_gas, storage_tank_electric, tankless_gas, tankless_electric, heat_pump_water_heater, indirect_from_boiler, solar_thermal, other]
+      required: true
+    
+    fuel_type:
+      type: enum
+      values: [natural_gas, propane, electricity, solar, other]
+      required: true
+    
+    capacity:
+      type: number
+      unit: gallons
+      required: false
+      note: "Tank size for storage types"
+    
+    efficiency:
+      rating_type: {type: enum, values: [EF, UEF, Thermal_Efficiency]}
+      rating_value: {type: number, required: false}
+    
+    age:
+      type: integer
+      unit: years
+      required: false
+    
+    location:
+      type: enum
+      values: [conditioned_space, unconditioned_attic, unconditioned_basement, unconditioned_crawlspace, garage, closet]
+      required: false
+    
+    insulation_blanket:
+      present: {type: boolean}
+      r_value: {type: number, min: 0, max: 15}
+    
+    pipe_insulation:
+      present: {type: boolean}
+      percentage_insulated: {type: number, min: 0, max: 100}
+  
+  # ===== HEALTH & SAFETY =====
+  
+  health_safety:
+    
+    combustion_safety:
+      combustion_appliances_present:
+        type: boolean
+        required: true
+      
+      natural_draft_appliances:
+        type: boolean
+        required: false
+      
+      combustion_appliance_zone_testing_required:
+        type: boolean
+        auto_calculate: true
+        logic: "true if combustion_appliances_present"
+      
+      co_detectors:
+        present: {type: boolean, required: true}
+        location: {type: string}
+        quantity: {type: integer}
+      
+      smoke_detectors:
+        present: {type: boolean, required: true}
+        quantity: {type: integer}
+    
+    moisture_mold:
+      visible_mold:
+        present: {type: boolean, required: true}
+        location: {type: string, required: false}
+        severity: {type: enum, values: [minor, moderate, major]}
+      
+      moisture_problems:
+        present: {type: boolean, required: true}
+        location: {type: string}
+        source: {type: string}
+      
+      relative_humidity:
+        high: {type: boolean}
+        measured_value: {type: number, unit: percent, min: 0, max: 100}
+    
+    hazardous_materials:
+      asbestos:
+        suspected: {type: boolean, required: true}
+        location: {type: string}
+        confirmed: {type: boolean}
+      
+      lead_paint:
+        suspected: {type: boolean, required: true}
+        year_built_basis: {auto: true, logic: "year_built < 1978"}
+        confirmed: {type: boolean}
+      
+      vermiculite_insulation:
+        present: {type: boolean, required: false}
+        location: {type: string}
+      
+      knob_and_tube_wiring:
+        present: {type: boolean, required: true}
+        active: {type: boolean}
+        location: {type: string}
+      
+      radon:
+        tested: {type: boolean}
+        test_result: {type: number, unit: pCi_per_L}
+        mitigation_present: {type: boolean}
+    
+    structural_concerns:
+      roof_damage:
+        present: {type: boolean}
+        description: {type: string}
+      
+      foundation_damage:
+        present: {type: boolean}
+        description: {type: string}
+      
+      electrical_hazards:
+        present: {type: boolean}
+        description: {type: string}
+      
+      plumbing_leaks:
+        present: {type: boolean}
+        description: {type: string}
+  
+  # ===== DIAGNOSTIC TESTING =====
+  
+  diagnostics:
+    
+    blower_door:
+      test_required:
+        type: boolean
+        default: true
+      
+      test_performed:
+        type: boolean
+        required: false
+      
+      cfm50:
+        type: number
+        unit: cubic_feet_per_minute_at_50_pascals
+        required: false
+      
+      ach50:
+        type: number
+        unit: air_changes_per_hour_at_50_pascals
+        required: false
+        calculation: "(cfm50 * 60) / conditioned_volume"
+      
+      ela:
+        type: number
+        unit: equivalent_leakage_area_square_inches
+        required: false
+    
+    duct_testing:
+      test_required:
+        type: boolean
+        auto_calculate: true
+        logic: "true if ductwork present"
+      
+      test_performed:
+        type: boolean
+        required: false
+      
+      duct_leakage_to_outside:
+        type: number
+        unit: cfm25
+        required: false
+      
+      percent_leakage:
+        type: number
+        unit: percent
+        calculation: "(cfm25 / nominal_system_flow) * 100"
+    
+    combustion_safety_testing:
+      required:
+        type: boolean
+        auto_calculate: true
+        logic: "true if combustion_appliances_present"
+      
+      performed:
+        type: boolean
+        required: false
+      
+      co_ambient:
+        type: number
+        unit: parts_per_million
+        required: false
+      
+      co_flue:
+        type: number
+        unit: parts_per_million
+        required: false
+      
+      draft_pressure:
+        type: number
+        unit: pascals
+        required: false
+      
+      spillage_observed:
+        type: boolean
+        required: false
+
+# ===== VALIDATION RULES =====
+
+validation_rules:
+  required_for_bpi_compliance:
+    - property_identification.address
+    - geometry.conditioned_floor_area
+    - geometry.number_of_stories
+    - envelope.walls.construction_type
+    - envelope.ceiling_attic.attic_type
+    - envelope.foundation.foundation_type
+    - envelope.windows.window_type
+    - hvac.heating.primary_system.system_type
+    - health_safety.combustion_safety.combustion_appliances_present
+    - health_safety.combustion_safety.co_detectors.present
+  
+  conditional_requirements:
+    - if: "combustion_appliances_present == true"
+      then_require:
+        - diagnostics.combustion_safety_testing.performed
+    
+    - if: "ductwork.present == true"
+      then_require:
+        - diagnostics.duct_testing.test_performed
+  
+  data_quality_checks:
+    - rule: "conditioned_volume should be conditioned_floor_area * 8 to 12"
+    - rule: "net_wall_area should be less than gross_wall_area"
+    - rule: "total_window_area + total_door_area should not exceed gross_wall_area"
+    - rule: "heating system age should not exceed 50 years unless marked historical"
+
+metadata:
+  schema_version: "1.0"
+  standard_reference: "BPI-2400-S-2013"
+  last_updated: "2025-10-29"
+  notes: "This schema captures minimum data for BPI-compliant energy assessments. Additional fields may be required for specific programs or detailed modeling."
+  maintainer: "Oregon Comprehensive Energy Assessment Project"
