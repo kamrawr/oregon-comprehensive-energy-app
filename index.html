@@ -3529,5 +3529,26 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Initialize classes for browser -->
+    <script>
+        // Ensure classes are available globally
+        if (typeof window !== 'undefined') {
+            console.log('Checking class availability...');
+            console.log('ConfigLoader:', typeof ConfigLoader);
+            console.log('IncentiveRules:', typeof IncentiveRules);
+            
+            if (typeof ConfigLoader === 'undefined') {
+                console.error('❌ ConfigLoader not loaded');
+            }
+            if (typeof IncentiveRules === 'undefined') {
+                console.error('❌ IncentiveRules not loaded');
+            }
+            
+            if (typeof ConfigLoader !== 'undefined' && typeof IncentiveRules !== 'undefined') {
+                console.log('✅ All classes loaded successfully');
+            }
+        }
+    </script>
 </body>
 </html>
