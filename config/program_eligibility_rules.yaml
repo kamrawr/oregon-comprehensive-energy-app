@@ -1,0 +1,756 @@
+# Oregon Energy Program Eligibility Rules & Incentive Structure
+# Version: 1.0
+# Last Updated: 2025-10-29
+# Source: IRA programs, Energy Trust of Oregon, OHCS, state programs
+
+programs:
+  
+  # ========== FEDERAL PROGRAMS (IRA) ==========
+  
+  HOMES:
+    full_name: "Home Owner Managing Energy Savings (HOMES Rebate)"
+    authority: "Inflation Reduction Act (IRA) Section 50121"
+    administrator: "Oregon Department of Energy"
+    status: "Active - 2024-2032"
+    program_type: "performance_based"
+    
+    eligibility:
+      income_requirements:
+        enhanced_rebate:
+          threshold: "ami <= 80"
+          description: "Low-to-moderate income households"
+          rebate_multiplier: 1.0
+        
+        standard_rebate:
+          threshold: "ami > 80 AND ami <= 150"
+          description: "Moderate-to-middle income households"
+          rebate_multiplier: 1.0
+        
+        not_eligible:
+          threshold: "ami > 150"
+          description: "Above 150% AMI - not eligible for HOMES"
+      
+      home_requirements:
+        ownership_status: [own, landlord]
+        property_types: [single_family, duplex, triplex, fourplex, manufactured_home]
+        age_requirement: "Existing home (not new construction)"
+        utility_service: [pge, pacific_power, eweb, municipal_electric]
+        restrictions:
+          - "Cannot stack with HEAR program"
+          - "One rebate per home per program period"
+    
+    incentive_structure:
+      calculation_method: "modeled_energy_savings"
+      modeling_required: true
+      verification_required: true
+      payment_timing: "after_completion_and_verification"
+      
+      rebate_tiers:
+        tier_1:
+          savings_range: "20% to 34%"
+          max_rebate: 4000
+          calculation: "per_project_modeled_savings"
+          
+        tier_2:
+          savings_range: "35% or more"
+          max_rebate: 8000
+          calculation: "per_project_modeled_savings"
+      
+      income_based_adjustments:
+        ami_80_or_less:
+          bonus: "None - same rebate as standard"
+          max_total: 8000
+        
+        ami_80_to_150:
+          max_total: 8000
+      
+      project_limits:
+        max_rebate_per_home: 8000
+        max_applications_per_home: 1
+        program_lifetime_cap: "Subject to federal funding availability"
+    
+    eligible_measures:
+      whole_home_approach: true
+      measures:
+        - measure_id: "insulation_attic"
+          contributes_to_savings: true
+        - measure_id: "insulation_wall"
+          contributes_to_savings: true
+        - measure_id: "insulation_floor"
+          contributes_to_savings: true
+        - measure_id: "air_sealing"
+          contributes_to_savings: true
+        - measure_id: "windows_doors"
+          contributes_to_savings: true
+        - measure_id: "hvac_heat_pump_ducted"
+          contributes_to_savings: true
+        - measure_id: "hvac_heat_pump_ductless"
+          contributes_to_savings: true
+        - measure_id: "heat_pump_water_heater"
+          contributes_to_savings: true
+        - measure_id: "duct_sealing"
+          contributes_to_savings: true
+    
+    stacking_rules:
+      can_stack_with:
+        - CPF
+        - energy_trust_standard
+        - utility_incentives
+        - federal_tax_credits
+        - CERTA
+      
+      cannot_stack_with:
+        - HEAR
+      
+      notes: "HOMES and HEAR are mutually exclusive federal programs"
+    
+    application_process:
+      steps:
+        - "Complete energy assessment with qualified assessor"
+        - "Obtain energy model showing projected savings"
+        - "Reserve rebate through Oregon DOE portal"
+        - "Complete approved retrofit work"
+        - "Verification inspection"
+        - "Receive rebate payment"
+      
+      qualified_contractors:
+        - "BPI certified contractors"
+        - "Energy Trust Trade Allies"
+        - "HOMES approved contractors"
+      
+      timeline:
+        reservation_to_completion: "12 months typical"
+    
+    contact:
+      administrator: "Oregon Department of Energy"
+      phone: "TBD - Program launching 2024/2025"
+      website: "https://www.oregon.gov/energy/homes"
+  
+  # ==========
+  
+  HEAR:
+    full_name: "High-Efficiency Electric Home Rebate Act"
+    authority: "Inflation Reduction Act (IRA) Section 50122"
+    administrator: "Oregon Department of Energy"
+    status: "Active - 2024-2032"
+    program_type: "prescriptive_point_of_sale"
+    
+    eligibility:
+      income_requirements:
+        low_income:
+          threshold: "ami <= 80"
+          rebate_percentage: 100
+          max_per_household: 14000
+          description: "100% rebate up to limits"
+        
+        moderate_income:
+          threshold: "ami > 80 AND ami <= 150"
+          rebate_percentage: 50
+          max_per_household: 14000
+          description: "50% rebate up to limits"
+        
+        not_eligible:
+          threshold: "ami > 150"
+          description: "Above 150% AMI - not eligible"
+      
+      home_requirements:
+        ownership_status: [own, landlord]
+        property_types: [single_family, duplex, triplex, fourplex, manufactured_home]
+        restrictions:
+          - "Cannot stack with HOMES"
+          - "One set of rebates per home"
+    
+    incentive_structure:
+      type: "prescriptive_per_measure"
+      payment_timing: "point_of_sale_discount_or_rebate"
+      income_based: true
+      
+      measures:
+        heat_pump_central_ducted:
+          max_rebate: 8000
+          income_percentage_applies: true
+          requirements:
+            - "Replaces fossil fuel or electric resistance heating"
+            - "ENERGY STAR certified"
+            - "Proper sizing per Manual J"
+            - "Minimum efficiency: HSPF2 ≥ 7.8 / SEER2 ≥ 15.2"
+          notes: "Includes installation costs"
+        
+        heat_pump_ductless:
+          max_rebate: 8000
+          income_percentage_applies: true
+          requirements:
+            - "Replaces electric resistance heating"
+            - "ENERGY STAR certified"
+            - "HSPF2 ≥ 8.1 or better"
+          notes: "Single or multi-head systems"
+        
+        heat_pump_water_heater:
+          max_rebate: 1750
+          income_percentage_applies: true
+          requirements:
+            - "ENERGY STAR certified"
+            - "UEF ≥ 3.0 or higher"
+            - "≥ 50 gallon capacity"
+          notes: "Includes installation"
+        
+        electric_stove_cooktop_range_oven:
+          max_rebate: 840
+          income_percentage_applies: true
+          requirements:
+            - "Replaces gas cooking appliance"
+            - "Induction preferred"
+          notes: "Includes installation costs"
+        
+        electric_heat_pump_clothes_dryer:
+          max_rebate: 840
+          income_percentage_applies: true
+          requirements:
+            - "ENERGY STAR certified"
+          
+        electric_load_service_center_upgrade:
+          max_rebate: 4000
+          income_percentage_applies: true
+          requirements:
+            - "Minimum 200 amp service"
+            - "Required for electrification measures"
+            - "Licensed electrician installation"
+          notes: "Main panel upgrade"
+        
+        electric_wiring:
+          max_rebate: 2500
+          income_percentage_applies: true
+          requirements:
+            - "Necessary for qualified appliance installation"
+            - "Includes circuits, outlets, dedicated lines"
+          notes: "Supporting electrification infrastructure"
+        
+        insulation_air_sealing_ventilation:
+          max_rebate: 1600
+          income_percentage_applies: true
+          requirements:
+            - "Installed as part of electrification project"
+            - "Meets state/local codes"
+          notes: "Weatherization measures bundled"
+        
+        breaker_box_upgrade:
+          max_rebate: 4000
+          income_percentage_applies: true
+          requirements:
+            - "Required for new electric loads"
+      
+      household_limits:
+        max_total_low_income: 14000
+        max_total_moderate_income: 14000  # But at 50% rebate
+        max_8000_measures_per_home: 1  # Only one $8000 measure
+        notes: "Cannot claim both central HP and ductless HP at max"
+    
+    stacking_rules:
+      can_stack_with:
+        - utility_incentives
+        - CERTA
+        - federal_tax_credits
+      
+      cannot_stack_with:
+        - HOMES
+        - CPF
+        - energy_trust_income_qualified
+        - SWR
+      
+      notes: "HEAR is point-of-sale, generally replaces other income-qualified programs for chosen measures"
+    
+    application_process:
+      steps:
+        - "Income verification"
+        - "Select qualified contractor"
+        - "Contractor applies for rebate reservation"
+        - "Rebate applied at point of sale or reimbursed"
+        - "Installation completed"
+        - "Documentation submitted"
+      
+      qualified_contractors:
+        - "HEAR enrolled contractors"
+        - "Must be licensed and bonded"
+      
+      timeline:
+        typical_project: "1-3 months from approval to completion"
+    
+    contact:
+      administrator: "Oregon Department of Energy"
+      phone: "TBD - Program launching 2024/2025"
+      website: "https://www.oregon.gov/energy/homes"
+  
+  # ========== STATE/UTILITY PROGRAMS ==========
+  
+  CPF:
+    full_name: "Community Partner Funding"
+    authority: "Energy Trust of Oregon"
+    administrator: "Community Based Organizations (CBOs)"
+    status: "Active - Ongoing"
+    program_type: "prescriptive_enhanced_income_qualified"
+    
+    eligibility:
+      income_requirements:
+        threshold: "ami <= 80"
+        verification: "required"
+        acceptable_documentation:
+          - "Federal tax return (1040)"
+          - "2 months recent pay stubs"
+          - "Benefit award letters (SNAP, TANF, SSI)"
+          - "Self-attestation (limited circumstances)"
+      
+      geographic_requirements:
+        utility_territories: [pge, pacific_power]
+        notes: "Must be in Energy Trust service territory"
+      
+      home_requirements:
+        ownership_status: [own, rent_with_landlord_approval, landlord]
+        property_types: [single_family, multi_family, manufactured_home, townhome]
+    
+    incentive_structure:
+      type: "prescriptive_enhanced"
+      reference_document: "PI 320CPF-OR v2025.3"
+      payment_method: "paid_to_contractor_or_cbo"
+      
+      heat_pumps:
+        ductless_single_family:
+          base_incentive: 1800
+          requirements:
+            - "Replaces electric resistance heat"
+            - "HSPF2 ≥ 8.10"
+            - "Single-head, single-compressor system"
+            - "Indoor head in main living space"
+          notes: "Gas heating replacement not eligible"
+        
+        ductless_manufactured_home:
+          incentive: 3500
+          requirements:
+            - "Same as single family"
+            - "Limited to manufactured homes"
+        
+        ductless_multifamily:
+          incentive: 2000
+          requirements:
+            - "Eligible multifamily property"
+            - "Replaces electric resistance"
+            - "HSPF2 ≥ 8.10"
+        
+        ducted_single_family:
+          incentive: 4000
+          requirements:
+            - "Replaces electric forced-air furnace"
+            - "HSPF2 ≥ 7.50"
+          notes: "Cannot combine with other HP incentives"
+        
+        ducted_multifamily:
+          incentive: 5000
+          requirements:
+            - "Same as single family"
+            - "Eligible multifamily property"
+        
+        no_cost_ducted:
+          incentive: "Covers full installation cost"
+          requirements:
+            - "Income qualified (≤80% AMI)"
+            - "Replaces electric forced-air furnace"
+            - "HSPF2 ≥ 7.50"
+          notes: "Intended to eliminate customer cost"
+        
+        extended_capacity_new:
+          base_incentive: 2000
+          requirements:
+            - "Does not require replacement of electric heat"
+            - "Central ducted system"
+            - "Energy Trust qualifying product list"
+            - "Auxiliary heat lockout controls"
+            - "No backup gas heating"
+            - "PGE or Pacific Power only"
+        
+        extended_capacity_replacing_furnace:
+          incentive: 6000
+          requirements:
+            - "Replaces electric forced-air furnace"
+            - "Same technical requirements as above"
+        
+        extended_capacity_multifamily:
+          base_incentive: 2400
+          replace_furnace: 6650
+      
+      insulation:
+        attic:
+          incentive_rate: 0.15  # per sq ft
+          max_incentive: null  # No cap
+          requirements:
+            - "R-value improvement documented"
+            - "Proper ventilation maintained"
+            - "Meets Energy Trust specifications"
+          calculation: "square_footage * 0.15"
+        
+        wall:
+          incentive_rate: 0.10  # per sq ft
+          max_incentive: null
+          requirements:
+            - "Existing insulation R-4 or less (≤1.5 inches)"
+            - "Fill all cavities"
+          calculation: "square_footage * 0.10"
+        
+        floor_crawlspace:
+          incentive_rate: 0.12  # per sq ft
+          max_incentive: null
+          requirements:
+            - "Proper installation per specs"
+            - "Ground cover required"
+      
+      windows_doors:
+        available: "Limited"
+        notes: "Contact CBO for eligibility"
+      
+      health_safety:
+        covered: true
+        notes: "CBOs can address health/safety barriers to weatherization"
+    
+    stacking_rules:
+      can_stack_with:
+        - HOMES
+        - utility_specific_incentives
+        - CERTA
+      
+      cannot_stack_with:
+        - HEAR
+        - energy_trust_standard
+        - SWR
+      
+      notes: "CPF is enhanced income-qualified alternative to standard Energy Trust"
+    
+    application_process:
+      method: "Through Community Based Organization"
+      steps:
+        - "Contact local CBO partner"
+        - "Complete intake and income verification"
+        - "CBO arranges assessment"
+        - "Work scheduled with approved contractor"
+        - "Installation completed"
+        - "CBO handles incentive payment"
+      
+      participating_cbos:
+        notes: "Visit Energy Trust website for current CBO partners"
+    
+    contact:
+      energy_trust: "1-866-368-7878"
+      website: "https://www.energytrust.org/cpf"
+  
+  # ==========
+  
+  SWR:
+    full_name: "Single Family Weatherization (Oregon Weatherization)"
+    authority: "Oregon Housing and Community Services (OHCS)"
+    administrator: "Local Community Action Agencies"
+    status: "Active - Ongoing (DOE WAP funded)"
+    program_type: "comprehensive_no_cost"
+    
+    eligibility:
+      income_requirements:
+        threshold: "smi <= 60 OR fpl <= 200"
+        use_higher_threshold: true
+        verification: "extensive_required"
+        documentation:
+          - "Tax returns"
+          - "Pay stubs (3 months)"
+          - "Benefit verification"
+          - "All household members documented"
+      
+      home_requirements:
+        ownership_status: [own, rent_with_landlord_participation]
+        property_types: [single_family, manufactured_home, duplex_owner_occupied]
+        restrictions:
+          - "Owner occupied or landlord participates"
+          - "Must be primary residence"
+    
+    incentive_structure:
+      type: "no_cost_comprehensive"
+      customer_cost: 0
+      average_investment_per_home: 8000-12000
+      
+      included_measures:
+        comprehensive_weatherization:
+          - "Attic insulation (up to code)"
+          - "Wall insulation (if feasible)"
+          - "Floor/crawlspace insulation"
+          - "Air sealing (blower door guided)"
+          - "Duct sealing and insulation"
+          - "Window repair or replacement (if health/safety)"
+          - "Door replacement (if necessary)"
+          - "Weatherstripping"
+        
+        mechanical_systems:
+          - "Heating system repair or replacement (if failed/unsafe)"
+          - "Water heater replacement (if failed/unsafe)"
+          - "Ventilation improvements"
+        
+        health_safety:
+          - "CO detector installation"
+          - "Smoke detector installation"
+          - "Combustion appliance testing"
+          - "Minor roof repairs (if blocking insulation)"
+          - "Electrical repairs (if safety issue)"
+          - "Plumbing repairs (minor)"
+          - "Knob-and-tube wiring mitigation"
+          - "Mold/moisture remediation (limited)"
+      
+      assessment:
+        required: "Comprehensive in-home energy audit"
+        performed_by: "Certified energy auditor"
+        includes:
+          - "Blower door test"
+          - "Combustion safety testing"
+          - "Infrared imaging (if available)"
+          - "Detailed assessment of all systems"
+      
+      work_priorities:
+        - "Health and safety first"
+        - "Cost-effective weatherization"
+        - "Equipment replacement if unsafe/failed"
+    
+    stacking_rules:
+      can_stack_with:
+        - LIHEAP  # Energy bill assistance
+      
+      cannot_stack_with:
+        - "All other energy retrofit programs"
+      
+      notes: "Weatherization is comprehensive - replaces need for other programs"
+    
+    application_process:
+      steps:
+        - "Apply through local Community Action Agency"
+        - "Income verification and eligibility determination"
+        - "Placed on waitlist (may be 6-18 months)"
+        - "Pre-weatherization assessment"
+        - "Work order developed"
+        - "Installation scheduled"
+        - "Final inspection"
+        - "Post-weatherization testing"
+      
+      timeline:
+        application_to_work: "6-18 months typical (varies by county)"
+        work_duration: "1-3 days typical"
+    
+    contact:
+      state_office: "Oregon Housing and Community Services"
+      phone: "1-800-766-6861"
+      website: "https://www.oregon.gov/ohcs/energy-weatherization"
+      local_caa: "Contact county Community Action Agency"
+  
+  # ==========
+  
+  CERTA:
+    full_name: "Clean Energy Retrofit Tax Assistance"
+    authority: "Oregon Revised Statutes (ORS)"
+    administrator: "County Assessors / Oregon Department of Revenue"
+    status: "Active - Ongoing"
+    program_type: "property_tax_exemption"
+    
+    eligibility:
+      income_requirements:
+        threshold: null  # Available to all income levels
+        enhanced_for: "ami <= 80 (longer exemption)"
+      
+      home_requirements:
+        ownership_status: [own]  # Must own property
+        property_types: [all_residential]
+        restrictions:
+          - "Must be residential property"
+          - "Owner-occupied or rental property"
+    
+    incentive_structure:
+      type: "property_tax_exemption"
+      benefit: "Exempts added assessed value from energy improvements"
+      
+      exemption_duration:
+        standard: "10 years"
+        enhanced_low_income: "15 years (if ami <= 80)"
+      
+      how_it_works:
+        - "Energy improvements typically increase assessed value"
+        - "CERTA exempts that increase from property taxes"
+        - "Example: $10,000 retrofit adds $8,000 assessed value"
+        - "That $8,000 is tax-exempt for 10-15 years"
+      
+      eligible_improvements:
+        - "Insulation"
+        - "High-efficiency heating/cooling"
+        - "High-efficiency water heaters"
+        - "Energy-efficient windows/doors"
+        - "Solar panels"
+        - "Heat pumps"
+        - "Other qualifying energy improvements"
+    
+    stacking_rules:
+      can_stack_with:
+        - "All programs (HOMES, HEAR, CPF, SWR, standard)"
+      
+      notes: "CERTA is a tax benefit, stacks with all rebate programs"
+    
+    application_process:
+      steps:
+        - "Complete energy improvements"
+        - "Obtain documentation/receipts"
+        - "File application with County Assessor"
+        - "Application due by April 1 following completion"
+        - "Assessor reviews and approves"
+        - "Exemption appears on next tax statement"
+      
+      timeline:
+        application_deadline: "April 1 of year following installation"
+        exemption_begins: "Next tax year"
+    
+    contact:
+      state_info: "Oregon Department of Revenue"
+      phone: "503-945-8091"
+      website: "https://www.oregon.gov/dor"
+      local: "Contact County Assessor's office"
+  
+  # ==========
+  
+  energy_trust_standard:
+    full_name: "Energy Trust of Oregon - Standard Residential Incentives"
+    authority: "Energy Trust of Oregon"
+    administrator: "Energy Trust / Trade Ally Network"
+    status: "Active - Ongoing"
+    program_type: "prescriptive_standard"
+    
+    eligibility:
+      income_requirements:
+        threshold: null  # Available to all income levels
+        notes: "For income-qualified enhanced incentives, see CPF"
+      
+      geographic_requirements:
+        utility_territories:
+          electric: [pge, pacific_power]
+          gas: [nw_natural, cascade, avista]
+      
+      home_requirements:
+        ownership_status: [own, rent_with_approval, landlord]
+        property_types: [all_residential]
+    
+    incentive_structure:
+      heat_pumps:
+        ductless:
+          incentive: 800
+          requirements:
+            - "HSPF2 ≥ 8.10"
+            - "Qualifying product list"
+        
+        ducted:
+          incentive: 1500
+          requirements:
+            - "HSPF2 ≥ 7.50"
+            - "Replaces electric or gas system"
+      
+      insulation:
+        attic:
+          rate: 0.10  # per sq ft
+        wall:
+          rate: 0.08  # per sq ft
+        floor:
+          rate: 0.10  # per sq ft
+      
+      windows:
+        incentive: 50  # per window
+        max_per_home: 500
+        requirements:
+          - "ENERGY STAR certified"
+          - "U-factor ≤ 0.30"
+      
+      water_heating:
+        heat_pump_water_heater:
+          incentive: 600
+          requirements:
+            - "UEF ≥ 3.0"
+        
+        gas_water_heater:
+          incentive: 300
+          requirements:
+            - "UEF ≥ 0.90 or tankless"
+      
+      smart_thermostats:
+        incentive: 75
+        requirements:
+          - "Qualifying connected thermostat"
+    
+    stacking_rules:
+      can_stack_with:
+        - HOMES
+        - CERTA
+        - federal_tax_credits
+        - utility_specific_programs
+      
+      cannot_stack_with:
+        - HEAR
+        - CPF
+        - SWR
+    
+    application_process:
+      method: "Through Trade Ally contractor or online"
+      steps:
+        - "Find Trade Ally contractor"
+        - "Get quote including incentive"
+        - "Contractor applies for incentive"
+        - "Work completed"
+        - "Incentive processed"
+    
+    contact:
+      phone: "1-866-368-7878"
+      website: "https://www.energytrust.org"
+      trade_ally_locator: "https://www.energytrust.org/find-a-contractor"
+
+# ========== UTILITY-SPECIFIC PROGRAMS ==========
+
+utility_specific_programs:
+  pge_smart_thermostat:
+    utility: pge
+    incentive: 50
+    requirements: [approved_connected_device]
+    stacks_with: [all_programs]
+  
+  nw_natural_furnace:
+    utility: nw_natural
+    measure: gas_furnace
+    incentive: 700
+    requirements: [95_percent_afue_or_higher]
+
+# ========== STACKING MATRIX ==========
+
+stacking_matrix:
+  rules:
+    federal_exclusivity:
+      description: "HOMES and HEAR are mutually exclusive"
+      logic: "NOT (HOMES AND HEAR)"
+    
+    income_qualified_exclusivity:
+      description: "Choose one: CPF, SWR, or HEAR for income-qualified"
+      logic: "MAX_ONE_OF (CPF, SWR, HEAR)"
+    
+    weatherization_comprehensive:
+      description: "SWR covers everything"
+      logic: "IF SWR THEN NOT (any_other_major_program)"
+    
+    cpf_standard_exclusive:
+      description: "CPF and standard Energy Trust are exclusive"
+      logic: "NOT (CPF AND energy_trust_standard)"
+  
+  maximum_caps:
+    hear_per_household: 14000
+    homes_per_project: 8000
+
+metadata:
+  version: "1.0"
+  last_updated: "2025-10-29"
+  data_sources:
+    - "IRA program guidance (HOMES/HEAR)"
+    - "Energy Trust PI 320CPF-OR v2025.3"
+    - "Energy Trust measure specifications 2025"
+    - "OHCS weatherization program guidelines"
+    - "Oregon Department of Revenue CERTA rules"
+  notes: "Program rules subject to change. Verify with program administrators."
+  next_review_date: "2025-12-01"

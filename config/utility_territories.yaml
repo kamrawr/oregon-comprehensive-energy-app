@@ -1,0 +1,483 @@
+# Oregon Utility Territories & Program Availability
+# Version: 1.0
+# Last Updated: 2025-10-29
+# Source: Energy Trust of Oregon service territory maps, utility provider data
+
+electric_utilities:
+  pge:
+    full_name: Portland General Electric
+    type: investor_owned
+    service_area:
+      counties:
+        - Multnomah
+        - Clackamas
+        - Washington
+        - Marion
+        - Yamhill
+        - Polk
+        - Benton
+        - Clatsop
+        - Columbia
+        - parts_of_Lane
+        - parts_of_Linn
+        - parts_of_Hood_River
+      major_cities:
+        - Portland
+        - Salem
+        - Hillsboro
+        - Beaverton
+        - Gresham
+        - Lake Oswego
+        - West Linn
+        - Oregon City
+        - Corvallis
+        - Albany
+    
+    available_programs:
+      federal:
+        - HOMES
+        - HEAR
+      state_utility:
+        - CPF
+        - energy_trust_standard
+        - CERTA
+      utility_specific:
+        - smart_thermostat_rebate
+        - time_of_use_rates
+        - green_future_impact
+    
+    contact:
+      phone: "503-736-4PGE (4743)"
+      website: "https://portlandgeneral.com"
+      energy_trust_phone: "1-866-368-7878"
+  
+  pacific_power:
+    full_name: Pacific Power (PacifiCorp)
+    type: investor_owned
+    service_area:
+      counties:
+        - Klamath
+        - Jackson
+        - Josephine
+        - Douglas
+        - Lane  # Southern portion
+        - Deschutes
+        - Jefferson
+        - Crook
+        - Grant
+        - Harney
+        - Malheur
+        - Baker
+        - Union
+        - Wallowa
+        - parts_of_Umatilla
+        - parts_of_Morrow
+      major_cities:
+        - Bend
+        - Redmond
+        - Medford
+        - Ashland
+        - Grants Pass
+        - Roseburg
+        - Klamath Falls
+        - La Grande
+        - Baker City
+    
+    available_programs:
+      federal:
+        - HOMES
+        - HEAR
+      state_utility:
+        - CPF
+        - energy_trust_standard
+        - CERTA
+      utility_specific:
+        - wattsmart_program
+        - blue_sky_renewable
+    
+    contact:
+      phone: "1-888-221-7070"
+      website: "https://www.pacificpower.net"
+      energy_trust_phone: "1-866-368-7878"
+  
+  eweb:
+    full_name: Eugene Water & Electric Board
+    type: municipal
+    service_area:
+      counties:
+        - Lane  # Eugene/Springfield area only
+      major_cities:
+        - Eugene
+        - Springfield
+    
+    available_programs:
+      federal:
+        - HOMES
+        - HEAR
+      state_utility:
+        - energy_trust_standard  # Limited
+        - CERTA
+      utility_specific:
+        - eweb_greenpower
+        - eweb_home_energy_review
+        - eweb_efficiency_incentives
+    
+    income_qualified_programs:
+      available: true
+      local_programs:
+        - low_income_weatherization
+        - emergency_assistance
+    
+    contact:
+      phone: "541-484-2411"
+      website: "https://www.eweb.org"
+      energy_programs: "https://www.eweb.org/residential-customers"
+  
+  municipal_utilities:
+    type: municipal_group
+    utilities:
+      - name: "Ashland Electric"
+        service_area: [Ashland, Jackson County]
+      - name: "Bandon Public Works"
+        service_area: [Bandon, Coos County]
+      - name: "Canby Utility"
+        service_area: [Canby, Clackamas County]
+      - name: "Cascade Locks PUD"
+        service_area: [Cascade Locks, Hood River County]
+      - name: "Central Lincoln PUD"
+        service_area: [Newport, Lincoln County]
+      - name: "City of Milton-Freewater"
+        service_area: [Milton-Freewater, Umatilla County]
+      - name: "Columbia River PUD"
+        service_area: [St. Helens, Columbia County]
+      - name: "Emerald PUD"
+        service_area: [Eugene area, Lane County]
+      - name: "Forest Grove Light & Power"
+        service_area: [Forest Grove, Washington County]
+      - name: "Hermiston Energy Services"
+        service_area: [Hermiston, Umatilla County]
+      - name: "McMinnville Water & Light"
+        service_area: [McMinnville, Yamhill County]
+      - name: "Northern Wasco County PUD"
+        service_area: [The Dalles, Wasco County]
+      - name: "Salem Electric"
+        service_area: [Salem area, Marion County]
+      - name: "Tillamook PUD"
+        service_area: [Tillamook, Tillamook County]
+      - name: "Umatilla Electric Coop"
+        service_area: [Eastern Oregon, Umatilla/Morrow]
+    
+    available_programs:
+      federal:
+        - HOMES  # Eligibility varies
+        - HEAR   # Eligibility varies
+      state_utility:
+        - CERTA
+        - local_programs  # Varies by utility
+      notes: "Program availability varies significantly by municipal utility. Contact local utility for specific programs."
+    
+    contact:
+      general_info: "Contact your local municipal utility for program details"
+
+gas_utilities:
+  nw_natural:
+    full_name: NW Natural Gas
+    type: investor_owned
+    service_area:
+      counties:
+        - Multnomah
+        - Washington
+        - Clackamas
+        - Marion
+        - Yamhill
+        - Polk
+        - Lane  # Eugene/Springfield
+        - Linn  # Albany area
+        - Columbia
+        - Clatsop  # Astoria area
+      major_cities:
+        - Portland
+        - Salem
+        - Eugene
+        - Springfield
+        - Hillsboro
+        - Beaverton
+        - Albany
+        - Corvallis
+    
+    available_programs:
+      federal:
+        - none  # Gas utilities not eligible for HOMES/HEAR
+      state_utility:
+        - CPF  # For combo electric/gas measures
+        - energy_trust_standard
+        - CERTA
+      utility_specific:
+        - gas_furnace_rebates
+        - gas_water_heater_rebates
+        - gas_fireplace_rebates
+        - smart_thermostat_program
+    
+    contact:
+      phone: "1-800-422-4012"
+      website: "https://www.nwnatural.com"
+      energy_trust_phone: "1-866-368-7878"
+  
+  cascade:
+    full_name: Cascade Natural Gas
+    type: investor_owned
+    service_area:
+      counties:
+        - Deschutes
+        - Jefferson
+        - Crook
+        - Klamath
+        - Jackson
+        - parts_of_Hood_River
+        - parts_of_Wasco
+      major_cities:
+        - Bend
+        - Redmond
+        - Sisters
+        - Madras
+        - Klamath Falls
+        - Medford
+        - Ashland
+    
+    available_programs:
+      federal:
+        - none
+      state_utility:
+        - energy_trust_standard
+        - CERTA
+      utility_specific:
+        - gas_furnace_incentives
+        - gas_water_heater_incentives
+    
+    contact:
+      phone: "1-888-522-1130"
+      website: "https://www.cngc.com"
+      energy_trust_phone: "1-866-368-7878"
+  
+  avista:
+    full_name: Avista Utilities
+    type: investor_owned
+    service_area:
+      counties:
+        - Union  # La Grande area
+        - Wallowa  # Enterprise area
+      major_cities:
+        - La Grande
+        - Enterprise
+    
+    available_programs:
+      federal:
+        - none
+      state_utility:
+        - energy_trust_standard
+        - CERTA
+      utility_specific:
+        - comfort_level_program
+        - energy_efficiency_rebates
+    
+    contact:
+      phone: "1-800-227-9187"
+      website: "https://www.myavista.com"
+      energy_trust_phone: "1-866-368-7878"
+
+# Cross-reference: County to Utility Mapping
+county_to_utility_map:
+  Baker County:
+    electric: [pacific_power]
+    gas: [propane_only]
+    notes: "No natural gas service, propane common"
+  
+  Benton County:
+    electric: [pge]
+    gas: [nw_natural]
+  
+  Clackamas County:
+    electric: [pge, canby_utility]
+    gas: [nw_natural]
+  
+  Clatsop County:
+    electric: [pge]
+    gas: [nw_natural]
+  
+  Columbia County:
+    electric: [pge, columbia_river_pud]
+    gas: [nw_natural]
+  
+  Coos County:
+    electric: [pacific_power, bandon_pw]
+    gas: [propane_only]
+  
+  Crook County:
+    electric: [pacific_power]
+    gas: [cascade]
+  
+  Curry County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Deschutes County:
+    electric: [pacific_power]
+    gas: [cascade]
+  
+  Douglas County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Gilliam County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Grant County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Harney County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Hood River County:
+    electric: [pge, pacific_power, cascade_locks_pud]
+    gas: [cascade, nw_natural]
+  
+  Jackson County:
+    electric: [pacific_power, ashland_electric]
+    gas: [cascade]
+  
+  Jefferson County:
+    electric: [pacific_power]
+    gas: [cascade]
+  
+  Josephine County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Klamath County:
+    electric: [pacific_power]
+    gas: [cascade]
+  
+  Lake County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Lane County:
+    electric: [eweb, pge, pacific_power, emerald_pud]
+    gas: [nw_natural]
+  
+  Lincoln County:
+    electric: [central_lincoln_pud]
+    gas: [propane_only]
+  
+  Linn County:
+    electric: [pge, pacific_power]
+    gas: [nw_natural]
+  
+  Malheur County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Marion County:
+    electric: [pge, salem_electric]
+    gas: [nw_natural]
+  
+  Morrow County:
+    electric: [umatilla_electric_coop]
+    gas: [propane_only]
+  
+  Multnomah County:
+    electric: [pge]
+    gas: [nw_natural]
+  
+  Polk County:
+    electric: [pge]
+    gas: [nw_natural]
+  
+  Sherman County:
+    electric: [northern_wasco_pud]
+    gas: [propane_only]
+  
+  Tillamook County:
+    electric: [tillamook_pud]
+    gas: [propane_only]
+  
+  Umatilla County:
+    electric: [pacific_power, umatilla_electric_coop, hermiston_es, milton_freewater]
+    gas: [propane_only]
+  
+  Union County:
+    electric: [pacific_power]
+    gas: [avista]
+  
+  Wallowa County:
+    electric: [pacific_power]
+    gas: [avista]
+  
+  Wasco County:
+    electric: [northern_wasco_pud, pacific_power]
+    gas: [cascade]
+  
+  Washington County:
+    electric: [pge, forest_grove_lp]
+    gas: [nw_natural]
+  
+  Wheeler County:
+    electric: [pacific_power]
+    gas: [propane_only]
+  
+  Yamhill County:
+    electric: [pge, mcminnville_wl]
+    gas: [nw_natural]
+
+# Validation Rules
+validation_rules:
+  must_select_at_least_one_electric: true
+  gas_optional: true
+  warn_if_utility_not_in_county: true
+  suggest_utilities_based_on_county: true
+  
+  propane_handling:
+    message: "No natural gas service available in this area. Propane is common for heating/cooking."
+    programs_available: [HOMES, HEAR, CERTA, limited_energy_trust]
+
+# Program Eligibility Matrix
+program_availability_by_utility:
+  HOMES:
+    required_utilities: [pge, pacific_power, eweb, municipal_electric]
+    excluded_utilities: [gas_only]
+  
+  HEAR:
+    required_utilities: [pge, pacific_power, eweb, municipal_electric]
+    excluded_utilities: [gas_only]
+  
+  CPF:
+    required_utilities: [pge, pacific_power]
+    excluded_utilities: [eweb, municipal, gas_only]
+    notes: "Income-qualified program, limited to Energy Trust territories"
+  
+  SWR:
+    required_utilities: [any]
+    notes: "State weatherization program available statewide regardless of utility"
+  
+  CERTA:
+    required_utilities: [any]
+    notes: "State tax program available statewide"
+  
+  energy_trust_standard:
+    required_utilities: [pge, pacific_power, nw_natural, cascade, avista]
+    excluded_utilities: [eweb, most_municipal]
+    notes: "Available in Energy Trust service territories"
+
+metadata:
+  version: "1.0"
+  last_updated: "2025-10-29"
+  data_sources:
+    - "Energy Trust of Oregon service territory maps"
+    - "PGE service area documentation"
+    - "Pacific Power service area documentation"
+    - "Oregon Public Utility Commission records"
+  update_frequency: "Quarterly or as utility territories change"
+  maintainer: "Oregon Comprehensive Energy Assessment Project"
