@@ -1706,32 +1706,34 @@
                 });
             }
 
-            // Insulation recommendations
+            // Insulation recommendations (using residential insights data: $1.0-4.5/sqft)
             if (data.atticInsulation === 'none' || data.atticInsulation === 'poor') {
                 const sqft = parseInt(data.homeSquareFootage) || 2000;
-                const cost = sqft * 2.5;
-                const incentive = sqft * 0.15;
+                const costPerSqft = data.atticInsulation === 'none' ? 3.0 : 2.5; // Higher for none
+                const cost = Math.round(sqft * costPerSqft);
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Attic Insulation',
-                    description: `Upgrade attic insulation to R-49 (~${sqft} sq ft)`,
+                    description: `Upgrade attic insulation to R-38+ (~${sqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
-                    incentive: `$${Math.round(incentive).toLocaleString()} Energy Trust rebate`,
+                    sqft: sqft, // Store for incentive calculation
+                    incentive: 'Calculate' based on eligibility',
                     dependencies: 'Roof in good condition'
                 });
             }
 
             if (data.wallInsulation === 'none' || data.wallInsulation === 'partial') {
                 const sqft = parseInt(data.homeSquareFootage) || 2000;
-                const wallSqft = Math.round(sqft * 0.6);
-                const cost = wallSqft * 3.5;
-                const incentive = wallSqft * 0.10;
+                const wallSqft = Math.round(sqft * 0.6); // Exterior wall area approximation
+                const costPerSqft = data.wallInsulation === 'none' ? 4.0 : 3.0; // $1.0-4.5/sqft range
+                const cost = Math.round(wallSqft * costPerSqft);
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Wall Insulation',
-                    description: `Add wall insulation (~${wallSqft} sq ft)`,
+                    description: `Add wall insulation (~${wallSqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
-                    incentive: `$${Math.round(incentive).toLocaleString()} Energy Trust rebate`,
+                    sqft: wallSqft,
+                    incentive: 'Calculated based on eligibility',
                     dependencies: 'None'
                 });
             }
@@ -1740,14 +1742,15 @@
             if ((data.foundationType === 'crawlspace' || data.foundationType === 'basement_unfinished') && 
                 (data.floorInsulation === 'none' || data.floorInsulation === 'poor')) {
                 const sqft = parseInt(data.homeSquareFootage) || 2000;
-                const cost = sqft * 3.0;
-                const incentive = sqft * 0.12;
+                const costPerSqft = 3.5; // Mid-range for floor insulation
+                const cost = Math.round(sqft * costPerSqft);
                 recommendations.push({
                     priority: '🟠',
                     measure: 'Floor Insulation',
-                    description: `Insulate floor/crawlspace (~${sqft} sq ft)`,
+                    description: `Insulate floor/crawlspace to R-30 (~${sqft.toLocaleString()} sq ft)`,
                     estimatedCost: `$${cost.toLocaleString()}`,
-                    incentive: `$${Math.round(incentive).toLocaleString()} Energy Trust rebate`,
+                    sqft: sqft,
+                    incentive: 'Calculated based on eligibility',
                     dependencies: 'Moisture control may be required first'
                 });
             }
@@ -1760,28 +1763,29 @@
                 
                 if (hasGoodDucts && (data.heatingType === 'electric_furnace' || data.heatingType === 'gas_furnace')) {
                     // Recommend ducted heat pump for homes with existing duct system
-                    const cost = 15000;
+                    // Residential insights: $2500-15000 range for heat pumps
+                    const cost = 12000; // Typical ducted system cost
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
                         heatPumpType: 'ducted',
-                        description: `Install ducted (central) heat pump system to utilize existing ductwork`,
+                        description: `Install ducted (central) heat pump system (HSPF2 ≥7.5) to utilize existing ductwork`,
                         estimatedCost: `$${cost.toLocaleString()}`,
-                        incentive: `$1,500+ Energy Trust + utility incentives`,
+                        incentive: 'Calculated based on eligibility',
                         dependencies: 'Duct sealing recommended first'
                     });
                 } else {
                     // Recommend ductless for homes without ducts or with poor duct condition
                     const units = Math.ceil(conditionedSpace / 900);
-                    const cost = units * 8000;
-                    const incentive = units * 500;
+                    const costPerUnit = units === 1 ? 6000 : 5000; // Single vs multi-head
+                    const cost = units * costPerUnit;
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
                         heatPumpType: 'ductless',
-                        description: `Install ${units} ductless heat pump unit(s) - no ductwork needed`,
+                        description: `Install ${units} ductless heat pump unit(s) (HSPF2 ≥8.1) - no ductwork needed`,
                         estimatedCost: `$${cost.toLocaleString()}`,
-                        incentive: `$${incentive.toLocaleString()} Energy Trust + utility incentives`,
+                        incentive: 'Calculated based on eligibility',
                         dependencies: 'Insulation upgrades recommended first'
                     });
                 }
@@ -1812,15 +1816,17 @@
             }
             
             // Heat Pump Water Heater
+            // Residential insights: $3600-6500 cost, $240 standard incentive, $1750 HEAR
             const waterHeaterAge = parseInt(data.waterHeaterAge) || 0;
             if ((waterHeaterAge > 10 || data.waterHeaterType === 'electric_tank' || data.waterHeaterType === 'gas_tank') && 
                 data.waterHeaterType !== 'heat_pump_water_heater') {
+                const cost = 4500; // Mid-range for HPWH
                 recommendations.push({
                     priority: '🟡',
                     measure: 'Heat Pump Water Heater',
-                    description: 'Replace existing water heater with energy-efficient heat pump model',
-                    estimatedCost: '$2,500 - $4,000',
-                    incentive: '$240+ Energy Trust + HEAR Federal rebates',
+                    description: 'Replace existing water heater with energy-efficient heat pump model (UEF ≥3.0)',
+                    estimatedCost: `$${cost.toLocaleString()}`,
+                    incentive: 'Calculated based on eligibility',
                     dependencies: '30A dedicated circuit may be required'
                 });
             }
@@ -1915,8 +1921,16 @@
 
         // ===== MODULE 4: COMPREHENSIVE INSIGHTS =====
         function showComprehensiveResults() {
+            console.log('showComprehensiveResults called');
+            console.log('Recommendations:', appState.recommendations);
+            
             try {
                 // Initialize IncentiveRules engine
+                if (typeof IncentiveRules === 'undefined') {
+                    console.error('IncentiveRules not loaded');
+                    throw new Error('IncentiveRules not available');
+                }
+                
                 const incentiveRules = new IncentiveRules();
                 
                 // Get customer eligibility tier
@@ -1925,8 +1939,12 @@
                 const fplPercent = appState.incomeData.percentages.fpl;
                 const eligibilityTier = incentiveRules.getEligibilityTier(amiPercent, smiPercent, fplPercent);
                 
+                console.log('Eligibility Tier:', eligibilityTier);
+                
                 // For weatherization-eligible, show CPF tier incentives
                 const displayTier = eligibilityTier === 'weatherization' ? 'cpf_low' : eligibilityTier;
+                
+                console.log('Display Tier:', displayTier);
                 
                 // Build comprehensive results with tier info
                 const tierDescription = incentiveRules.getTierDescription(eligibilityTier);
@@ -1940,7 +1958,7 @@
                     if (measureId) {
                         const measureDetails = {
                             housingType: appState.customerData.housingType,
-                            sqft: parseInt(appState.assessmentData.homeSquareFootage) || 2000,
+                            sqft: rec.sqft || parseInt(appState.assessmentData.homeSquareFootage) || 2000,
                             cpfEligible: eligibility.cpfEligible || eligibility.weatherization
                         };
                         
@@ -1975,12 +1993,21 @@
                 appState.eligibilityTier = eligibilityTier;
                 
                 // Generate and display HTML
+                console.log('Calling displayEnrichedResults');
                 displayEnrichedResults(tierDescription, enrichedRecommendations);
+                console.log('displayEnrichedResults completed');
                 
             } catch (error) {
                 console.error('Error generating comprehensive results:', error);
-                // Fallback to basic display
-                showBasicResults();
+                alert('Error generating incentive details: ' + error.message + '. Please refresh and try again.');
+                // Display error in results div
+                document.getElementById('comprehensiveResults').innerHTML = `
+                    <div class="alert" style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 1rem;">
+                        <h4>Error Loading Incentive Details</h4>
+                        <p>There was an error calculating your personalized incentives. Please refresh the page and try again.</p>
+                        <p style="font-size: 0.9rem; color: #666;">Error: ${error.message}</p>
+                    </div>
+                `;
             }
         }
         
@@ -2376,27 +2403,7 @@
             return html;
         }
         
-        // Fallback basic results function
-        function showBasicResults() {
-            const eligibility = appState.eligibilityResults;
-            const customer = appState.customerData;
-            const income = appState.incomeData;
-            
-            let html = `
-                <div class="customer-id-display">
-                    <div class="id-label">Assessment ID</div>
-                    <div class="id-value">${customer.customerId}</div>
-                </div>
-
-                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Your Personalized Energy Pathway</h3>
-                
-                <div class="alert alert-info">
-                    <strong>Customer Profile:</strong> ${customer.firstName} ${customer.lastName} | 
-                    ${income.householdSize} person household | 
-                    ${customer.county} | 
-                    ${customer.housingType.replace(/_/g, ' ')}
-                </div>
-            `;
+        // Note: Removed showBasicResults - we only use enriched results with proper incentive calculations
 
             // Eligibility-based recommendations
             if (eligibility.weatherization && eligibility.liheap) {
