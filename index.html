@@ -1589,7 +1589,7 @@
                     ${eligibility.weatherization ? `
                         <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
                             <strong>⚠️ Important:</strong> Oregon Weatherization may have waitlists. Check agency capacity. 
-                            Meanwhile, you can also access HOMES/HEAR programs for faster upgrades.
+                            Meanwhile, you can also access ${eligibility.workingWithCBO ? 'CPF (via CBO), ' : ''}HOMES/HEAR programs for faster upgrades.
                         </div>
                     ` : ''}
                     <div style="margin-top: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 8px;">
@@ -1696,6 +1696,7 @@
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
+                        heatPumpType: 'ducted',
                         description: `Install ducted (central) heat pump system to utilize existing ductwork`,
                         estimatedCost: `$${cost.toLocaleString()}`,
                         incentive: `$1,500+ Energy Trust + utility incentives`,
@@ -1709,6 +1710,7 @@
                     recommendations.push({
                         priority: '🟡',
                         measure: 'Heat Pump System',
+                        heatPumpType: 'ductless',
                         description: `Install ${units} ductless heat pump unit(s) - no ductwork needed`,
                         estimatedCost: `$${cost.toLocaleString()}`,
                         incentive: `$${incentive.toLocaleString()} Energy Trust + utility incentives`,
@@ -1845,9 +1847,10 @@
                 const tierDescription = incentiveRules.getTierDescription(eligibilityTier);
                 
                 // Calculate incentives for each recommended measure
+                const eligibility = appState.eligibilityResults;
                 const enrichedRecommendations = appState.recommendations.map(rec => {
                     // Map measure names to IDs
-                    const measureId = mapMeasureToId(rec.measure);
+                    const measureId = mapMeasureToId(rec.measure, rec.heatPumpType);
                     
                     if (measureId) {
                         const measureDetails = {
@@ -1896,12 +1899,16 @@
             }
         }
         
-        function mapMeasureToId(measureName) {
+        function mapMeasureToId(measureName, heatPumpType) {
+            // Handle heat pump differentiation
+            if (measureName === 'Heat Pump System') {
+                return heatPumpType === 'ducted' ? 'heat_pump_ducted' : 'heat_pump_ductless';
+            }
+            
             const mapping = {
                 'Attic Insulation': 'attic_insulation',
                 'Wall Insulation': 'wall_insulation',
                 'Floor Insulation': 'floor_insulation',
-                'Heat Pump System': 'heat_pump_ductless',
                 'Window Upgrades': 'window_replacement',
                 'Air Sealing': 'air_sealing',
                 'Duct Sealing': 'duct_sealing',

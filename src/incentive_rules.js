@@ -230,7 +230,7 @@ class IncentiveRules {
                     amount: '2,000-8,000',
                     priority: 2,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home rebate (≥20% savings required), cannot stack with HEAR'
+                    note: 'Whole-home rebate (20%+ savings required), cannot stack with HEAR'
                 }
             ];
             
@@ -326,7 +326,7 @@ class IncentiveRules {
                         amount: '2,000-8,000',
                         priority: 2,
                         contact: 'Oregon DOE',
-                        note: 'Whole-home rebate (≥20% savings), cannot stack with HEAR'
+                        note: 'Whole-home rebate (20%+ savings), cannot stack with HEAR'
                     }
                 ],
                 note: 'Best for comprehensive projects'
