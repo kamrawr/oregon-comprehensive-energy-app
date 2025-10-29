@@ -2195,6 +2195,15 @@
                 displayEnrichedResults(tierDescription, cappedRecommendations, eligibilityTier);
                 console.log('displayEnrichedResults completed');
                 
+                // Apply no-cost enhancement if checkbox is checked by default
+                setTimeout(() => {
+                    const noCostCheckbox = document.getElementById('noCostEligible');
+                    if (noCostCheckbox && noCostCheckbox.checked) {
+                        console.log('Applying initial no-cost enhancement...');
+                        applyNoCostEnhancement(true);
+                    }
+                }, 100);
+                
             } catch (error) {
                 console.error('Error generating comprehensive results:', error);
                 alert('Error generating incentive details: ' + error.message + '. Please refresh and try again.');
@@ -2519,21 +2528,20 @@
         }
         
         /**
-         * Toggle No-Cost Eligible and recalculate incentives dynamically
-         * When enabled: Apply enhanced CPF/SWR no-cost incentives
-         * When disabled: Use standard CPF/SWR/Energy Trust incentives
+         * Apply or remove no-cost enhancement
+         * @param {boolean} applyEnhancement - Whether to apply or remove enhancement
          */
-        function toggleNoCostEligible() {
-            const noCostChecked = document.getElementById('noCostEligible').checked;
-            console.log('No-Cost Eligible toggled:', noCostChecked);
+        function applyNoCostEnhancement(applyEnhancement) {
+            console.log('applyNoCostEnhancement called:', applyEnhancement);
             
             if (!appState.enrichedRecommendations || typeof IncentiveRules === 'undefined') {
-                console.error('Cannot toggle No-Cost: missing data or IncentiveRules');
+                console.error('Cannot apply No-Cost: missing data or IncentiveRules');
                 return;
             }
             
             const incentiveRules = new IncentiveRules();
-            const optOutHOMES = document.getElementById('optOutHOMES').checked;
+            const optOutHOMESEl = document.getElementById('optOutHOMES');
+            const optOutHOMES = optOutHOMESEl ? optOutHOMESEl.checked : false;
             
             // Eligible measure types for no-cost treatment
             const noCostMeasures = [
@@ -2555,7 +2563,7 @@
                 );
                 
                 if (cpfIncentive) {
-                    if (noCostChecked) {
+                    if (applyEnhancement) {
                         // Apply enhanced no-cost CPF - increase to cover full cost minus other incentives
                         const otherIncentives = rec.bestPackage.incentives
                             .filter(inc => !inc.program.includes('CPF'))
@@ -2606,7 +2614,16 @@
             console.log('Updating table and summaries...');
             updateRecommendationsTable();
             updateCostSummary();
-            console.log('No-Cost toggle complete');
+            console.log('No-Cost enhancement complete');
+        }
+        
+        /**
+         * Toggle No-Cost Eligible checkbox and apply changes
+         */
+        function toggleNoCostEligible() {
+            const noCostChecked = document.getElementById('noCostEligible').checked;
+            console.log('No-Cost Eligible toggled:', noCostChecked);
+            applyNoCostEnhancement(noCostChecked);
         }
         
         /**
