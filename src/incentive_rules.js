@@ -960,12 +960,21 @@ class IncentiveRules {
     }
 }
 
-// Export for use in main app
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = IncentiveRules;
+// Export for use in main app (try-catch to prevent errors)
+try {
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = IncentiveRules;
+    }
+} catch (e) {
+    console.warn('Could not export IncentiveRules to module.exports:', e.message);
 }
 
-// Also export to window for browser
-if (typeof window !== 'undefined') {
-    window.IncentiveRules = IncentiveRules;
+// Also export to window for browser (always do this)
+try {
+    if (typeof window !== 'undefined') {
+        window.IncentiveRules = IncentiveRules;
+        console.log('✅ IncentiveRules exported to window');
+    }
+} catch (e) {
+    console.error('❌ Failed to export IncentiveRules to window:', e.message);
 }

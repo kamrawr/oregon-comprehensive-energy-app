@@ -172,12 +172,21 @@ class ConfigLoader {
     }
 }
 
-// Export for both Node.js and browser
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ConfigLoader;
+// Export for both Node.js and browser (try-catch to prevent errors)
+try {
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = ConfigLoader;
+    }
+} catch (e) {
+    console.warn('Could not export ConfigLoader to module.exports:', e.message);
 }
 
-// Also export to window for browser
-if (typeof window !== 'undefined') {
-    window.ConfigLoader = ConfigLoader;
+// Also export to window for browser (always do this)
+try {
+    if (typeof window !== 'undefined') {
+        window.ConfigLoader = ConfigLoader;
+        console.log('✅ ConfigLoader exported to window');
+    }
+} catch (e) {
+    console.error('❌ Failed to export ConfigLoader to window:', e.message);
 }
