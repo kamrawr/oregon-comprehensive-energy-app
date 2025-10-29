@@ -540,6 +540,9 @@ class ReportGenerator {
                     <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;"><em>Note: 0% financing may be available through Energy Trust or utility programs for qualified customers.</em></p>
                 </div>
                 
+                <h3 style="margin-top: 2rem;">💰 Program Benefits Breakdown</h3>
+                ${this.generateProgramBreakdown(incentiveResults.recommendations)}
+                
                 <h3 style="margin-top: 2rem;">Financing Programs</h3>
                 <div class="financing-options">
                     <div class="financing-card">
@@ -1161,6 +1164,81 @@ class ReportGenerator {
             (Math.pow(1 + monthlyRate, months) - 1);
         
         return Math.round(payment);
+    }
+    
+    /**
+     * Generate program benefits breakdown table
+     */
+    generateProgramBreakdown(recommendations) {
+        // Aggregate incentives by program
+        const programTotals = {};
+        const programMeasures = {};
+        
+        recommendations.forEach(rec => {
+            if (rec.availableIncentives && rec.availableIncentives.length > 0) {
+                rec.availableIncentives.forEach(inc => {
+                    const programName = inc.program || 'Other';
+                    const amount = inc.amount || 0;
+                    
+                    if (!programTotals[programName]) {
+                        programTotals[programName] = 0;
+                        programMeasures[programName] = [];
+                    }
+                    
+                    programTotals[programName] += amount;
+                    if (!programMeasures[programName].includes(rec.measure)) {
+                        programMeasures[programName].push(rec.measure);
+                    }
+                });
+            }
+        });
+        
+        // Sort programs by total amount
+        const sortedPrograms = Object.entries(programTotals)
+            .sort((a, b) => b[1] - a[1]);
+        
+        if (sortedPrograms.length === 0) {
+            return '<p>No program-specific incentives identified for selected measures.</p>';
+        }
+        
+        let html = `
+            <table class="program-breakdown-table" style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                <thead>
+                    <tr style="background: #2c5530; color: white;">
+                        <th style="padding: 0.75rem; text-align: left;">Program</th>
+                        <th style="padding: 0.75rem; text-align: right;">Total Incentive</th>
+                        <th style="padding: 0.75rem; text-align: left;">Applied To</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        sortedPrograms.forEach(([program, total], idx) => {
+            const measures = programMeasures[program].join(', ');
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9fafb';
+            
+            html += `
+                <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 0.75rem; font-weight: 600;">${program}</td>
+                    <td style="padding: 0.75rem; text-align: right; font-weight: bold; color: #5cb85c;">$${total.toLocaleString()}</td>
+                    <td style="padding: 0.75rem; color: #666; font-size: 0.9rem;">${measures}</td>
+                </tr>
+            `;
+        });
+        
+        // Add total row
+        const grandTotal = sortedPrograms.reduce((sum, [_, total]) => sum + total, 0);
+        html += `
+                <tr style="background: #d4edda; font-weight: bold; border-top: 3px solid #2c5530;">
+                    <td style="padding: 0.75rem;">TOTAL INCENTIVES</td>
+                    <td style="padding: 0.75rem; text-align: right; font-size: 1.1rem; color: #2c5530;">$${grandTotal.toLocaleString()}</td>
+                    <td style="padding: 0.75rem; color: #666;">${sortedPrograms.length} program(s)</td>
+                </tr>
+            </tbody>
+        </table>
+        `;
+        
+        return html;
     }
 
 

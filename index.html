@@ -2291,6 +2291,13 @@
                         ${generateCostSummary(recommendations)}
                     </div>
                 `;
+                
+                // Add program benefits rollup
+                html += `
+                    <div id="programRollup" style="margin-top: 2rem;">
+                        ${generateProgramRollup(recommendations)}
+                    </div>
+                `;
             }
             
             // Next steps
@@ -2313,8 +2320,14 @@
         
         function updateCostSummary() {
             const summaryDiv = document.getElementById('costSummary');
+            const rollupDiv = document.getElementById('programRollup');
+            
             if (summaryDiv && appState.enrichedRecommendations) {
                 summaryDiv.innerHTML = generateCostSummary(appState.enrichedRecommendations);
+            }
+            
+            if (rollupDiv && appState.enrichedRecommendations) {
+                rollupDiv.innerHTML = generateProgramRollup(appState.enrichedRecommendations);
             }
         }
         
@@ -2344,6 +2357,92 @@
                 zeroPercent: `$${Math.round(zeroPercentPayment).toLocaleString()}`,
                 fifteenPercent: `$${Math.round(fifteenPercentPayment).toLocaleString()}`
             };
+        }
+        
+        /**
+         * Generate program benefits rollup showing which programs contribute to which measures
+         */
+        function generateProgramRollup(recommendations) {
+            // Aggregate incentives by program across all selected measures
+            const programTotals = {};
+            const programMeasures = {};
+            
+            recommendations.filter(r => r.selected && r.bestPackage).forEach(rec => {
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    rec.bestPackage.incentives.forEach(inc => {
+                        const programName = inc.program;
+                        const amount = typeof inc.amount === 'number' ? inc.amount : 0;
+                        
+                        if (!programTotals[programName]) {
+                            programTotals[programName] = 0;
+                            programMeasures[programName] = [];
+                        }
+                        
+                        programTotals[programName] += amount;
+                        programMeasures[programName].push({
+                            name: rec.measure,
+                            amount: amount
+                        });
+                    });
+                }
+            });
+            
+            // Sort programs by total amount (highest first)
+            const sortedPrograms = Object.entries(programTotals)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (sortedPrograms.length === 0) {
+                return '';
+            }
+            
+            let html = `
+                <h3 style="color: var(--brand); margin: 2rem 0 1rem;">💰 Program Benefits Breakdown</h3>
+                <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6;">
+                    <p style="margin-bottom: 1rem; color: var(--muted);">Your selected measures are funded by the following programs:</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--brand); color: white;">
+                                <th style="padding: 0.75rem; text-align: left; border-radius: 8px 0 0 0;">Program</th>
+                                <th style="padding: 0.75rem; text-align: right;">Total Incentive</th>
+                                <th style="padding: 0.75rem; text-align: left; border-radius: 0 8px 0 0;">Applied To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedPrograms.forEach(([program, total], idx) => {
+                const measures = programMeasures[program];
+                const bgColor = idx % 2 === 0 ? 'white' : '#f9fafb';
+                const measureList = measures.map(m => {
+                    const amt = m.amount > 0 ? ` ($${m.amount.toLocaleString()})` : '';
+                    return `${m.name}${amt}`;
+                }).join(', ');
+                
+                html += `
+                    <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 1rem; font-weight: 600; color: var(--brand);">${program}</td>
+                        <td style="padding: 1rem; text-align: right; font-size: 1.1rem; font-weight: bold; color: var(--success);">
+                            $${total.toLocaleString()}
+                        </td>
+                        <td style="padding: 1rem; color: var(--muted); font-size: 0.9rem;">${measureList}</td>
+                    </tr>
+                `;
+            });
+            
+            // Add total row
+            const grandTotal = sortedPrograms.reduce((sum, [_, total]) => sum + total, 0);
+            html += `
+                        <tr style="background: linear-gradient(135deg, #d4edda, #c3e6cb); font-weight: bold; border-top: 3px solid var(--brand);">
+                            <td style="padding: 1rem; font-size: 1.1rem;">TOTAL INCENTIVES</td>
+                            <td style="padding: 1rem; text-align: right; font-size: 1.3rem; color: var(--brand);">$${grandTotal.toLocaleString()}</td>
+                            <td style="padding: 1rem; color: var(--muted); font-size: 0.9rem;">${sortedPrograms.length} program(s)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            `;
+            
+            return html;
         }
         
         function generateCostSummary(recommendations) {
