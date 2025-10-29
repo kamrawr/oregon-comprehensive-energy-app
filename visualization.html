@@ -323,7 +323,7 @@
             <div class="card-grid" id="test-overview">
                 <div class="card">
                     <h4>Total Test Scenarios</h4>
-                    <div class="metric" id="total-tests">20</div>
+                    <div class="metric" id="total-tests">30</div>
                     <p>Comprehensive coverage across all program tiers</p>
                 </div>
                 <div class="card">
@@ -418,7 +418,7 @@
         <!-- HOMES Allocation Analysis -->
         <div class="section">
             <h2>🏗️ HOMES Allocation Analysis</h2>
-            <p style="margin-bottom: 20px;">Dynamic allocation of the $10,000 HOMES site cap across priority measures. <strong>Note:</strong> For moderate income (81-150% AMI), HOMES is limited to 50% of each measure's cost, making the $10K cap harder to reach.</p>
+            <p style="margin-bottom: 20px;">Dynamic allocation of the $10,000 HOMES site cap across priority measures. <strong>Eligibility:</strong> HOMES available only for households ≤150% AMI. Low income (≤80% AMI) receives 100% coverage, moderate income (81-150% AMI) limited to 50% of each measure's cost. <strong>NOT available for >150% AMI households.</strong></p>
             <div class="chart-container" id="homes-allocation-chart"></div>
         </div>
 
@@ -477,9 +477,8 @@
         const programCoverageData = [
             { tier: '≤60% AMI', weatherization: 100, cpf: 100, hear: 100, homes: 100, energyTrust: 100 },
             { tier: '61-80% AMI', weatherization: 0, cpf: 100, hear: 100, homes: 100, energyTrust: 100 },
-            { tier: '81-150% AMI', weatherization: 0, cpf: 35, hear: 50, homes: 100, energyTrust: 0 },
-            { tier: '151-400% AMI', weatherization: 0, cpf: 0, hear: 0, homes: 100, energyTrust: 0 },
-            { tier: '>400% AMI', weatherization: 0, cpf: 0, hear: 0, homes: 0, energyTrust: 0 }
+            { tier: '81-150% AMI', weatherization: 0, cpf: 0, hear: 50, homes: 50, energyTrust: 100 },
+            { tier: '>150% AMI', weatherization: 0, cpf: 0, hear: 0, homes: 0, energyTrust: 100 }
         ];
 
         const homesAllocationData = [
