@@ -2472,20 +2472,26 @@
             // Calculate selected totals
             let selectedCost = 0;
             let selectedIncentives = 0;
+            let selectedMonthlySavings = 0;
             selected.forEach(r => {
                 selectedCost += r.estimatedCostNum || 0;
                 selectedIncentives += r.totalIncentives || 0;
+                selectedMonthlySavings += r.monthlySavings || 0;
             });
             const selectedNet = selectedCost - selectedIncentives;
+            const selectedAnnualSavings = selectedMonthlySavings * 12;
             
             // Calculate full scope totals
             let fullCost = 0;
             let fullIncentives = 0;
+            let fullMonthlySavings = 0;
             all.forEach(r => {
                 fullCost += r.estimatedCostNum || 0;
                 fullIncentives += r.totalIncentives || 0;
+                fullMonthlySavings += r.monthlySavings || 0;
             });
             const fullNet = fullCost - fullIncentives;
+            const fullAnnualSavings = fullMonthlySavings * 12;
             
             // Calculate financing options for net costs
             const selectedFinancing = calculateFinancing(selectedNet);
@@ -2514,6 +2520,21 @@
                             <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
                                 ${Math.round((selectedIncentives / selectedCost) * 100) || 0}% covered by incentives
                             </div>
+                            ${selectedMonthlySavings > 0 ? `
+                                <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <h5 style="margin: 0 0 0.75rem 0; color: var(--brand); font-size: 0.95rem;">💵 Estimated Energy Savings</h5>
+                                    <div style="display: grid; gap: 0.5rem; font-size: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Monthly Savings:</span>
+                                            <strong style="color: var(--success);">≈$${selectedMonthlySavings}/month</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Annual Savings:</span>
+                                            <strong style="color: var(--success);">≈$${selectedAnnualSavings.toLocaleString()}/year</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
                             ${selectedNet > 0 ? `
                                 <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
                                     <h5 style="margin: 0 0 0.75rem 0; color: var(--brand); font-size: 0.95rem;">💳 Financing Options (5-year term)</h5>
@@ -2552,6 +2573,21 @@
                             <div style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted);">
                                 ${Math.round((fullIncentives / fullCost) * 100) || 0}% covered by incentives
                             </div>
+                            ${fullMonthlySavings > 0 ? `
+                                <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <h5 style="margin: 0 0 0.75rem 0; color: var(--accent-dark); font-size: 0.95rem;">💵 Estimated Energy Savings</h5>
+                                    <div style="display: grid; gap: 0.5rem; font-size: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Monthly Savings:</span>
+                                            <strong style="color: var(--success);">≈$${fullMonthlySavings}/month</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Annual Savings:</span>
+                                            <strong style="color: var(--success);">≈$${fullAnnualSavings.toLocaleString()}/year</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
                             ${fullNet > 0 ? `
                                 <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
                                     <h5 style="margin: 0 0 0.75rem 0; color: var(--accent-dark); font-size: 0.95rem;">💳 Financing Options (5-year term)</h5>
