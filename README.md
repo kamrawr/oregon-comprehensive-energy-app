@@ -40,11 +40,12 @@ This tool helps Oregon homeowners:
 | Program | Eligibility | Coverage |
 |---------|-------------|----------|
 | **Oregon Weatherization (OHCS)** | ≤60% SMI or ≤200% FPL | 100% no-cost |
-| **Community Partner Fund (CPF)** | ≤80% AMI + Priority Community/CBO | Enhanced rebates |
-| **HEAR (IRA Federal)** | ≤150% AMI | 50-100% electrification |
+| **Community Partner Fund (CPF)** | Tier 1: ≤80% AMI + (Priority OR CBO)<br>Tier 2: 81-150% AMI + (Priority AND CBO) | Enhanced rebates |
+| **HEAR (IRA Federal)** | ≤80% AMI (100%)<br>81-150% AMI (50%) | Electrification rebates |
 | **HOMES (IRA Federal)** | ≤400% AMI | $2,000-$8,000 whole-home |
 | **CERTA** | All income levels | Tax exemption |
 | **Energy Trust Standard** | All income levels | Market-rate rebates |
+| **LIHEAP** | ≤150% FPL | Bill assistance |
 
 ---
 
@@ -89,24 +90,67 @@ All data comes from official sources:
 
 ```
 oregon-comprehensive-energy-app/
-├── index.html                  # Main application (self-contained)
-├── config/                     # Data configuration
-│   ├── incentive_eligibility_map.json    # Official incentive data
-│   └── program_eligibility_rules.yaml    # Program rules
-├── src/                        # JavaScript modules
-│   ├── data_loader.js         # Config loader
-│   ├── incentive_rules.js     # Eligibility logic
-│   ├── incentive_calculator.js
-│   └── report_generator.js
-├── docs/                       # Documentation
-│   ├── guides/                # How-to guides
-│   │   ├── UPDATE_GUIDE.md   # Data update instructions
-│   │   └── CONTRIBUTING.md   # Contribution guidelines
-│   ├── development/           # Dev documentation
-│   ├── DATA_SOURCES.md        # Data provenance
-│   └── USER_GUIDE.md          # End-user guide
-└── README.md                   # This file
+├── index.html                          # Main application (single-page)
+├── README.md                           # This file
+│
+├── config/                             # Data configuration
+│   ├── incentive_eligibility_map.json  # Incentive amounts & stacking rules
+│   ├── oregon_income_thresholds_full_2025.json  # Exact income thresholds
+│   ├── program_eligibility_rules.yaml  # Program requirements
+│   ├── utility_territories.yaml        # Utility coverage data
+│   └── bpi2400_schema.yaml            # BPI standards
+│
+├── src/                                # JavaScript modules
+│   ├── income_data_loader.js          # Income threshold lookups (NEW)
+│   ├── data_loader.js                 # General data utilities
+│   ├── incentive_rules.js             # Eligibility logic
+│   ├── incentive_calculator.js        # Incentive calculations
+│   └── report_generator.js            # PDF report generation
+│
+├── tests/                              # Test suite
+│   ├── eligibility-validation.test.js # 10 edge case tests (NEW)
+│   └── README.md                      # Test documentation (NEW)
+│
+└── docs/                               # Documentation
+    ├── DATA_SOURCES.md                # Official data references
+    ├── AUDIT_REPORT.md                # Comprehensive audit (NEW)
+    ├── IMPLEMENTATION_SUMMARY.md      # Implementation details (NEW)
+    ├── USER_GUIDE.md                  # End-user guide
+    ├── guides/
+    │   ├── CONTRIBUTING.md            # Contribution guidelines
+    │   └── UPDATE_GUIDE.md            # Data update procedures
+    └── development/
+        ├── PROJECT_SUMMARY.md         # Project overview
+        ├── ENHANCEMENT_SPEC.md        # Feature specifications
+        ├── IMPLEMENTATION_STATUS.md   # Development status
+        └── DEVELOPMENT_SUMMARY.md     # Technical summary
 ```
+
+---
+
+## 🧪 Testing
+
+### **Automated Test Suite**
+
+```bash
+node tests/eligibility-validation.test.js
+```
+
+**Coverage:** 10 edge cases, all passing ✅
+- CPF Tier 1 and Tier 2 eligibility
+- HEAR/HOMES exclusions for CPF Tier 2
+- Federal opt-out filtering
+- Weatherization via SMI and FPL paths
+- Priority community requirements
+
+**Documentation:** `tests/README.md`
+
+### **Demo Data**
+
+Every module has a "📋 Load Demo Data" button:
+- **Intake:** Jane Smith, Multnomah County, priority + CBO
+- **Income:** Family of 4, $55,000/year (≈65% AMI)
+- **Assessment:** 1975 home, poor insulation, old equipment
 
 ---
 
@@ -128,6 +172,9 @@ oregon-comprehensive-energy-app/
 - ✅ Config-driven data
 - ✅ Modular JavaScript architecture
 - ✅ Mobile-first responsive design
+- ✅ Exact income threshold lookups (JSON-based)
+- ✅ Automated test suite (10/10 passing)
+- ✅ Comprehensive audit trail (95% confidence)
 
 ### **Contributing**
 
@@ -154,10 +201,16 @@ git push origin feature/your-feature
 
 ## 📚 Documentation
 
+### **User Documentation**
 - **[User Guide](docs/USER_GUIDE.md)** - How to use the assessment tool
 - **[Data Sources](docs/DATA_SOURCES.md)** - Complete data provenance
+
+### **Developer Documentation**
+- **[Audit Report](docs/AUDIT_REPORT.md)** - Comprehensive data validation (NEW)
+- **[Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md)** - Recent updates (NEW)
 - **[Update Guide](docs/guides/UPDATE_GUIDE.md)** - How to update program data
 - **[Contributing Guide](docs/guides/CONTRIBUTING.md)** - How to contribute
+- **[Test Documentation](tests/README.md)** - Test suite details (NEW)
 
 ---
 
@@ -217,17 +270,34 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## 📈 Project Stats
 
-- **📦 Total Size:** ~245 KB (including all assets)
+- **📦 Total Size:** ~3,000+ lines of code
 - **⚡ Load Time:** <2 seconds on broadband
 - **📱 Mobile Ready:** Responsive design
 - **♿ Accessible:** Semantic HTML, ARIA labels
 - **🌐 Browser Support:** Modern browsers (Chrome, Firefox, Safari, Edge)
+- **🧪 Test Coverage:** 10 edge cases, 100% passing
+- **📊 Counties Supported:** All 36 Oregon counties
+- **💰 Programs Mapped:** 8+ incentive programs
+- **🔧 Measures Covered:** 15+ energy upgrade measures
+- **✅ Data Accuracy:** 95% audit confidence
 
 ---
 
 ## 🗓️ Version History
 
-**Current Version:** 1.0 (October 2025)
+**Current Version:** 1.1 (October 29, 2025)
+
+### Recent Updates (v1.1)
+- ✅ CPF Tier 2 eligibility added (81-150% AMI with priority+CBO)
+- ✅ Exact income data integration (`oregon_income_thresholds_full_2025.json`)
+- ✅ Federal program opt-out feature
+- ✅ Demo data buttons for all modules
+- ✅ Comprehensive audit completed (95% confidence)
+- ✅ Test suite with 10 passing edge cases
+- ✅ HEAR/HOMES exclusions for CPF Tier 2 customers
+- ✅ Income calculation uses exact thresholds (no more adjustments)
+
+### Initial Release (v1.0)
 - ✅ 2025 official data integrated
 - ✅ Corrected eligibility rules (SMI-based weatherization)
 - ✅ HOMES/HEAR for all income tiers
