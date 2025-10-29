@@ -2,6 +2,15 @@
  * Incentive Rules Engine
  * Maps customer eligibility to correct incentive amounts
  * Based on residential-incentive-insights project data
+ * 
+ * FUNDING PRIORITY STRATEGY:
+ * 1. HEAR/HOMES federal funding applied FIRST (primary funding source)
+ * 2. CPF fills gaps to achieve no-cost measures for eligible households
+ * 3. CERTA covers enabling repairs (electrical/structural prep)
+ * 
+ * Goal: Maximize use of federal dollars, then state/utility programs to achieve
+ * no-cost or near-no-cost upgrades for income-qualified households.
+ * CPF amounts may exceed remaining costs to provide customer assurance.
  */
 
 class IncentiveRules {
@@ -172,82 +181,87 @@ class IncentiveRules {
     
     /**
      * Build CPF incentive packages with proper stacking
-     * CPF can stack with HEAR OR HOMES (not both) + CERTA
+     * Priority: HEAR/HOMES first (federal $), then CPF gap-fill for no-cost coverage
      */
     buildCPFPackages(measureId, measureRule, measureDetails, hearPercentage) {
         const packages = [];
         const cpfAmount = this.getCPFAmount(measureId, measureDetails);
         const hearAmount = this.getHEARAmount(measureId, hearPercentage);
         
-        // Package 1: CPF + HEAR (for electrification measures)
-        if (cpfAmount && hearAmount) {
+        // Package 1: HEAR + CPF + CERTA (for electrification measures)
+        // Prioritize HEAR federal funding, then CPF to fill gaps
+        if (hearAmount && cpfAmount) {
             const incentives = [
-                {
-                    program: 'CPF - Energy Trust',
-                    amount: cpfAmount,
-                    priority: 1,
-                    contact: 'Community Partner'
-                },
                 {
                     program: 'HEAR (IRA Federal)',
                     amount: hearAmount,
                     coverage: `${hearPercentage}%`,
                     priority: 1,
                     contact: 'Oregon DOE: 1-800-221-8035',
-                    note: 'Cannot stack with HOMES'
+                    note: 'Primary federal funding - applied first'
+                },
+                {
+                    program: 'CPF - Energy Trust',
+                    amount: cpfAmount,
+                    priority: 2,
+                    contact: 'Community Partner',
+                    note: 'Gap funding to achieve no-cost (may exceed remaining cost)'
                 }
             ];
             
-            // Add CERTA only for insulation/sealing/duct projects
+            // Add CERTA for insulation/sealing/duct projects
             if (this.isCERTAEligible(measureId)) {
                 incentives.push({
                     program: 'CERTA (Enabling Repairs)',
                     amount: 2000,
-                    priority: 2,
+                    priority: 3,
                     contact: 'Oregon DOE',
-                    note: 'For electrical/structural prep'
+                    note: 'For electrical/structural prep work'
                 });
             }
             
             packages.push({
-                name: 'CPF + HEAR Package',
+                name: 'HEAR + CPF Stack (No-Cost Path)',
                 incentives: incentives,
-                note: 'Maximum stacking for this measure'
+                note: 'Federal $ first, CPF fills gaps - typically achieves $0 cost'
             });
         }
         
-        // Package 2: CPF + HOMES (for envelope measures)
-        if (cpfAmount && measureRule.homes_eligible) {
+        // Package 2: HOMES + CPF + CERTA (for envelope measures)
+        // HOMES covers comprehensive work, CPF fills gaps
+        if (measureRule.homes_eligible && cpfAmount) {
             const incentives = [
-                {
-                    program: 'CPF - Energy Trust',
-                    amount: cpfAmount,
-                    priority: 1,
-                    contact: 'Community Partner'
-                },
                 {
                     program: 'HOMES (IRA Federal)',
                     amount: '2,000-8,000',
-                    priority: 2,
+                    priority: 1,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home rebate (20%+ savings required), cannot stack with HEAR'
+                    note: 'Whole-home rebate (≥20% savings) - applied first'
+                },
+                {
+                    program: 'CPF - Energy Trust',
+                    amount: cpfAmount,
+                    priority: 2,
+                    contact: 'Community Partner',
+                    note: 'Gap funding for remaining costs (may exceed balance)'
                 }
             ];
             
-            // Add CERTA only for insulation/sealing/duct projects
+            // Add CERTA for insulation/sealing/duct projects
             if (this.isCERTAEligible(measureId)) {
                 incentives.push({
                     program: 'CERTA',
                     amount: 2000,
-                    priority: 2,
-                    contact: 'Oregon DOE'
+                    priority: 3,
+                    contact: 'Oregon DOE',
+                    note: 'For enabling repairs'
                 });
             }
             
             packages.push({
-                name: 'CPF + HOMES Package',
+                name: 'HOMES + CPF Stack (No-Cost Path)',
                 incentives: incentives,
-                note: 'Best for comprehensive envelope upgrades'
+                note: 'Federal whole-home rebate + CPF gap funding - typically achieves $0 cost'
             });
         }
         
@@ -281,55 +295,58 @@ class IncentiveRules {
     
     /**
      * Build Standard + HEAR packages for moderate income
+     * Priority: HEAR federal funding first, then standard programs
      */
     buildStandardPlusHEARPackages(measureId, measureRule, measureDetails) {
         const packages = [];
         const standardAmount = this.getStandardAmount(measureId, measureDetails);
         const hearAmount = this.getHEARAmount(measureId, 50);
         
-        // Package 1: Standard + HEAR
-        if (standardAmount && hearAmount) {
+        // Package 1: HEAR + Standard
+        if (hearAmount && standardAmount) {
             packages.push({
-                name: 'Standard + HEAR 50%',
+                name: 'HEAR 50% + Standard',
                 incentives: [
-                    {
-                        program: 'Energy Trust Standard',
-                        amount: standardAmount,
-                        priority: 1,
-                        contact: 'Energy Trust: 1-866-368-7878'
-                    },
                     {
                         program: 'HEAR 50% (IRA Federal)',
                         amount: hearAmount,
                         priority: 1,
                         contact: 'Oregon DOE: 1-800-221-8035',
-                        note: 'Cannot stack with HOMES'
-                    }
-                ],
-                note: 'Best for electrification measures'
-            });
-        }
-        
-        // Package 2: Standard + HOMES
-        if (standardAmount && measureRule.homes_eligible) {
-            packages.push({
-                name: 'Standard + HOMES',
-                incentives: [
+                        note: 'Federal funding applied first'
+                    },
                     {
                         program: 'Energy Trust Standard',
                         amount: standardAmount,
-                        priority: 1,
-                        contact: 'Energy Trust: 1-866-368-7878'
-                    },
+                        priority: 2,
+                        contact: 'Energy Trust: 1-866-368-7878',
+                        note: 'Gap funding for remaining costs'
+                    }
+                ],
+                note: 'Federal $ first, standard programs fill gaps'
+            });
+        }
+        
+        // Package 2: HOMES + Standard
+        if (measureRule.homes_eligible && standardAmount) {
+            packages.push({
+                name: 'HOMES + Standard',
+                incentives: [
                     {
                         program: 'HOMES (IRA Federal)',
                         amount: '2,000-8,000',
-                        priority: 2,
+                        priority: 1,
                         contact: 'Oregon DOE',
-                        note: 'Whole-home rebate (20%+ savings), cannot stack with HEAR'
+                        note: 'Federal whole-home rebate (≥20% savings) - applied first'
+                    },
+                    {
+                        program: 'Energy Trust Standard',
+                        amount: standardAmount,
+                        priority: 2,
+                        contact: 'Energy Trust: 1-866-368-7878',
+                        note: 'Gap funding for remaining costs'
                     }
                 ],
-                note: 'Best for comprehensive projects'
+                note: 'Federal $ first for comprehensive envelope work'
             });
         }
         
@@ -487,7 +504,7 @@ class IncentiveRules {
      */
     getCPFAmount(measureId, details) {
         const rules = this.getMeasureRules()[measureId];
-        if (!rules || !rules.cpf) return null;
+        if (!rules || (!rules.cpf && !rules.cpf_per_sqft)) return null;
 
         if (rules.cpf === 'full') return 'Full Coverage';
 
