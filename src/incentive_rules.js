@@ -6,7 +6,9 @@
  * FUNDING PRIORITY STRATEGY:
  * 1. HEAR/HOMES federal funding applied FIRST (primary funding source)
  *    - HEAR: $14,000 household cap, measure-specific limits apply
- *    - HOMES: $2,000-$8,000 based on whole-home energy savings (≥20%)
+ *    - HOMES: Two pathways:
+ *      a) Modeled savings: $2,000-$8,000 based on whole-home energy savings (≥20%)
+ *      b) Flex funding: Up to $10,000 can flex across non-HEAR funded measures per site
  * 2. CERTA: Capped at $2,000 for enabling repairs
  *    - If enabling costs exceed $2K, HOMES can cover the gap
  * 3. CPF fills remaining gaps to achieve no-cost measures for eligible households
@@ -31,7 +33,8 @@ class IncentiveRules {
             HEAR_LOW_INCOME: 14000,      // $14,000 household cap (≤80% or ≤150% FPL)
             HEAR_MODERATE: 14000,         // $14,000 household cap (81-150% AMI)
             HOMES_MIN: 2000,              // $2,000 minimum HOMES rebate
-            HOMES_MAX: 8000,              // $8,000 maximum HOMES rebate
+            HOMES_MAX: 8000,              // $8,000 maximum HOMES rebate (whole-home modeled savings)
+            HOMES_FLEX_MAX: 10000,        // $10,000 HOMES flex funding for non-HEAR measures
             CERTA_MAX: 2000               // $2,000 CERTA cap for enabling repairs
         };
     }
@@ -129,12 +132,12 @@ class IncentiveRules {
                     name: 'HOMES Package (Comprehensive Alternative)',
                     incentives: [{
                         program: 'HOMES (IRA Federal)',
-                        amount: '2,000-8,000',
+                        amount: '2,000-10,000',
                         priority: 2,
                         contact: 'Oregon DOE',
-                        note: 'Whole-home rebate (≥20% savings) - available to all income tiers'
+                        note: 'Whole-home rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
                     }],
-                    note: 'Good for comprehensive projects - no waitlist'
+                    note: 'Good for comprehensive projects - no waitlist, flexible funding'
                 });
             }
             
@@ -241,6 +244,7 @@ class IncentiveRules {
         
         // Package 2: HOMES + CPF + CERTA (for envelope measures)
         // HOMES covers comprehensive work including enabling repairs above CERTA cap
+        // HOMES can flex up to $10K across non-HEAR funded measures per site
         if (measureRule.homes_eligible && cpfAmount) {
             const incentives = [
                 {
@@ -248,7 +252,7 @@ class IncentiveRules {
                     amount: `${this.programCaps.HOMES_MIN.toLocaleString()}-${this.programCaps.HOMES_MAX.toLocaleString()}`,
                     priority: 1,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home rebate (≥20% savings) - covers enabling work if needed'
+                    note: 'Whole-home rebate (≥20% savings) OR up to $10K flex funding for non-HEAR measures'
                 },
                 {
                     program: 'CPF - Energy Trust',
@@ -347,10 +351,10 @@ class IncentiveRules {
                 incentives: [
                     {
                         program: 'HOMES (IRA Federal)',
-                        amount: '2,000-8,000',
+                        amount: '2,000-10,000',
                         priority: 1,
                         contact: 'Oregon DOE',
-                        note: 'Federal whole-home rebate (≥20% savings) - applied first'
+                        note: 'Federal whole-home rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
                     },
                     {
                         program: 'Energy Trust Standard',
@@ -399,10 +403,10 @@ class IncentiveRules {
             if (measureRule.homes_eligible) {
                 incentives.push({
                     program: 'HOMES (IRA Federal)',
-                    amount: '2,000-8,000',
+                    amount: '2,000-10,000',
                     priority: 2,
                     contact: 'Oregon DOE',
-                    note: 'Whole-home performance rebate'
+                    note: 'Whole-home performance rebate (≥20% savings: $2-8K) OR flex funding (up to $10K for non-HEAR measures)'
                 });
             }
             
