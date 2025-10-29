@@ -1,42 +1,29 @@
 # 🏠 Oregon Comprehensive Energy Assessment Tool
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+**Version 1.2** | Built by [Isaiah Kamrar](https://github.com/kamrawr) / [Community Consulting Partners LLC](mailto:dikamrar@gmail.com)
+
+[![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE.md)
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://kamrawr.github.io/oregon-comprehensive-energy-app/)
 [![Data Version](https://img.shields.io/badge/data-2025--official-green)](docs/DATA_SOURCES.md)
 
-**An independent, comprehensive assessment tool to help Oregon homeowners navigate energy efficiency incentives and programs.**
+A comprehensive web-based tool for assessing energy efficiency incentives and program eligibility for Oregon households. Integrates federal IRA programs (HOMES, HEAR), state weatherization, Energy Trust of Oregon programs, and local utility incentives.
 
-🔗 **Live Application:** https://kamrawr.github.io/oregon-comprehensive-energy-app/
+🔗 **[Try the Live Tool →](https://kamrawr.github.io/oregon-comprehensive-energy-app/)**
 
-📊 **Test Visualization & Impact Simulator:** https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
-
----
-
-## ✨ Features
-
-- **✅ Accurate 2025 Data** - Official HUD AMI, FPL, and program incentive data
-- **🎯 4-Step Assessment** - Customer intake → Income qualification → Home evaluation → Personalized pathways
-- **💰 Comprehensive Program Coverage** - OHCS Weatherization, CPF, HEAR, HOMES, Energy Trust, CERTA
-- **📊 Intelligent Incentive Stacking** - Proper program combination rules with HEAR/HOMES exclusivity
-- **🏠 Dynamic HOMES Allocation** - $10K site cap intelligently distributed across measures, prioritizing health/safety and envelope
-- **🏘️ Priority Community Support** - Enhanced eligibility tracking for underserved communities
-- **🎛️ Flexible Program Options** - Opt-out of HOMES (audit requirement) and toggle no-cost CPF eligibility
-- **📱 Mobile Responsive** - Works on all devices
-- **📥 Downloadable Reports** - Export personalized assessment results
-- **🔄 Interactive Selection** - Choose priority measures with dual cost summaries and real-time updates
-- **📈 Interactive Visualizations** - Explore test results, program coverage, and simulate long-term impact
+📊 **[Explore Test Results & Impact Simulator →](https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html)**
 
 ---
 
-## 🎯 What It Does
+## ✨ Key Features
 
-This tool helps Oregon homeowners:
-
-1. **Determine eligibility** for federal, state, and utility energy programs
-2. **Calculate accurate incentive amounts** based on income, location, and home type
-3. **Understand program stacking rules** (which incentives can combine)
-4. **Get personalized recommendations** prioritized by need and cost-effectiveness
-5. **Access official program contacts** for application assistance
+- **Dynamic HOMES Allocation** - Smart $10K site cap distributed across measures
+- **Real-Time Calculations** - Instant incentive updates as users select measures  
+- **Comprehensive Program Coverage** - OHCS Weatherization, CPF, HEAR, HOMES, Energy Trust, CERTA
+- **Intelligent Program Stacking** - Proper HEAR/HOMES exclusivity rules
+- **No-Cost Program Toggles** - Switch between HOMES and CPF pathways
+- **2025 HUD Data** - All 36 Oregon counties with current income thresholds
+- **Mobile Responsive** - Works on any device
+- **Quick Demo Mode** - Pre-filled scenarios for training
 
 ---
 
@@ -45,44 +32,102 @@ This tool helps Oregon homeowners:
 | Program | Eligibility | Coverage |
 |---------|-------------|----------|
 | **Oregon Weatherization (OHCS)** | ≤60% SMI or ≤200% FPL | 100% no-cost |
-| **Community Partner Fund (CPF)** | Tier 1: ≤80% AMI + (Priority OR CBO)<br>Tier 2: 81-150% AMI + (Priority AND CBO) | Enhanced rebates |
-| **HEAR (IRA Federal)** | ≤80% AMI (100%)<br>81-150% AMI (50%) | Electrification rebates |
-| **HOMES (IRA Federal)** | ≤400% AMI | Up to $10,000 flex funding (dynamically allocated) |
-| **CERTA** | All income levels | Tax exemption |
+| **Community Partner Fund (CPF)** | Tier 1: ≤80% AMI<br>Tier 2: 81-150% AMI (with conditions) | Enhanced rebates |
+| **HEAR (IRA Federal)** | ≤80% AMI (100% rebate)<br>81-150% AMI (50% rebate) | Up to $14,000/household |
+| **HOMES (IRA Federal)** | ≤400% AMI | Up to $10,000 flex funding |
+| **CERTA** | All income levels | 10-year tax exemption |
 | **Energy Trust Standard** | All income levels | Market-rate rebates |
-| **LIHEAP** | ≤150% FPL | Bill assistance |
 
 ---
 
 ## 🚀 Quick Start
 
-### **Try the Live Demo**
+### **Try It Now**
 
-1. Visit: https://kamrawr.github.io/oregon-comprehensive-energy-app/
+1. **[Open the live tool](https://kamrawr.github.io/oregon-comprehensive-energy-app/)**
 2. Click **"📋 Load Demo Data"** to see a sample assessment
 3. Walk through all 4 steps
-4. Explore package options and cost summaries
+4. Explore incentive packages and options
 
-### **Explore Test Results & Impact**
-
-1. Visit: https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
-2. View interactive test scenario results and analysis
-3. Explore program coverage visualizations by income tier
-4. Use the impact simulator to estimate long-term effects
-5. Analyze HOMES allocation and CPF no-cost coverage
-
-### **Run Locally**
+### **Deploy Your Own**
 
 ```bash
 # Clone the repository
 git clone https://github.com/kamrawr/oregon-comprehensive-energy-app.git
 cd oregon-comprehensive-energy-app
 
-# Open in your browser
+# Open in browser (no build required!)
 open index.html
+
+# Or serve with Python
+python3 -m http.server 8000
 ```
 
-No build process or dependencies required!
+No dependencies, no build process, no npm install!
+
+---
+
+## 💼 Professional Services
+
+### Need Help Implementing This Tool?
+
+While this software is **freely available** to use, Community Consulting Partners LLC offers professional services for organizations that need customization, deployment assistance, or ongoing support.
+
+#### 🔧 Implementation Package - **$2,500**
+**Get up and running with a branded deployment**
+- Custom branding (logo, colors, organization name)
+- Deployment to your domain (`tool.yourorganization.org`)
+- Program contact information configuration
+- 2 hours of staff training
+- 30 days email support
+
+**Perfect for:** Nonprofits and agencies wanting a turnkey solution
+
+#### ⚙️ Custom Configuration - **$5,000**
+**Tailored to your specific service area and programs**
+- Everything in Implementation Package, plus:
+- Custom JSON data integration (local/regional programs)
+- Modified incentive logic for your service area
+- Custom PDF report templates with your branding
+- CRM or database integration
+- 5 hours of comprehensive training
+- 90 days priority support
+
+**Perfect for:** Regional coalitions, utilities, state agencies
+
+#### 🏢 Enterprise Development - **$15,000+**
+**Complete custom platform for your organization**
+- Multi-state expansion beyond Oregon
+- Custom program logic and calculation algorithms
+- API development for system integration
+- White-label license (full branding removal rights)
+- Ongoing maintenance and feature development contracts
+- Dedicated support channel
+
+**Perfect for:** National organizations, utilities, software companies
+
+#### 👨‍💻 Consulting Services - **$150/hour**
+**Expert guidance and technical advisory**
+- Energy program design and policy consulting
+- Code review and optimization
+- Custom feature development
+- Data analysis and reporting
+- Staff training and capacity building
+
+**Minimum engagement:** 5 hours
+
+📧 **Contact:** dikamrar@gmail.com | Response time: Within 24 hours
+
+---
+
+## 🎓 Use Cases
+
+- **Community-Based Organizations** - Screen clients for energy assistance programs
+- **Energy Navigators** - Assess household eligibility and incentive stacking
+- **Weatherization Agencies** - Pre-qualify homeowners for comprehensive upgrades
+- **Energy Contractors** - Estimate incentive packages for customer proposals
+- **Housing Counselors** - Connect clients with energy savings opportunities
+- **Policy Researchers** - Analyze program impacts and eligibility gaps
 
 ---
 
@@ -103,43 +148,33 @@ All data comes from official sources:
 
 ```
 oregon-comprehensive-energy-app/
-├── index.html                          # Main application (single-page)
-├── README.md                           # This file
-│
-├── config/                             # Data configuration
-│   ├── incentive_eligibility_map.json  # Incentive amounts & stacking rules
-│   ├── oregon_income_thresholds_full_2025.json  # Exact income thresholds
-│   ├── program_eligibility_rules.yaml  # Program requirements
-│   ├── utility_territories.yaml        # Utility coverage data
-│   └── bpi2400_schema.yaml            # BPI standards
+├── index.html                          # Main application
+├── visualization.html                  # Test scenarios & analytics
 │
 ├── src/                                # JavaScript modules
-│   ├── income_data_loader.js          # Income threshold lookups (NEW)
+│   ├── income_data_loader.js          # Income threshold lookups
 │   ├── data_loader.js                 # General data utilities
 │   ├── incentive_rules.js             # Eligibility logic
 │   ├── incentive_calculator.js        # Incentive calculations
 │   └── report_generator.js            # PDF report generation
 │
-├── tests/                              # Test suite
-│   ├── eligibility-validation.test.js # 10 edge case tests (NEW)
-│   ├── comprehensive-scenarios.test.js # 20 scenario tests (NEW)
-│   └── README.md                      # Test documentation (NEW)
+├── config/                             # Data configuration
+│   ├── oregon_income_thresholds_full_2025.json
+│   ├── incentive_eligibility_map.json
+│   ├── program_eligibility_rules.yaml
+│   └── utility_territories.yaml
 │
-├── visualization.html                  # Interactive test & impact visualization (NEW)
+├── tests/                              # Test suite
+│   ├── eligibility-validation.test.js # Edge case tests
+│   ├── comprehensive-scenarios.test.js# Scenario tests
+│   └── README.md                      # Test documentation
 │
 └── docs/                               # Documentation
     ├── DATA_SOURCES.md                # Official data references
-    ├── AUDIT_REPORT.md                # Comprehensive audit (NEW)
-    ├── IMPLEMENTATION_SUMMARY.md      # Implementation details (NEW)
     ├── USER_GUIDE.md                  # End-user guide
-    ├── guides/
-    │   ├── CONTRIBUTING.md            # Contribution guidelines
-    │   └── UPDATE_GUIDE.md            # Data update procedures
-    └── development/
-        ├── PROJECT_SUMMARY.md         # Project overview
-        ├── ENHANCEMENT_SPEC.md        # Feature specifications
-        ├── IMPLEMENTATION_STATUS.md   # Development status
-        └── DEVELOPMENT_SUMMARY.md     # Technical summary
+    ├── AUDIT_REPORT.md                # Data validation
+    ├── IMPLEMENTATION_SUMMARY.md      # Technical overview
+    └── TESTING_GUIDE.md               # QA procedures
 ```
 
 ---
@@ -150,89 +185,18 @@ oregon-comprehensive-energy-app/
 
 ```bash
 node tests/eligibility-validation.test.js
+node tests/comprehensive-scenarios.test.js
 ```
 
-**Coverage:** 10 edge cases, all passing ✅
-- CPF Tier 1 and Tier 2 eligibility
-- HEAR/HOMES exclusions for CPF Tier 2
-- Federal opt-out filtering
-- Weatherization via SMI and FPL paths
-- Priority community requirements
-
-**Documentation:** `tests/README.md`
+**Coverage:** 30+ test cases, 100% passing ✅
 
 ### **Interactive Visualization**
 
 Explore test results and simulate program impact:
-
-```
-Open: visualization.html
-```
-
-**Features:**
-- 📊 Test scenario analysis across 20+ comprehensive tests
-- 📈 Program coverage by income tier visualizations
-- 🎯 Impact simulator for long-term projections
-- 🏗️ HOMES allocation priority analysis
-- 💸 CPF no-cost coverage comparisons
-- 📉 Interactive D3.js charts and graphs
-
-**Live Demo:** https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html
-
-### **Demo Data**
-
-Every module has a "📋 Load Demo Data" button:
-- **Intake:** Jane Smith, Multnomah County, priority + CBO
-- **Income:** Family of 4, $55,000/year (≈65% AMI)
-- **Assessment:** 1975 home, poor insulation, old equipment
-
----
-
-## 🔧 For Developers
-
-### **Technology Stack**
-
-- **HTML5** - Semantic, accessible markup
-- **CSS3** - Responsive design with CSS Grid/Flexbox
-- **Vanilla JavaScript** - No framework dependencies
-- **Chart.js** - Data visualization (CDN)
-- **GitHub Pages** - Static site hosting
-
-### **Key Features**
-
-- ✅ No build process
-- ✅ No npm dependencies
-- ✅ Self-contained single-page app
-- ✅ Config-driven data
-- ✅ Modular JavaScript architecture
-- ✅ Mobile-first responsive design
-- ✅ Exact income threshold lookups (JSON-based)
-- ✅ Dynamic HOMES allocation with $10K site cap
-- ✅ Real-time incentive recalculation on option toggles
-- ✅ No-cost CPF enhancement for eligible measures
-- ✅ Automated test suite (10/10 passing)
-- ✅ Comprehensive audit trail (95% confidence)
-
-### **Contributing**
-
-We welcome contributions! See [docs/guides/CONTRIBUTING.md](docs/guides/CONTRIBUTING.md)
-
-```bash
-# Setup
-git clone https://github.com/kamrawr/oregon-comprehensive-energy-app.git
-cd oregon-comprehensive-energy-app
-
-# Create branch
-git checkout -b feature/your-feature
-
-# Make changes and test
-open index.html
-
-# Commit and push
-git add .
-git commit -m "Feature: Description"
-git push origin feature/your-feature
-```
+- 📊 Test scenario analysis
+- 📈 Program coverage visualizations
+- 🎯 Impact simulator for projections
+- **[View Live →](https://kamrawr.github.io/oregon-comprehensive-energy-app/visualization.html)**
 
 ---
 
@@ -243,11 +207,79 @@ git push origin feature/your-feature
 - **[Data Sources](docs/DATA_SOURCES.md)** - Complete data provenance
 
 ### **Developer Documentation**
-- **[Audit Report](docs/AUDIT_REPORT.md)** - Comprehensive data validation (NEW)
-- **[Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md)** - Recent updates (NEW)
-- **[Update Guide](docs/guides/UPDATE_GUIDE.md)** - How to update program data
-- **[Contributing Guide](docs/guides/CONTRIBUTING.md)** - How to contribute
-- **[Test Documentation](tests/README.md)** - Test suite details (NEW)
+- **[Audit Report](docs/AUDIT_REPORT.md)** - Comprehensive data validation
+- **[Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md)** - Recent updates
+- **[Testing Guide](docs/TESTING_GUIDE.md)** - Test suite details
+
+---
+
+## 🔧 Technology Stack
+
+- **Frontend:** Vanilla JavaScript (no framework dependencies)
+- **Data:** JSON-based configuration (easy annual updates)
+- **Visualization:** Chart.js for income comparison charts
+- **Architecture:** Single-page application, fully client-side
+- **Deployment:** Static hosting (GitHub Pages, Netlify, Vercel)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+**By contributing, you agree that your contributions will be licensed under the same license as this project.**
+
+---
+
+## 📄 License
+
+This project is licensed under a **Source-Available License** with attribution requirements.
+
+**You MAY:**
+- ✅ Use the software for any purpose (nonprofit or commercial)
+- ✅ Deploy on your own infrastructure
+- ✅ Modify for internal use
+- ✅ Study and learn from the code
+
+**You MAY NOT:**
+- ❌ Redistribute or resell the software
+- ❌ Offer as a hosted service to third parties
+- ❌ Remove attribution or branding
+- ❌ White-label without a commercial license
+
+**For white-label licensing or custom implementations:** dikamrar@gmail.com
+
+See [LICENSE.md](LICENSE.md) for full terms.
+
+---
+
+## 🏆 Why Choose Professional Services?
+
+### ✅ **Expertise**
+- Deep knowledge of Oregon energy programs and compliance
+- Direct connections with Energy Trust, OHCS, and Oregon DOE
+- Experience with program stacking rules and policy implementation
+
+### ✅ **Speed**
+- Avoid months of trial-and-error configuration
+- Get a working deployment in days, not weeks
+- Benefit from battle-tested implementations
+
+### ✅ **Support**
+- Ongoing technical support and program updates
+- Staff training and capacity building
+- Troubleshooting and optimization
+
+### ✅ **Customization**
+- Tailored to your exact workflows and data sources
+- Integration with existing systems
+- Custom features developed to your specifications
 
 ---
 
@@ -263,37 +295,55 @@ git push origin feature/your-feature
 - ❌ A guarantee of program eligibility or incentive amounts
 - ❌ A substitute for official program application
 
-**To access programs:** You must apply directly through official program administrators. Contact information is provided in assessment results.
-
----
-
-## 🔄 Keeping Data Current
-
-Program data is updated when:
-- Income limits change (annually, typically March/April)
-- Program incentives are adjusted (monitor quarterly)
-- New programs launch or rules change
-
-See [docs/guides/UPDATE_GUIDE.md](docs/guides/UPDATE_GUIDE.md) for update procedures.
+**To access programs:** You must apply directly through official program administrators.
 
 ---
 
 ## 📞 Contact & Support
 
-- **Questions:** Open a [GitHub Issue](https://github.com/kamrawr/oregon-comprehensive-energy-app/issues)
-- **Bug Reports:** Use the issue tracker
-- **Feature Requests:** Open a discussion
+**For Professional Services:**  
+Isaiah Kamrar | Community Consulting Partners LLC  
+Email: dikamrar@gmail.com  
+Response time: Within 24 hours
 
-**For official program information, contact:**
+**For Technical Questions:**  
+GitHub Issues: [github.com/kamrawr/oregon-comprehensive-energy-app/issues](https://github.com/kamrawr/oregon-comprehensive-energy-app/issues)
+
+**For Official Program Information:**
 - Energy Trust: 1-866-368-7878
 - Oregon Weatherization: 1-800-766-6861
 - Oregon DOE: 1-800-221-8035
 
 ---
 
-## 📜 License
+## 📈 Project Stats
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+- **Test Coverage:** 30+ test cases, 100% passing
+- **Counties Supported:** All 36 Oregon counties
+- **Programs Mapped:** 8+ incentive programs
+- **Measures Covered:** 15+ energy upgrade measures
+- **Data Accuracy:** 95% audit confidence
+- **Browser Support:** Modern browsers (Chrome, Firefox, Safari, Edge)
+
+---
+
+## 🗓️ Version History
+
+**Current Version:** 1.2 (October 29, 2025)
+
+### Recent Updates (v1.2)
+- ✅ Dynamic HOMES allocation with $10K site cap
+- ✅ HOMES/No-Cost CPF program toggles
+- ✅ Real-time incentive recalculation
+- ✅ Quick Demo Mode for training
+- ✅ Enhanced CPF Tier 2 eligibility (81-150% AMI)
+- ✅ Comprehensive test suite with edge case coverage
+
+### v1.1 Updates
+- ✅ Exact income data integration (2025 HUD thresholds)
+- ✅ Federal program opt-out feature
+- ✅ Demo data buttons for all modules
+- ✅ Comprehensive audit (95% confidence)
 
 ---
 
@@ -305,45 +355,8 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ---
 
-## 📈 Project Stats
+**Built with ❤️ in Portland, Oregon**
 
-- **📦 Total Size:** ~3,000+ lines of code
-- **⚡ Load Time:** <2 seconds on broadband
-- **📱 Mobile Ready:** Responsive design
-- **♿ Accessible:** Semantic HTML, ARIA labels
-- **🌐 Browser Support:** Modern browsers (Chrome, Firefox, Safari, Edge)
-- **🧪 Test Coverage:** 10 edge cases, 100% passing
-- **📊 Counties Supported:** All 36 Oregon counties
-- **💰 Programs Mapped:** 8+ incentive programs
-- **🔧 Measures Covered:** 15+ energy upgrade measures
-- **✅ Data Accuracy:** 95% audit confidence
-
----
-
-## 🗓️ Version History
-
-**Current Version:** 1.1 (October 29, 2025)
-
-### Recent Updates (v1.1)
-- ✅ CPF Tier 2 eligibility added (81-150% AMI with priority+CBO)
-- ✅ Exact income data integration (`oregon_income_thresholds_full_2025.json`)
-- ✅ Federal program opt-out feature
-- ✅ Demo data buttons for all modules
-- ✅ Comprehensive audit completed (95% confidence)
-- ✅ Test suite with 10 passing edge cases
-- ✅ HEAR/HOMES exclusions for CPF Tier 2 customers
-- ✅ Income calculation uses exact thresholds (no more adjustments)
-
-### Initial Release (v1.0)
-- ✅ 2025 official data integrated
-- ✅ Corrected eligibility rules (SMI-based weatherization)
-- ✅ HOMES/HEAR for all income tiers
-- ✅ Priority community tracking
-- ✅ Measure selection with dual reports
-- ✅ Comprehensive disclaimers
-
----
-
-**Built with ❤️ for Oregon homeowners**
+© 2025 Isaiah Kamrar / Community Consulting Partners LLC. All rights reserved.
 
 [View Live Application →](https://kamrawr.github.io/oregon-comprehensive-energy-app/)

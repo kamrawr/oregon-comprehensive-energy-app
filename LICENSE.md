@@ -1,4 +1,4 @@
-# Proprietary Software License
+# Source-Available License
 
 **Oregon Comprehensive Energy Assessment Tool**
 
@@ -9,48 +9,53 @@ All Rights Reserved.
 
 ## License Grant
 
-This software and associated documentation files (the "Software") are proprietary and confidential property of Isaiah Kamrar and Community Consulting Partners LLC.
+This software and associated documentation files (the "Software") are made publicly available under the following terms.
 
-### Permitted Use
+### ✅ YOU MAY:
 
-The following entities may use this Software under the terms specified:
+#### Use the Software
+- Download and use the Software for any lawful purpose
+- Use the Software to serve clients (nonprofit or commercial)
+- View, study, and learn from the source code
+- Deploy the Software on your own infrastructure
+- Modify the Software for your own internal use
 
-#### Non-Commercial License (Free)
-- **Eligible Users:** Non-profit organizations, government agencies, educational institutions, and community-based organizations operating on a non-commercial basis
-- **Permitted Activities:**
-  - Use the Software to provide free services to low-income households
-  - Use the Software for research and educational purposes
-  - Deploy the Software on websites serving community assistance programs
-- **Requirements:**
-  - Provide attribution to "Isaiah Kamrar / Community Consulting Partners LLC"
-  - Notify the copyright holder of deployment via email
-  - No modifications to the Software without written permission
-  - No redistribution of source code
+#### Share the Software
+- Share links to the original repository
+- Recommend the Software to others
+- Contribute bug reports and feature requests
 
-#### Commercial License (Paid)
-For all commercial use, including but not limited to:
-- Energy contractors using the tool for client assessment
-- Consulting firms integrating the Software into paid services
-- Software companies embedding the Software in commercial products
-- Any use generating revenue directly or indirectly
+### ❌ YOU MAY NOT:
 
-**Contact for Commercial Licensing:**  
-Isaiah Kamrar  
-Community Consulting Partners LLC  
-Email: dikamrar@gmail.com
+#### Redistribute or Resell
+- **No Redistribution** – You may not redistribute modified or unmodified versions of the Software
+- **No SaaS/Hosting** – You may not offer the Software as a hosted service to third parties
+- **No White-Label Resale** – You may not rebrand and sell the Software as your own product
+- **No Competitive Services** – You may not use the Software to compete with Community Consulting Partners LLC's professional services
+
+#### Remove Attribution
+- **Attribution Required** – All deployments must retain visible attribution: "Powered by Community Consulting Partners LLC"
+- **No Branding Removal** – You may not remove or obscure copyright notices, trademarks, or author credits
 
 ---
 
-## Restrictions
+## Professional Services
 
-The following activities are **strictly prohibited** without explicit written permission:
+**Need customization or implementation help?**
 
-❌ **No Unauthorized Copying** – You may not copy, reproduce, or duplicate the Software  
-❌ **No Modification** – You may not alter, adapt, translate, or create derivative works  
-❌ **No Distribution** – You may not sell, rent, lease, sublicense, or distribute the Software  
-❌ **No Reverse Engineering** – You may not decompile, disassemble, or reverse engineer the Software  
-❌ **No Commercial Use** – You may not use the Software for commercial purposes without a commercial license  
-❌ **No Removal of Notices** – You may not remove or obscure any copyright, trademark, or proprietary notices
+While the Software is freely available, Isaiah Kamrar and Community Consulting Partners LLC offer professional services for organizations that need:
+
+- **Custom Implementation** – Tailored deployment and configuration
+- **White-Label Licensing** – Remove attribution and rebrand for your organization  
+  *Requires commercial license: Contact dikamrar@gmail.com*
+- **Feature Development** – Custom functionality and integrations
+- **Data Customization** – Local program data, custom incentive logic
+- **Training & Support** – Staff training and ongoing technical support
+- **Consulting Services** – Energy program expertise and strategic advisory
+
+**Pricing starts at $2,500 for implementation packages.**
+
+**Contact:** dikamrar@gmail.com
 
 ---
 
@@ -77,7 +82,7 @@ IN NO EVENT SHALL ISAIAH KAMRAR OR COMMUNITY CONSULTING PARTNERS LLC BE LIABLE F
 
 ## Termination
 
-This license is effective until terminated. Your rights under this license will terminate automatically without notice if you fail to comply with any term hereof. Upon termination, you must destroy all copies of the Software in your possession.
+This license is effective until terminated. Your rights under this license will terminate automatically without notice if you fail to comply with any term hereof.
 
 ---
 
@@ -87,22 +92,27 @@ This license shall be governed by and construed in accordance with the laws of t
 
 ---
 
-## Contact & Licensing Inquiries
+## Contact & Service Inquiries
 
 **Isaiah Kamrar**  
 Community Consulting Partners LLC
 
-**For Commercial Licensing:**  
+**For Professional Services:**  
+Email: dikamrar@gmail.com  
+Phone: Available upon request
+
+**For White-Label Licensing:**  
 Email: dikamrar@gmail.com
 
-**For Non-Commercial Use Notification:**  
-Email: dikamrar@gmail.com
+**For Open Source Questions:**  
+GitHub Issues: https://github.com/kamrawr/oregon-comprehensive-energy-app/issues
 
 ---
 
 ## Version History
 
-- v1.0 (2025-10-29) – Initial proprietary license with dual-license structure
+- v2.0 (2025-10-29) – Source-available license with professional services model
+- v1.0 (2025-10-29) – Initial proprietary license
 
 ---
 
