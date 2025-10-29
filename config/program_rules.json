@@ -1,0 +1,175 @@
+{
+  "version": "2.0.0",
+  "effective_date": "2025-01-01",
+  "last_updated": "2025-10-29",
+  "description": "Oregon Energy Program Rules - Production Configuration",
+  "copyright": "© 2025 Isaiah Kamrar / Community Consulting Partners LLC",
+  
+  "income_thresholds": {
+    "weatherization_smi_max": 60,
+    "weatherization_fpl_max": 200,
+    "cpf_tier1_ami_min": 0,
+    "cpf_tier1_ami_max": 80,
+    "cpf_tier2_ami_min": 81,
+    "cpf_tier2_ami_max": 150,
+    "hear_low_income_ami_max": 80,
+    "hear_moderate_ami_min": 81,
+    "hear_moderate_ami_max": 150,
+    "homes_ami_max": 150,
+    "energy_trust_ami_max": 80
+  },
+  
+  "program_caps": {
+    "hear_household_cap": 14000,
+    "homes_flex_site_cap": 10000,
+    "homes_modeled_min": 2000,
+    "homes_modeled_max": 8000,
+    "certa_household_cap": 2000
+  },
+  
+  "homes_coverage_rules": {
+    "low_income": {
+      "ami_max": 80,
+      "coverage_percent": 100,
+      "description": "Full gap coverage up to site cap"
+    },
+    "moderate_income": {
+      "ami_min": 81,
+      "ami_max": 150,
+      "coverage_percent": 50,
+      "description": "Limited to 50% of measure cost"
+    },
+    "not_eligible": {
+      "ami_min": 151,
+      "coverage_percent": 0,
+      "description": "HOMES not available above 150% AMI"
+    }
+  },
+  
+  "measure_incentives": {
+    "heat_pump_ductless": {
+      "cpf": {
+        "single_family": 1800,
+        "manufactured": 3500,
+        "multifamily": 2000
+      },
+      "hear": 8000,
+      "standard": 800,
+      "homes_eligible": true,
+      "certa_eligible": false,
+      "cpf_requirements": ["HSPF2 ≥ 8.1", "Replaces electric resistance"]
+    },
+    "heat_pump_ducted": {
+      "cpf": {
+        "single_family": 4000,
+        "extended_capacity": 6000,
+        "no_cost": "full"
+      },
+      "hear": 8000,
+      "standard": 1500,
+      "homes_eligible": true,
+      "certa_eligible": false,
+      "cpf_requirements": ["HSPF2 ≥ 7.5", "Replaces electric furnace"]
+    },
+    "attic_insulation": {
+      "cpf_per_sqft": 1.5,
+      "hear": 1600,
+      "standard_per_sqft": 0.10,
+      "homes_eligible": true,
+      "certa_eligible": true,
+      "cpf_requirements": ["R-value improvement to R-38+"]
+    },
+    "wall_insulation": {
+      "cpf_per_sqft": 1.0,
+      "hear": 1600,
+      "standard_per_sqft": 0.08,
+      "homes_eligible": true,
+      "certa_eligible": true
+    },
+    "floor_insulation": {
+      "cpf_per_sqft": 1.2,
+      "hear": 1600,
+      "standard_per_sqft": 0.10,
+      "homes_eligible": true,
+      "certa_eligible": true
+    },
+    "air_sealing": {
+      "cpf": 800,
+      "hear": "included_in_insulation",
+      "standard": 400,
+      "homes_eligible": true,
+      "certa_eligible": false
+    },
+    "heat_pump_water_heater": {
+      "cpf": 240,
+      "hear": 1750,
+      "standard": 240,
+      "homes_eligible": false,
+      "certa_eligible": false,
+      "cpf_requirements": ["UEF ≥ 3.0", "30A circuit"]
+    },
+    "duct_sealing": {
+      "cpf": 600,
+      "hear": null,
+      "standard": 400,
+      "homes_eligible": true,
+      "certa_eligible": false
+    },
+    "smart_thermostat": {
+      "cpf": 250,
+      "hear": null,
+      "standard": 250,
+      "homes_eligible": false,
+      "certa_eligible": false
+    },
+    "window_replacement": {
+      "cpf_per_sqft": 1.5,
+      "hear": null,
+      "standard_per_window": 50,
+      "standard_max": 500,
+      "homes_eligible": true,
+      "certa_eligible": false
+    },
+    "electric_panel_upgrade": {
+      "cpf": "full",
+      "hear": 4000,
+      "standard": 0,
+      "homes_eligible": false,
+      "certa_eligible": true
+    },
+    "health_safety_repairs": {
+      "cpf": "full",
+      "hear": null,
+      "standard": 0,
+      "homes_eligible": true,
+      "certa_eligible": true
+    }
+  },
+  
+  "certa_eligible_measures": [
+    "attic_insulation",
+    "wall_insulation",
+    "floor_insulation",
+    "air_sealing",
+    "duct_sealing"
+  ],
+  
+  "no_cost_eligible_measures": [
+    "attic_insulation",
+    "wall_insulation",
+    "floor_insulation",
+    "heat_pump_ducted",
+    "heat_pump_ductless",
+    "heat_pump_water_heater"
+  ],
+  
+  "homes_allocation_priority": [
+    "health_safety_repairs",
+    "attic_insulation",
+    "wall_insulation",
+    "floor_insulation",
+    "air_sealing",
+    "window_replacement",
+    "duct_sealing"
+  ]
+}
