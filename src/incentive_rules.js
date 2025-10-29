@@ -14,6 +14,10 @@
  *    - HOMES: Two pathways:
  *      a) Modeled savings: $2,000-$8,000 based on whole-home energy savings (≥20%)
  *      b) Flex funding: Up to $10,000 can flex across non-HEAR funded measures per site
+ *      HOMES Coverage by Income:
+ *        • ≤80% AMI: 100% of costs (up to limits)
+ *        • 81-150% AMI: 50% of costs (up to limits)
+ *        • >150% AMI: NOT ELIGIBLE
  * 2. CERTA: Capped at $2,000 for enabling repairs
  *    - If enabling costs exceed $2K, HOMES can cover the gap
  * 3. CPF fills remaining gaps to achieve no-cost measures for eligible households
@@ -395,34 +399,22 @@ class IncentiveRules {
     
     /**
      * Build standard packages (>150% AMI)
+     * HOMES NOT AVAILABLE above 150% AMI per IRA rules
      */
     buildStandardPackages(measureId, measureRule, measureDetails) {
         const packages = [];
         const standardAmount = this.getStandardAmount(measureId, measureDetails);
         
         if (standardAmount) {
-            const incentives = [{
-                program: 'Energy Trust Standard',
-                amount: standardAmount,
-                priority: 1,
-                contact: 'Energy Trust: 1-866-368-7878'
-            }];
-            
-            if (measureRule.homes_eligible) {
-                // Amount is placeholder - will be dynamically allocated in applyHOMESAllocation()
-                incentives.push({
-                    program: 'HOMES (IRA Federal)',
-                    amount: 0, // Placeholder - dynamically allocated up to $10K site cap
-                    priority: 2,
-                    contact: 'Oregon DOE',
-                    note: 'Allocated dynamically up to $10K site cap (fills gaps after other incentives)'
-                });
-            }
-            
             packages.push({
                 name: 'Standard Programs',
-                incentives: incentives,
-                note: 'Market-rate incentives'
+                incentives: [{
+                    program: 'Energy Trust Standard',
+                    amount: standardAmount,
+                    priority: 1,
+                    contact: 'Energy Trust: 1-866-368-7878'
+                }],
+                note: 'Market-rate incentives (HOMES not available >150% AMI)'
             });
         }
         
@@ -747,11 +739,27 @@ class IncentiveRules {
      * Priority: Health/Safety > Envelope (insulation, air sealing) > Other
      * HOMES cannot stack with HEAR on the same measure
      * 
-     * IMPORTANT: HOMES for moderate income (81-150% AMI) is limited to 50% of measure cost
-     * This means the $10K cap is harder to reach unless high-cost measures are selected
+     * HOMES Coverage by Income (IRA Program Rules):
+     * - ≤80% AMI: 100% of costs covered (up to $10K site cap)
+     * - 81-150% AMI: 50% of costs covered (up to $10K site cap)
+     * - >150% AMI: NOT ELIGIBLE for HOMES
      */
     applyHOMESAllocation(enrichedRecommendations, customerTier = null) {
         let homesRemaining = this.programCaps.HOMES_FLEX_MAX; // $10,000 site cap
+        
+        // Check eligibility - HOMES only available ≤150% AMI
+        if (customerTier === this.tiers.STANDARD) {
+            console.log('🏠 HOMES not available for >150% AMI customers');
+            // Remove any HOMES incentives from standard tier customers
+            enrichedRecommendations.forEach(rec => {
+                if (rec.bestPackage && rec.bestPackage.incentives) {
+                    rec.bestPackage.incentives = rec.bestPackage.incentives.filter(inc => 
+                        !inc.program || !inc.program.includes('HOMES')
+                    );
+                }
+            });
+            return;
+        }
         
         // Check if customer is moderate income (affects HOMES percentage)
         const isModerateIncome = customerTier === this.tiers.HEAR_MODERATE;
