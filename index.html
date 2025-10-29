@@ -2255,9 +2255,14 @@
                 
                 <div class="alert alert-success">
                     <h4 style="margin-bottom: 0.5rem;">${tierDescription}</h4>
-                    <p><strong>Profile:</strong> ${customer.firstName} ${customer.lastName} | 
-                    ${income.householdSize} person household | 
-                    ${customer.county} | ${income.percentages.ami}% AMI</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Profile:</strong> ${customer.firstName} ${customer.lastName} | 
+                    ${income.householdSize} person household | ${customer.county}</p>
+                    <p style="margin: 0; font-size: 0.95rem;">
+                        <strong>Income Qualification:</strong> 
+                        ${income.percentages.ami}% AMI • 
+                        ${income.percentages.smi}% SMI • 
+                        ${income.percentages.fpl}% FPL
+                    </p>
                 </div>
             `;
             
