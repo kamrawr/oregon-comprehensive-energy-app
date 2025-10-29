@@ -1,5 +1,10 @@
 /**
  * Income Data Loader
+ * 
+ * Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+ * All Rights Reserved. Proprietary Software.
+ * See LICENSE.md for terms and conditions.
+ * 
  * Loads and provides access to Oregon 2025 income thresholds
  * Uses exact values from oregon_income_thresholds_full_2025.json
  */

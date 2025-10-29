@@ -1,0 +1,26 @@
+<!--
+═══════════════════════════════════════════════════════════════════════════
+  Oregon Comprehensive Energy Assessment Tool
+  
+  Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+  All Rights Reserved.
+  
+  PROPRIETARY SOFTWARE - NOT OPEN SOURCE
+  
+  This software is protected by copyright law and international treaties.
+  Unauthorized reproduction, distribution, modification, or use is 
+  strictly prohibited and may result in severe civil and criminal penalties.
+  
+  For licensing inquiries:
+  Isaiah Kamrar
+  Community Consulting Partners LLC
+  Email: dikamrar@gmail.com
+  
+  Non-profit & government agencies: Free licensing available
+  Commercial use: Paid license required
+  
+  See LICENSE.md for full terms and conditions.
+═══════════════════════════════════════════════════════════════════════════
+-->
+
+<!-- ADD THIS COMMENT BLOCK TO THE TOP OF YOUR HTML FILE (after <!DOCTYPE html>) -->

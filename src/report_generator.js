@@ -1,6 +1,10 @@
 /**
  * Oregon Energy Assessment Report Generator
  * 
+ * Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+ * All Rights Reserved. Proprietary Software.
+ * See LICENSE.md for terms and conditions.
+ * 
  * Generates comprehensive 9-section professional reports aligned with:
  * - BPI-2400 standards
  * - Energy Trust specifications

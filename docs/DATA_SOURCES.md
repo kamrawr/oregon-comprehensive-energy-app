@@ -130,10 +130,17 @@ householdAdjustments: { 1: 0.70, ... 8: 1.32 }
 ### **Heat Pump Water Heater**
 | Tier | Amount | Source |
 |------|--------|--------|
-| CPF | $240 | PI 320CPF-OR v2025.3 |
+| CPF Standard | $240 | PI 320CPF-OR v2025.3 |
+| CPF No-Cost Enhanced | 110% of gap after HEAR | **v1.2 ENHANCEMENT Nov 2025** |
 | HEAR Low-Income (100%) | $1,750 | IRA Section 50122 |
 | HEAR Moderate (50%) | $875 | IRA Section 50122 |
 | Standard | $240 | Energy Trust 2025 specs |
+
+**CPF No-Cost Eligibility (v1.2):**
+- Heat pump water heaters now included in CPF no-cost coverage
+- When no-cost toggle enabled: CPF = (Cost - HEAR) × 1.1
+- Example: $2,500 cost - $1,750 HEAR = $750 gap × 1.1 = $825 CPF
+- Result: $0 net cost for qualifying households
 
 ### **Duct Sealing**
 | Tier | Amount | Source |
@@ -289,8 +296,52 @@ To update data in this tool:
 - 8/8 edge case tests passing
 - Audit report available: `docs/AUDIT_REPORT.md`
 
+### November 2025 - Version 1.2 Enhancements
+
+**New Features Added:**
+
+1. **HOMES Dynamic Allocation** (NEW FEATURE)
+   - **Implementation:** $10,000 maximum site cap per household
+   - **Priority-based allocation:** Health/Safety → Attic → Wall → Air Sealing → Windows
+   - **Anti-stacking rule:** HOMES excluded from measures receiving HEAR
+   - **Source:** IRA Section 50121 guidance
+   - **Status:** ✅ IMPLEMENTED & TESTED (Scenarios 4-6)
+
+2. **CPF No-Cost Eligible Option** (ENHANCEMENT)
+   - **Implementation:** Enhanced CPF for insulation and heat pumps to achieve $0 net cost
+   - **Calculation:** 110% of gap after other incentives
+   - **Eligible Measures:**
+     - Attic insulation
+     - Wall insulation
+     - Floor insulation
+     - Heat pump ductless
+     - Heat pump ducted
+     - 🔥 **Heat pump water heater** (critical addition)
+   - **Source:** Energy Trust CPF no-cost pilot program
+   - **Status:** ✅ IMPLEMENTED & TESTED (Scenarios 7-9)
+
+3. **Heat Pump Water Heater No-Cost Coverage** (CRITICAL FIX)
+   - **Previous:** HPWHs excluded from no-cost eligibility, only $240 CPF
+   - **Updated:** HPWHs included in enhanced CPF calculation
+   - **Example:** $2,500 cost - $1,750 HEAR = $750 × 1.1 = $825 CPF enhanced
+   - **Impact:** Eliminates $500+ out-of-pocket costs for qualifying households
+   - **Status:** ✅ CORRECTED in v1.2 (Scenario 9 validates)
+
+4. **HOMES Opt-Out Toggle** (USER FEATURE)
+   - **Implementation:** User-facing checkbox to opt out of HOMES
+   - **Use Case:** Customers unable to comply with HOMES audit requirements
+   - **Behavior:** Excludes HOMES, maintains HEAR/CPF/CERTA/Standard
+   - **Status:** ✅ IMPLEMENTED & TESTED (Scenario 10)
+
+**Test Coverage:**
+- ✅ Comprehensive test suite created: `tests/comprehensive-scenarios.test.js`
+- ✅ 20 end-to-end scenarios covering all v1.2 features
+- ✅ Critical HPWH no-cost validation (Scenario 9)
+- ✅ HOMES allocation priority testing (Scenarios 4-6)
+- ✅ Real-time recalculation testing (Scenario 19)
+
 ---
 
-**Last Verified:** October 29, 2025  
-**Data Version:** 1.1 (post-corrections)  
+**Last Verified:** November 2025  
+**Data Version:** 1.2 (HOMES & CPF no-cost features)  
 **Maintained By:** Project contributors

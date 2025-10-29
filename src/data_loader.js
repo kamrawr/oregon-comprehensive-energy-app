@@ -1,5 +1,10 @@
 /**
  * Data Loader Module
+ * 
+ * Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+ * All Rights Reserved. Proprietary Software.
+ * See LICENSE.md for terms and conditions.
+ * 
  * Loads official incentive and eligibility data from config files
  * Source: config/incentive_eligibility_map.json
  */

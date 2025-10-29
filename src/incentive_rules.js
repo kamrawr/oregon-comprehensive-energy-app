@@ -1,5 +1,10 @@
 /**
  * Incentive Rules Engine
+ * 
+ * Copyright © 2025 Isaiah Kamrar / Community Consulting Partners LLC
+ * All Rights Reserved. Proprietary Software.
+ * See LICENSE.md for terms and conditions.
+ * 
  * Maps customer eligibility to correct incentive amounts
  * Based on residential-incentive-insights project data
  * 
