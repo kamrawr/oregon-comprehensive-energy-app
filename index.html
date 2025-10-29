@@ -3098,7 +3098,13 @@
             let fullReport = appState.lastGeneratedReport;
             
             if (!fullReport) {
-                const reportContent = document.getElementById('comprehensiveResults').innerHTML;
+                let reportContent = document.getElementById('comprehensiveResults').innerHTML;
+                
+                // Disable all checkboxes in the downloaded report
+                reportContent = reportContent.replace(/<input([^>]*type=["']checkbox["'][^>]*)>/gi, '<input$1 disabled>');
+                // Remove onclick handlers
+                reportContent = reportContent.replace(/onchange=["'][^"']*["']/gi, '');
+                
                 fullReport = `
                     <!DOCTYPE html>
                     <html>
@@ -3113,11 +3119,16 @@
                             .alert { padding: 15px; margin: 15px 0; border-radius: 5px; }
                             .alert-success { background-color: #d4edda; border-left: 4px solid #28a745; }
                             .alert-info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+                            /* Disable checkbox interaction in static report */
+                            input[type="checkbox"] { pointer-events: none; }
                         </style>
                     </head>
                     <body>
                         <h1>Oregon Comprehensive Energy Assessment Report</h1>
                         <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                            <strong>Note:</strong> This is a static report. Checkboxes are locked to reflect your selections at the time of download.
+                        </p>
                         ${reportContent}
                     </body>
                     </html>
