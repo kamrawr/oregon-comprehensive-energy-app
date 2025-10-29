@@ -1,10 +1,18 @@
 # Oregon Comprehensive Energy Assessment
 
+## 🌐 Live Application
+**[Launch App →](https://kamrawr.github.io/oregon-comprehensive-energy-app/)**
+
+Click "📋 Load Demo Data" to quickly explore all features!
+
+---
+
 All-in-one, single-page web app that combines:
-- Customer intake and eligibility screening (geography, utility, profile, needs)
-- Income qualification (AMI/SMI/FPL) using 2025 data
-- Home energy assessment (envelope, HVAC, health & safety)
-- Incentive insights and prioritized retrofit pathways
+- Customer intake with drag-and-drop priority ranking
+- Income qualification (AMI/SMI/FPL) using 2025 Oregon data
+- Comprehensive BPI-2400 aligned energy assessment
+- Advanced incentive calculation engine with program stacking
+- Professional 9-section PDF-ready reports
 
 Live-ready for GitHub Pages. No build step. Pure HTML/CSS/JS.
 
