@@ -3,7 +3,7 @@
   "effective_date": "2025-01-01",
   "last_updated": "2025-10-29",
   "description": "Oregon Energy Program Rules - Production Configuration",
-  "copyright": "© 2025 Isaiah Kamrar / Community Consulting Partners LLC",
+  "copyright": "© 2025 Isaiah Kamrar",
   
   "income_thresholds": {
     "weatherization_smi_max": 60,
