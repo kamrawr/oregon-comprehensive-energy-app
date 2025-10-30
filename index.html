@@ -874,7 +874,7 @@
                             <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer;">
                                 <input type="checkbox" id="optOutFederalPrograms" style="width: 22px; height: 22px; accent-color: var(--brand-light);">
                                 <span style="font-weight: 600; font-size: 1rem;">
-                                    I want to opt out of federally-funded programs (CPF no-cost track, OHCS Weatherization, HEAR, HOMES)
+                                    I want to opt out of federally-funded programs (OHCS Weatherization, HEAR, HOMES, CERTA)
                                 </span>
                             </label>
                             <p style="color: #856404; font-size: 0.9rem; margin-top: 0.75rem; line-height: 1.5;">
@@ -1761,7 +1761,7 @@
             const optOutNotice = eligibility.optOutFederalPrograms ? `
                 <div style="margin: 1rem 0; padding: 1rem; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px;">
                     <strong>🚫 Federal Program Opt-Out Active</strong><br>
-                    <span style="font-size: 0.9rem;">You have chosen to opt out of federally-funded programs (CPF, OHCS Weatherization, HEAR, HOMES). Only state and utility-funded programs will be shown.</span>
+                    <span style="font-size: 0.9rem;">You have chosen to opt out of federally-funded programs (OHCS Weatherization, HEAR, HOMES, CERTA). State and utility programs (Energy Trust CPF, standard rebates) are still available.</span>
                 </div>
             ` : '';
             
@@ -2292,7 +2292,7 @@
                     <h3 style="color: var(--brand); margin: 2rem 0 1rem;">Prioritized Retrofit Plan with Your Incentives</h3>
                     
                     <!-- Program Options -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: ${eligibility.cpfEligible ? '1fr 1fr' : '1fr'}; gap: 1rem; margin-bottom: 1.5rem;">
                         <!-- HOMES Opt-Out Option -->
                         <div style="padding: 1.25rem; background: #fff8e1; border: 2px solid #ffc107; border-radius: 10px;">
                             <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
@@ -2309,6 +2309,7 @@
                             </label>
                         </div>
                         
+                        ${eligibility.cpfEligible ? `
                         <!-- No-Cost Eligible Option -->
                         <div style="padding: 1.25rem; background: #d4edda; border: 2px solid #28a745; border-radius: 10px;">
                             <label class="checkbox-label" style="background: transparent; padding: 0; cursor: pointer; display: flex; align-items: flex-start; gap: 1rem;">
@@ -2316,14 +2317,15 @@
                                        style="width: 22px; height: 22px; margin-top: 2px; accent-color: var(--success); cursor: pointer; flex-shrink: 0;">
                                 <div>
                                     <span style="font-weight: 600; font-size: 1rem; display: block; margin-bottom: 0.5rem;">
-                                        🌟 No-Cost Eligible
+                                        🌟 CPF No-Cost Eligible
                                     </span>
                                     <p style="margin: 0; color: #155724; font-size: 0.9rem; line-height: 1.5;">
-                                        Apply enhanced CPF/SWR no-cost incentives to insulation, heat pumps, and heat pump water heaters.
+                                        Apply enhanced CPF no-cost incentives to insulation, heat pumps, and heat pump water heaters.
                                     </p>
                                 </div>
                             </label>
                         </div>
+                        ` : ''}
                     </div>
                     
                     <div class="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; border: none; margin-bottom: 1.5rem;">
