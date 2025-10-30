@@ -2030,6 +2030,7 @@
         function displayAssessmentSummary() {
             const data = appState.assessmentData;
             const issues = countIssues(data);
+            const savingsBreakdown = calculateMonthlySavings();
             
             const summaryHTML = `
                 <div class="summary-card">
@@ -2041,8 +2042,13 @@
                     <div class="summary-label">Potential Issues</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-value">${calculateTotalIncentives()}</div>
-                    <div class="summary-label">Estimated Incentives</div>
+                    <div class="summary-value" style="font-size: 2rem;">$${savingsBreakdown.total}/mo</div>
+                    <div class="summary-label">Est. Monthly Savings</div>
+                    <div style="font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.4;">
+                        ${savingsBreakdown.weatherization > 0 ? `Weatherization: $${savingsBreakdown.weatherization}/mo<br>` : ''}
+                        ${savingsBreakdown.hvac > 0 ? `HVAC: $${savingsBreakdown.hvac}/mo<br>` : ''}
+                        ${savingsBreakdown.other > 0 ? `Other: $${savingsBreakdown.other}/mo` : ''}
+                    </div>
                 </div>
             `;
             
@@ -2097,6 +2103,34 @@
             return count;
         }
 
+        function calculateMonthlySavings() {
+            let weatherization = 0;
+            let hvac = 0;
+            let other = 0;
+            
+            const weatherizationMeasures = ['Attic Insulation', 'Wall Insulation', 'Floor Insulation', 'Air Sealing', 'Window Upgrades'];
+            const hvacMeasures = ['Heat Pump System', 'Heat Pump Water Heater'];
+            
+            appState.recommendations.forEach(rec => {
+                const savings = rec.monthlySavings || 0;
+                
+                if (weatherizationMeasures.includes(rec.measure)) {
+                    weatherization += savings;
+                } else if (hvacMeasures.includes(rec.measure)) {
+                    hvac += savings;
+                } else {
+                    other += savings;
+                }
+            });
+            
+            return {
+                weatherization: weatherization,
+                hvac: hvac,
+                other: other,
+                total: weatherization + hvac + other
+            };
+        }
+        
         function calculateTotalIncentives() {
             let total = 0;
             appState.recommendations.forEach(rec => {
