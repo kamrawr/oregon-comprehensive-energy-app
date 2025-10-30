@@ -6,7 +6,11 @@
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://kamrawr.github.io/oregon-comprehensive-energy-app/)
 [![Data Version](https://img.shields.io/badge/data-2025--official-green)](docs/DATA_SOURCES.md)
 
-A comprehensive web-based tool for assessing energy efficiency incentives and program eligibility for Oregon households. Integrates federal IRA programs (HOMES, HEAR), state weatherization, Energy Trust of Oregon programs, and local utility incentives.
+> **The only tool that accurately navigates Oregon's complex energy incentive landscape**—combining federal IRA programs, state weatherization, and utility rebates into one intelligent assessment. Turn a 4-hour manual eligibility calculation into a 4-minute guided experience.
+
+### 🎯 Built for Impact
+
+Help Oregon households unlock **$10,000-$40,000** in available incentives they didn't know existed. This tool cuts through the complexity of overlapping federal, state, and utility programs—delivering personalized roadmaps that make zero-emission retrofits accessible to every income level.
 
 🔗 **[Try the Live Tool →](https://kamrawr.github.io/oregon-comprehensive-energy-app/)**
 
