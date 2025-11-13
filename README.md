@@ -38,7 +38,7 @@ Help Oregon households unlock **$10,000-$40,000** in available incentives they d
 | **Oregon Weatherization (OHCS)** | ≤60% SMI or ≤200% FPL | 100% no-cost |
 | **Community Partner Fund (CPF)** | Tier 1: ≤80% AMI<br>Tier 2: 81-150% AMI (with conditions) | Enhanced rebates |
 | **HEAR (IRA Federal)** | ≤80% AMI (100% rebate)<br>81-150% AMI (50% rebate) | Up to $14,000/household |
-| **HOMES (IRA Federal)** | ≤400% AMI | Up to $10,000 flex funding |
+| **HOMES (IRA Federal)** | ≤80% AMI | Up to $10,000 flex funding |
 | **CERTA** | All income levels | 10-year tax exemption |
 | **Energy Trust Standard** | All income levels | Market-rate rebates |
 
